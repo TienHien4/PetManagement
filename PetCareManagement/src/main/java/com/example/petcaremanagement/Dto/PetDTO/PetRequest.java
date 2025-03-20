@@ -1,0 +1,20 @@
+package com.example.petcaremanagement.Dto.PetDTO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PetRequest {
+    private long id;
+    private String name;
+    private String species;
+    private String breed;
+    private int age;
+    private long ownerId;
+
+}
+
