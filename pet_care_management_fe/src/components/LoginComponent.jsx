@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+
 import axios from 'axios';
 
 const LoginComponent = () => {
   const [userName, setUserName] = useState("")
   const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState(""); 
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,20 +30,22 @@ const LoginComponent = () => {
      console.log(response)
      localStorage.setItem("UserName", response.data.userName);
 
-      if (response.data.message !== "Success!") {
+      if (response.data.message !== "Login success!") {
         setErrorMessage(response.data.message || "Login failed!");
         return;
       }
-      console.log(roles)
+      console.log(response.data.roles)
       if (roles.includes("ADMIN")) {
         localStorage.setItem("accessToken", response.data.token);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
         setErrorMessage("");
+        navigate("/admin");
 
     }
-
     
       if (roles.includes("USER")) {
         localStorage.setItem("accessToken", response.data.token);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
         setErrorMessage("");
         navigate("/home");
     }
@@ -47,6 +55,37 @@ const LoginComponent = () => {
       setErrorMessage(errorMessage);
     }
   };
+
+  const handleGoogleLogin = async () => {
+
+
+    window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    
+};
+const handleFacebookLogin = () => {
+  window.location.href = "http://localhost:8080/oauth2/authorization/facebook";
+};
+
+// useEffect(() => {
+//   const fetchUserProfile = async () => {
+//     try {
+//       const response = await axios.get("http://localhost:8080/profile", {
+//         withCredentials: true,
+//       });
+
+//       console.log("User profile:", response.data);
+//       localStorage.setItem("email", response.data.email);
+//       setEmail(response.data.email);
+
+//     } catch (error) {
+//       console.error("Lỗi khi lấy thông tin người dùng:", error.response?.data || error.message);
+//     }
+//   };
+//   fetchUserProfile();
+// }, [])
+
+
+
 
   return (
     <div>
@@ -132,15 +171,19 @@ const LoginComponent = () => {
                             Register here
                           </a>
                         </p>
-                        <a data-mdb-ripple-init class="btn btn-primary btn-lg btn-block" style={{backgroundColor: "#3b5998", width: "280px", marginBottom: "10px"}} href="#!"
+                        
+            {/* <GoogleOAuthProvider clientId="299042231220-vr8lgta60poobljkliph9uutrgmmj41j.apps.googleusercontent.com">
+                <GoogleLogin onSuccess={handleGoogleLogin} onError={() => console.error("Google login failed")} />
+            </GoogleOAuthProvider> */}
+                      </form>
+                      <button onClick={handleFacebookLogin} data-mdb-ripple-init class="btn btn-primary btn-lg btn-block" style={{backgroundColor: "#3b5998", width: "280px", marginBottom: "10px"}} href="#!"
             role="button">
             <i class="fab fa-facebook-f me-2"></i>Continue with Facebook
-          </a>
+          </button>
           <br></br>
-          <a data-mdb-ripple-init class="btn btn-primary btn-lg btn-block" style={{backgroundColor: "#55acee", width: "280px"}} href="#!"
+          <button onClick={handleGoogleLogin} data-mdb-ripple-init class="btn btn-primary btn-lg btn-block" style={{backgroundColor: "#55acee", width: "280px"}} href="#!"
             role="button">
-            <i class="fab fa-google me-2"></i>Continue with Google</a>
-                      </form>
+            <i class="fab fa-google me-2"></i>Continue with Google</button>
                     </div>
                   </div>
                 </div>

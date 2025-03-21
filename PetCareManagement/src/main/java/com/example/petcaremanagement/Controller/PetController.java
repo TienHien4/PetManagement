@@ -31,6 +31,7 @@ public class PetController {
 
     @PostMapping("/create")
     public ResponseEntity<PetResponse> CreatePet(@RequestBody PetRequest request){
+        System.out.println("IN");
         return ResponseEntity.ok().body(petService.CreatePet(request));
     }
 

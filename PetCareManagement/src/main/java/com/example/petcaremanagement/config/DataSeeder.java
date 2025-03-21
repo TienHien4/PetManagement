@@ -52,6 +52,7 @@ public class DataSeeder {
                 User user = new User();
                 user.setUserName("admin");
                 user.setPassword("123456");
+                user.setEmail("admin@gmail.com");
                 user.setRoles(roles);
 
                 // Mã hóa mật khẩu

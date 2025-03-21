@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import static org.springframework.http.HttpMethod.*;
-
 import java.util.List;
 
 @Configuration
@@ -40,15 +39,24 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(request
                 -> request.requestMatchers(HttpMethod.GET, "/api/pet/**").permitAll()
                 .requestMatchers(HttpMethod.POST,  "/api/user/create",
-                        "/login", "/api/pet/**", "/refreshToken", "/logout").permitAll()
+                        "/login/**", "/api/pet/**", "/refreshToken", "/logout").permitAll()
 //                .requestMatchers(HttpMethod.GET, "/api/user/getAll").hasRole("ADMIN")
                 .anyRequest().authenticated());
+//        httpSecurity.oauth2Login()
+//                .loginPage("/login") // Trang login tùy chỉnh (nếu cần)
+//                .userInfoEndpoint()
+//                .userService(customOAuth2UserService) // Xử lý thông tin người dùng
+//                .and()
+//                .defaultSuccessUrl("http://localhost:3000", true); // Chuyển hướng sau đăng nhập
 
-//        httpSecurity.formLogin(login -> login
+//       httpSecurity.formLogin(login -> login
 //                .loginPage("/login")
 //                .permitAll());
-        httpSecurity.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(
-                userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)));
+        httpSecurity.oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(
+                userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService))
+                .defaultSuccessUrl("/oauth2/success")
+                .failureUrl("/login?error=true"));
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJWTDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter())));

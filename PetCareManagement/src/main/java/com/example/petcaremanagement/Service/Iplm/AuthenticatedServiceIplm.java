@@ -134,6 +134,7 @@ public class AuthenticatedServiceIplm implements AuthenticatedService {
     }
 
 
+    @Override
     public String GeneratedToken(User user){
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         Calendar calendar = Calendar.getInstance();
@@ -158,6 +159,7 @@ public class AuthenticatedServiceIplm implements AuthenticatedService {
 
     }
 
+    @Override
     public String GeneratedRefreshToken(User user){
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         Calendar calendar = Calendar.getInstance();
