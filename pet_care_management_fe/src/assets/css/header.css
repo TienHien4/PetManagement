@@ -1,0 +1,51 @@
+/* Style cho header */
+.header-area .header-top {
+    padding: 13px 0;
+}
+
+.header-area .header-top .header-info-left ul li {
+    color: #fff;
+    display: inline-block;
+    margin-right: 33px;
+    padding-right: 33px;
+    border-right: 1px solid #fff;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+}
+
+.header-area .header-top .header-info-left ul li:last-child {
+    border-right: 0;
+    margin-right: 0;
+    padding-right: 0px;
+}
+
+.header-area .header-top .header-info-right ul li {
+    color: #fff;
+    font-size: 14px;
+}
+
+.main-header {
+    position: relative;
+    z-index: 3;
+}
+
+.main-header .main-menu ul li {
+    display: inline-block;
+    position: relative;
+    z-index: 1;
+}
+
+.main-header .main-menu ul li a {
+    color: #021a47;
+    font-weight: 500;
+    padding: 28px 19px;
+    display: block;
+    font-size: 16px;
+    position: relative;
+    transition: all 0.3s ease-out 0s;
+}
+
+.main-header .main-menu ul li:hover > a {
+    color: #fff;
+    background: #c6a16e;
+}

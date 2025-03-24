@@ -1,0 +1,42 @@
+/* Style cho footer */
+.footer-area {
+    background: #010b1d;
+    padding: 170px 0;
+}
+
+.footer-area .footer-social a:hover {
+    background: #c6a16e;
+    color: #7f7f7f;
+    border: 1px solid transparent;
+}
+
+.footer-area .footer-pera p {
+    color: #868c98;
+    padding-right: 52px;
+    font-size: 16px;
+    margin-bottom: 50px;
+    line-height: 1.8;
+}
+
+.footer-area .footer-tittle h4 {
+    color: #ffffff;
+    font-size: 20px;
+    margin-bottom: 29px;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.footer-area .footer-tittle ul li {
+    color: #868c98;
+    margin-bottom: 9px;
+}
+
+.footer-area .footer-tittle ul li a {
+    color: #868c98;
+    font-weight: 300;
+}
+
+.footer-area .footer-tittle ul li a:hover {
+    color: #c6a16e;
+    padding-left: 5px;
+}

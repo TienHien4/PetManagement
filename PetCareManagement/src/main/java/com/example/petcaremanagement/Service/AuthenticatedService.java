@@ -8,7 +8,7 @@ import com.example.petcaremanagement.Entity.User;
 
 public interface AuthenticatedService {
     LoginResponse Authenticated(LoginRequest request);
-    void Logout(LogoutRequest request) throws Exception;
+    String Logout(LogoutRequest request) throws Exception;
     LoginResponse RefreshToken(RefreshTokenRequest request) throws Exception;
 
     boolean ValidToken(String token) throws Exception;

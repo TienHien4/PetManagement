@@ -15,15 +15,19 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AuthenticatedServiceIplm implements AuthenticatedService {
     @Autowired
@@ -46,28 +50,34 @@ public class AuthenticatedServiceIplm implements AuthenticatedService {
         var user = userRepo.findUserByUserName(request.getUserName());
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         var authen = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if(authen){
-            Set<String> listRoles = user.getRoles()
-                    .stream().map(s -> s.getName()).collect(Collectors.toSet());
-            String accessToken = GeneratedToken(user);
-            String refreshToken = GeneratedRefreshToken(user);
-            return LoginResponse.builder()
-                    .userName(request.getUserName())
-                    .roles(listRoles)
-                    .token(accessToken)
-                    .refreshToken(refreshToken)
-                    .message("Login success!")
-                    .build();
-
-
+        if(!authen){
+            throw new JwtException("Token is invalid in Au");
         }
+        Set<String> listRoles = user.getRoles()
+                .stream().map(s -> s.getName()).collect(Collectors.toSet());
+        String accessToken = GeneratedToken(user);
+        String refreshToken = GeneratedRefreshToken(user);
         return LoginResponse.builder()
-                .message("Login fail!")
+                .userName(request.getUserName())
+                .roles(listRoles)
+                .token(accessToken)
+                .refreshToken(refreshToken)
+                .message("Login success!")
                 .build();
     }
 
     @Override
-    public void Logout(LogoutRequest request) throws Exception {
+    public String Logout(LogoutRequest request) throws Exception {
+
+        var token = request.getToken();
+        if (token == null || token.isEmpty()) {
+            return ("Missing token");
+        }
+
+        // Kiểm tra nếu token có tiền tố "Bearer " thì loại bỏ nó
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         var signJWT = ValidToken1(request.getToken());
         String id = signJWT.getJWTClaimsSet().getJWTID();
         var expTime = signJWT.getJWTClaimsSet().getExpirationTime();
@@ -76,35 +86,37 @@ public class AuthenticatedServiceIplm implements AuthenticatedService {
                 .UUID(id)
                 .build();
         invalidatedTokenRepo.save(invalidatedToken);
+        return "Success";
     }
 
     @Override
     public LoginResponse RefreshToken(RefreshTokenRequest request) throws Exception {
-        SignedJWT  signedJWT = SignedJWT.parse(request.getRefreshToken());
-        var issueTime = signedJWT.getJWTClaimsSet().getIssueTime();
-        var expTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-        SignedJWT  signedJWT1 = SignedJWT.parse(request.getToken());
-        var id = signedJWT1.getJWTClaimsSet().getJWTID();
-        var expTime1 = signedJWT1.getJWTClaimsSet().getExpirationTime();
-        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
-                .expTime(expTime1)
-                .UUID(id)
-                .build();
-        if(expTime.before(new Date())){
-            invalidatedTokenRepo.save(invalidatedToken);
-            throw new Exception("RefreshToken is invalid");
+        SignedJWT signedRefreshToken = SignedJWT.parse(request.getRefreshToken());
+        Date expTimeRefreshToken = signedRefreshToken.getJWTClaimsSet().getExpirationTime();
+        System.out.println(expTimeRefreshToken);
+        if (expTimeRefreshToken.before(new Date())) {
+            throw new Exception("RefreshToken has expired");
         }
 
+        SignedJWT signedAccessToken = SignedJWT.parse(request.getToken());
+        String tokenId = signedAccessToken.getJWTClaimsSet().getJWTID();
+        Date expTimeAccessToken = signedAccessToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .expTime(expTimeAccessToken)
+                .UUID(tokenId)
+                .build();
+
         invalidatedTokenRepo.save(invalidatedToken);
-        var user = userRepo.findUserByUserName(signedJWT.getJWTClaimsSet().getSubject());
+        var user = userRepo.findUserByUserName(signedRefreshToken.getJWTClaimsSet().getSubject());
         var newAccessToken = GeneratedToken(user);
-        var newRefreshToken = GeneratedRefreshToken(user);
+
         return LoginResponse.builder()
                 .token(newAccessToken)
-                .refreshToken(newRefreshToken)
                 .message("Success")
                 .build();
     }
+
 
     @Override
     public boolean ValidToken(String token) throws Exception {

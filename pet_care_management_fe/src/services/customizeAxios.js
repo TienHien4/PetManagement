@@ -24,9 +24,9 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalConfig = error.config;
     console.log("Token expire!");
-    console.log(error.response)
+    console.log(error)
 
-    if (error.response && error.response.status === 401) {
+    if (error.response.status === 401) {
       try {
         console.log("call refresh token");
         const result = await axios.post("http://localhost:8080/refreshToken", {
@@ -37,8 +37,6 @@ apiClient.interceptors.response.use(
   
            const newAccessToken = result.data.token;
            localStorage.setItem("accessToken", newAccessToken);
-           const newRefreshToken = result.data.token;
-           localStorage.setItem("refreshToken", newRefreshToken);
            originalConfig.headers["Authorization"] = `Bearer ${newAccessToken}`;
            return await apiClient(originalConfig);
           } catch(err) {

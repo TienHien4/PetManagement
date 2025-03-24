@@ -7,23 +7,29 @@ import com.example.petcaremanagement.Repository.RoleRepository;
 import com.example.petcaremanagement.Repository.UserRepository;
 import com.example.petcaremanagement.Service.AuthenticatedService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@RestController
+@Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
+@RestController
 public class LoginController {
     @Autowired
     private AuthenticatedService authenticatedService;
@@ -38,94 +44,74 @@ public class LoginController {
            return ResponseEntity.ok().body(result);
     }
 
-
-
-    @GetMapping("/oauth2/authorization/facebook")
-    private Map<String, Object> getUserProfile(@AuthenticationPrincipal OAuth2User principal) {
-
-        return principal.getAttributes();
+    @GetMapping("/login/oauth2/code/google")
+    public void oauth2SuccessGoogle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Redirect với token gửi qua query parameter
+        String redirectUrl = "http://localhost:3000/oauth2/redirect";
+        response.sendRedirect(redirectUrl);
     }
 
-//    @GetMapping("/login/oauth2/code/facebook")
-//    public String handleOAuth2Callback() {
-//        System.out.println("IN");
-//       return "Test";
-//    }
+
+    @GetMapping("/login/oauth2/code/facebook")
+    public void oauth2SuccessFacebook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String redirectUrl = "http://localhost:3000/oauth2/redirect";
+        response.sendRedirect(redirectUrl);
+    }
+
 
     @GetMapping("/oauth2/success")
-    public ResponseEntity<?> handleOAuth2Success(Authentication authentication) {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+    public ResponseEntity<?> oauth2Success() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // Lấy thông tin user từ OAuth2
+        if (authentication == null || !(authentication.getPrincipal() instanceof OAuth2User)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized"));
+        }
+
+        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
-        String provider = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
 
-        // Trả về thông tin user
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("email", email);
-        userInfo.put("name", name);
-        userInfo.put("provider", provider);
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email not provided"));
+        }
 
-        return ResponseEntity.ok(userInfo);
+        boolean userExists = userRepo.existsUsersByEmail(email);
+        if (!userExists) {
+            Set<Role> roles = new HashSet<>();
+            var r = roleRepo.findById("USER")
+                    .orElseThrow(() -> new RuntimeException("Not found!"));
+            roles.add(r);
+            User newUser = User.builder()
+                    .roles(roles)
+                    .provider("FACEBOOK")
+                    .email(email)
+                    .userName(name)
+                    .build();
+            userRepo.save(newUser);
+        }
+
+        User user = userRepo.findUserByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "User not saved"));
+        }
+
+        String jwtToken = authenticatedService.GeneratedToken(user);
+        String refreshToken = authenticatedService.GeneratedRefreshToken(user);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", jwtToken);
+        response.put("refreshToken", refreshToken);
+        response.put("user", Map.of("email", email, "name", name, "roles", "USER"));
+
+        return ResponseEntity.ok(response);
     }
 
-//    @GetMapping("")
-//    private ResponseEntity<?> handleFacebookLogin(String accessToken) {
-//        FacebookUserInfo facebookUser = getFacebookUserInfo(accessToken);
-//        if (facebookUser == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token Facebook không hợp lệ!");
-//        }
-//
-//        // Kiểm tra user trong database
-//        User user = userRepo.findUserByEmail(facebookUser.getEmail());
-//        if (user == null) {
-//            Set<Role> roles = new HashSet<>();
-//            Role role = roleRepo.findById("USER")
-//                    .orElseThrow(() -> new EntityNotFoundException("Role USER not found"));
-//            roles.add(role);
-//
-//            user = User.builder()
-//                    .email(facebookUser.getEmail())
-//                    .userName(facebookUser.getName())
-//                    .provider("FACEBOOK")
-//                    .roles(roles)
-//                    .build();
-//
-//            userRepo.save(user);
-//        }
-//        Set<String> vt = new HashSet<>();
-//        vt.add("USER");
-//
-//        // Tạo AccessToken & RefreshToken
-//        String accessTokenJWT = authenticatedService.GeneratedToken(user);
-//        String refreshTokenJWT = authenticatedService.GeneratedRefreshToken(user);
-//
-//        return ResponseEntity.ok(new OAuth2Response(accessTokenJWT, refreshTokenJWT, user.getEmail(), "FACEBOOK", vt));
-//    }
-//
-//    // Gọi Facebook API để lấy thông tin user
-//    private FacebookUserInfo getFacebookUserInfo(String accessToken) {
-//        String url = "https://graph.facebook.com/me?fields=id,name,email,picture&access_token=" + accessToken;
-//        RestTemplate restTemplate = new RestTemplate();
-//        try {
-//            return restTemplate.getForObject(url, FacebookUserInfo.class);
-//        } catch (Exception e) {
-//            return null;
-//        }
-//    }
 
 
-    @PostMapping("/logout")
-    public ResponseEntity<Void> Logout(@RequestBody LogoutRequest request) throws Exception {
-        authenticatedService.Logout(request);
-        try {
-            return ResponseEntity.ok().build();
-        } catch (Exception ex) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .build();
-        }
+    @PostMapping("/api/logout")
+    public ResponseEntity<String> Logout(@RequestBody LogoutRequest request) throws Exception {
+        var result = authenticatedService.Logout(request);
+        return ResponseEntity.ok().body(result);
     }
     @PostMapping("/refreshToken")
     public ResponseEntity<LoginResponse> RefreshToken(@RequestBody RefreshTokenRequest request) throws Exception {

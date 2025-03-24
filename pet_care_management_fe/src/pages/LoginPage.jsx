@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
 import axios from 'axios';
 
-const LoginComponent = () => {
+const LoginPage = () => {
   const [userName, setUserName] = useState("")
   const [password, setPassword] = useState("")
-  const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState(""); 
 
@@ -65,24 +61,6 @@ const LoginComponent = () => {
 const handleFacebookLogin = () => {
   window.location.href = "http://localhost:8080/oauth2/authorization/facebook";
 };
-
-// useEffect(() => {
-//   const fetchUserProfile = async () => {
-//     try {
-//       const response = await axios.get("http://localhost:8080/profile", {
-//         withCredentials: true,
-//       });
-
-//       console.log("User profile:", response.data);
-//       localStorage.setItem("email", response.data.email);
-//       setEmail(response.data.email);
-
-//     } catch (error) {
-//       console.error("Lỗi khi lấy thông tin người dùng:", error.response?.data || error.message);
-//     }
-//   };
-//   fetchUserProfile();
-// }, [])
 
 
 
@@ -171,10 +149,7 @@ const handleFacebookLogin = () => {
                             Register here
                           </a>
                         </p>
-                        
-            {/* <GoogleOAuthProvider clientId="299042231220-vr8lgta60poobljkliph9uutrgmmj41j.apps.googleusercontent.com">
-                <GoogleLogin onSuccess={handleGoogleLogin} onError={() => console.error("Google login failed")} />
-            </GoogleOAuthProvider> */}
+       
                       </form>
                       <button onClick={handleFacebookLogin} data-mdb-ripple-init class="btn btn-primary btn-lg btn-block" style={{backgroundColor: "#3b5998", width: "280px", marginBottom: "10px"}} href="#!"
             role="button">
@@ -196,4 +171,4 @@ const handleFacebookLogin = () => {
   );
 };
 
-export default LoginComponent;
+export default LoginPage;

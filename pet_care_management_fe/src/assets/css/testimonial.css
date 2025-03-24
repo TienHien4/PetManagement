@@ -1,0 +1,29 @@
+/* Style cho phần testimonial */
+.testimonial-area .testimonial-caption .testimonial-top-cap img {
+    margin-bottom: 50px;
+    width: auto;
+    display: inline-block;
+}
+
+.testimonial-area .testimonial-caption .testimonial-top-cap p {
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.5;
+    padding: 0 3px;
+    margin-bottom: 50px;
+    font-size: 30px;
+}
+
+.testimonial-area .testimonial-caption .testimonial-founder .founder-text {
+    margin-left: 20px;
+}
+
+.testimonial-area .testimonial-caption .testimonial-founder .founder-text span {
+    color: #fff;
+}
+
+.testimonial-area .testimonial-caption .testimonial-founder .founder-text p {
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.5;
+}

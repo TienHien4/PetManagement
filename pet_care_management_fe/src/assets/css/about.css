@@ -1,0 +1,34 @@
+/* Style cho phần about */
+.about-area .about-img {
+    position: relative;
+}
+
+.about-area .about-img .info-man {
+    text-align: center;
+}
+
+.about-area .about-img .info-man .head-cap {
+    margin-bottom: 20px;
+}
+
+.about-area .about-img .info-man p {
+    font-size: 16px;
+    color: #fff;
+}
+
+.about-area .about-details {
+    padding: 50px 0;
+}
+
+.about-area .about-details .right-caption h2 {
+    font-size: 50px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.about-area .about-details .right-caption p {
+    font-size: 16px;
+    color: #506172;
+    line-height: 30px;
+    margin-bottom: 20px;
+}

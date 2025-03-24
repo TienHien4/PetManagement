@@ -1,6 +1,5 @@
 
 import './App.css';
-import LoginComponent from './components/LoginComponent';
 import AppRouter from './routers/AppRouter';
 
 function App() {

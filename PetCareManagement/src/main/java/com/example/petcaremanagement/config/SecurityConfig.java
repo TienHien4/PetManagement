@@ -1,6 +1,7 @@
 package com.example.petcaremanagement.config;
 
 import com.nimbusds.jwt.JWT;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +26,6 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
     @NonFinal
@@ -37,26 +37,27 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         httpSecurity.authorizeHttpRequests(request
-                -> request.requestMatchers(HttpMethod.GET, "/api/pet/**").permitAll()
+                -> request.requestMatchers(HttpMethod.GET, "/api/pet/**", "/oauth2/**", "/login**", "/login/**", "/public/**").permitAll()
                 .requestMatchers(HttpMethod.POST,  "/api/user/create",
-                        "/login/**", "/api/pet/**", "/refreshToken", "/logout").permitAll()
-//                .requestMatchers(HttpMethod.GET, "/api/user/getAll").hasRole("ADMIN")
+                        "/login/**", "/api/pet/**", "/refreshToken", "/oauth2/**", "/login**", "/public/**").permitAll()
                 .anyRequest().authenticated());
-//        httpSecurity.oauth2Login()
-//                .loginPage("/login") // Trang login tùy chỉnh (nếu cần)
-//                .userInfoEndpoint()
-//                .userService(customOAuth2UserService) // Xử lý thông tin người dùng
-//                .and()
-//                .defaultSuccessUrl("http://localhost:3000", true); // Chuyển hướng sau đăng nhập
-
-//       httpSecurity.formLogin(login -> login
-//                .loginPage("/login")
-//                .permitAll());
         httpSecurity.oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(
                 userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService))
-                .defaultSuccessUrl("/oauth2/success")
+                .loginPage("/login")
+                .defaultSuccessUrl("http://localhost:3000/oauth2/redirect", true)
                 .failureUrl("/login?error=true"));
+        httpSecurity.exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        }));
+        httpSecurity.logout()
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("Logged out successfully");
+                });
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJWTDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter())));
@@ -64,20 +65,7 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    //    @Bean
-//    public JWT decodeToken(String token) {
-//        try {
-//            return Jwts.parser()
-//                    .setSigningKey(SIGNER_KEY)
-//                    .parseClaimsJws(token)
-//                    .getBody();
-//        } catch (SignatureException e) {
-//            System.out.println("Token không hợp lệ!");
-//        } catch (Exception e) {
-//            System.out.println("Lỗi khi giải mã token: " + e.getMessage());
-//        }
-//        return null;
-//    }
+
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
