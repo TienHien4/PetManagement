@@ -3,6 +3,8 @@ package com.example.petcaremanagement.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,6 +17,9 @@ public class Pet {
     private String name;
     private String species;
     private String breed;
+    private String gender;
+    private Date dob;
+    private float weight;
     private int age;
     @ManyToOne
     @JoinColumn(name = "owner_id")

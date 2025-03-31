@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,9 @@ public class PetRequest {
     private String name;
     private String species;
     private String breed;
+    private String gender;
+    private Date dob;
+    private float weight;
     private int age;
     private long ownerId;
 

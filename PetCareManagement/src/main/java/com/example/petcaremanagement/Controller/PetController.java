@@ -22,9 +22,23 @@ public class PetController {
     public ResponseEntity<PetResponse> GetPets(@PathVariable long id){
         return ResponseEntity.ok().body(petService.GetPetById(id));
     }
+    @GetMapping("/getAllPet")
+    public ResponseEntity<List<PetResponse>> GetAllPet(){
+        return ResponseEntity.ok().body(petService.GetAllPet());
+    }
+    @GetMapping("/getPets/{keyword}")
+    public ResponseEntity<List<PetResponse>> GetPetsByKeyword(@PathVariable String keyword){
+        var result = petService.GetPetByKeyword(keyword);
+        return ResponseEntity.ok().body(result);
+    }
+//    @GetMapping("/getPets/{species}")
+//    public ResponseEntity<List<PetResponse>> GetPetsBySpecies(@PathVariable String species){
+//        var result = petService.GetPetBySpecies(species);
+//        return ResponseEntity.ok().body(result);
+//    }
     @GetMapping("/getPets")
     public ResponseEntity<Page<PetResponse>> GetAllPets(@RequestParam int pageNo,
-             @RequestParam(defaultValue = "2") int pageSize){
+             @RequestParam(defaultValue = "5") int pageSize){
         return ResponseEntity.ok().body(petService.Pagination(pageNo, pageSize));
     }
 

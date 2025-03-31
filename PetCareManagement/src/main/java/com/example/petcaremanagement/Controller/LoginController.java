@@ -75,21 +75,6 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email not provided"));
         }
 
-        boolean userExists = userRepo.existsUsersByEmail(email);
-        if (!userExists) {
-            Set<Role> roles = new HashSet<>();
-            var r = roleRepo.findById("USER")
-                    .orElseThrow(() -> new RuntimeException("Not found!"));
-            roles.add(r);
-            User newUser = User.builder()
-                    .roles(roles)
-                    .provider("FACEBOOK")
-                    .email(email)
-                    .userName(name)
-                    .build();
-            userRepo.save(newUser);
-        }
-
         User user = userRepo.findUserByEmail(email);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "User not saved"));

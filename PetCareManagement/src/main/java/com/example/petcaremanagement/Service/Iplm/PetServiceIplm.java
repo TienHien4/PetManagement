@@ -51,8 +51,6 @@ public class PetServiceIplm implements PetService {
     @Override
     public List<PetResponse> GetAllPet() {
         List<Pet> listPets = petRepo.findAll();
-
-
         List<PetResponse> listResponse = listPets.stream()
                 .map(pet -> {
                     PetResponse petResponse = petMapper.toPetResponse(pet);
@@ -73,15 +71,39 @@ public class PetServiceIplm implements PetService {
     }
 
     @Override
+    public List<PetResponse> GetPetByKeyword(String keyword) {
+        List<Pet> listPets = petRepo.searchSP(keyword);
+        List<PetResponse> listResponse = listPets.stream()
+                .map(pet -> {
+                    PetResponse petResponse = petMapper.toPetResponse(pet);
+                    petResponse.setOwnerId(pet.getOwner().getId());
+                    return petResponse;
+                })
+                .toList();
+
+        return listResponse;
+    }
+
+    @Override
+    public List<PetResponse> GetPetBySpecies(String species) {
+        List<Pet> listPets = petRepo.findPetsBySpecies(species);
+        return listPets.stream().map(s -> petMapper.toPetResponse(s)).toList();
+    }
+
+
+    @Override
     public void DeletePet(long id) {
         Pet pet = petRepo.findById(id).orElseThrow(() -> new RuntimeException("Pet not found with id: " + id));
-
         petRepo.delete(pet);
     }
 
     @Override
     public Page<PetResponse> Pagination(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return petRepo.findAll(pageable).map(s -> petMapper.toPetResponse(s));
+        return petRepo.findAll(pageable).map(s -> {
+            PetResponse petResponse = petMapper.toPetResponse(s);
+            petResponse.setOwnerId(s.getOwner().getId());
+            return petResponse;
+        });
     }
 }

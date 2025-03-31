@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../assets/css/bootstrap.min.css';
 import '../assets/css/owl.carousel.min.css';
 import '../assets/css/slicknav.css';
@@ -27,6 +27,7 @@ import sectionBg03 from '../assets/img/gallery/section_bg03.png';
 import sectionBg04 from '../assets/img/gallery/section_bg04.png';
 
 const Content = () => {
+
     return (
         <div>
             <div className="slider-area">
@@ -46,7 +47,13 @@ const Content = () => {
                                         <span data-animation="fadeInUp" data-delay=".3s">We help to groom your pet</span>
                                         <h1 data-animation="fadeInUp" data-delay=".3s">We Care Your Pets.</h1>
                                         <p data-animation="fadeInUp" data-delay=".6s">Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna sectetur adipisci.</p>
-                                        <a href="#" className="hero-btn" data-animation="fadeInLeft" data-delay=".3s">Contact Now<i className="ti-arrow-right"></i> </a>
+                                        <a
+    href="/contact" // Replace with the actual URL or route
+    className="hero-btn"
+    data-animation="fadeInLeft"
+    data-delay=".3s">
+ Contact Now<i className="ti-arrow-right"></i>
+</a>
                                     </div>
                                 </div>
                             </div>
@@ -67,7 +74,7 @@ const Content = () => {
                                         <span data-animation="fadeInUp" data-delay=".3s">We help to groom your pet</span>
                                         <h1 data-animation="fadeInUp" data-delay=".3s">We Care Your Pets.</h1>
                                         <p data-animation="fadeInUp" data-delay=".6s">Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna sectetur adipisci.</p>
-                                        <a href="#" className="hero-btn" data-animation="fadeInLeft" data-delay=".3s">Contact Now<i className="ti-arrow-right"></i> </a>
+                                        <a href='/contact' className="hero-btn" data-animation="fadeInLeft" data-delay=".3s">Contact Now<i className="ti-arrow-right"></i> </a>
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +106,7 @@ const Content = () => {
                                     <span className="flaticon-animal-kingdom"></span>
                                 </div>
                                 <div className="services-cap">
-                                    <h5><a href="#">Pet Boarding</a></h5>
+                                    <h5><a href='/contact'>Pet Boarding</a></h5>
                                     <p>consectetur adipiscing elit, serfd dgo eiusmod tempor incididunt ut ore et dolore magna aliqua.</p>
                                 </div>
                             </div>
@@ -110,7 +117,7 @@ const Content = () => {
                                     <span className="flaticon-animals"></span>
                                 </div>
                                 <div className="services-cap">
-                                    <h5><a href="#">Pet Treatment</a></h5>
+                                    <h5><a href='/contact'>Pet Treatment</a></h5>
                                     <p>consectetur adipiscing elit, serfd dgo eiusmod tempor incididunt ut ore et dolore magna aliqua.</p>
                                 </div>
                             </div>
@@ -121,7 +128,7 @@ const Content = () => {
                                     <span className="flaticon-animals-1"></span>
                                 </div>
                                 <div className="services-cap">
-                                    <h5><a href="#">Vaccinations</a></h5>
+                                    <h5><a href='/contact'>Vaccinations</a></h5>
                                     <p>consectetur adipiscing elit, serfd dgo eiusmod tempor incididunt ut ore et dolore magna aliqua.</p>
                                 </div>
                             </div>
@@ -165,7 +172,7 @@ const Content = () => {
                         <div className="about-more">
                             <p className="pera-top">Mollit anim laborum duis adseu dolor iuyn voluptcate velit ess <br />cillum dolore egru lofrre dsu.</p>
                             <p className="mb-65 pera-bottom">Mollit anim laborum.Dvcuis aute serunt  iruxvfg dhjkolohr indd re voluptate velit esscillumlore eu quife nrulla parihatur. Excghcepteur sfwsignjnt occa cupidatat non aute iruxvfg dhjinulpadeserunt moll.</p>
-                            <a href="#" className="btn">Read More</a>
+                            <a href='/contact' className="btn">Read More</a>
                         </div>
                     </div>
                 </div>
@@ -298,7 +305,7 @@ const Content = () => {
                                 </div>
                                 <div className="team-caption">
                                     <span>Mike Janathon</span>
-                                    <h3><a href="#">Doctor</a></h3>
+                                    <h3><a href='/contact'>Doctor</a></h3>
                                 </div>
                             </div>
                         </div>
@@ -309,7 +316,7 @@ const Content = () => {
                                 </div>
                                 <div className="team-caption">
                                     <span>Mike J Smith</span>
-                                    <h3><a href="#">Doctor</a></h3>
+                                    <h3><a href='/contact'>Doctor</a></h3>
                                 </div>
                             </div>
                         </div>
@@ -320,7 +327,7 @@ const Content = () => {
                                 </div>
                                 <div className="team-caption">
                                     <span>Pule W Smith</span>
-                                    <h3><a href="#">Doctor</a></h3>
+                                    <h3><a href='/contact'>Doctor</a></h3>
                                 </div>
                             </div>
                         </div>
@@ -463,7 +470,7 @@ const Content = () => {
                                 </div>
                                 <div className="contact_btn d-flex align-items-center justify-content-center">
                                     <a href="contact.html" className="btn white-btn">Contact Us</a>
-                                    <p>Or<a href="#"> +880 4664 216</a></p>
+                                    <p>Or<a href='/contact'> +880 4664 216</a></p>
                                 </div>
                             </div>
                         </div>

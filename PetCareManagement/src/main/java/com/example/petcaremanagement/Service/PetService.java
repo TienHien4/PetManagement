@@ -14,6 +14,8 @@ public interface PetService {
     PetResponse UpdatePet(long id, PetRequest request);
     List<PetResponse> GetAllPet();
     PetResponse GetPetById(long id);
+    List<PetResponse> GetPetByKeyword(String keyword);
+    List<PetResponse> GetPetBySpecies(String species);
     void DeletePet(long id);
     Page<PetResponse> Pagination(int pageNo, int pageSize);
 }

@@ -1,0 +1,82 @@
+.pet-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.form-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.owner-name {
+  font-size: 18px;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.form-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #444;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.input-group {
+  display: flex;
+  gap: 20px;
+}
+
+.input-field {
+  flex: 1;
+}
+
+.input-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #666;
+}
+
+.input-field input,
+.input-field select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.input-field select {
+  height: 38px;
+  background-color: white;
+}
+
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}/* Cập nhật phần label trong file CSS */
+.input-field label {
+  display: block;
+  margin-bottom: 8px;  /* Tăng khoảng cách dưới */
+  font-size: 16px;    /* Tăng cỡ chữ từ 14px lên 16px */
+  color: #333;        /* Màu tối hơn */
+  font-weight: 600;   /* Độ đậm hơn (600 thay vì normal 400) */
+}
