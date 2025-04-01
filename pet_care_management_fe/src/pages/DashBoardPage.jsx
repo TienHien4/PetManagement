@@ -10,7 +10,6 @@ import {
 } from '@ant-design/icons';
 import { Button, Layout, Menu, theme, Row, Col, Avatar } from 'antd';
 import { useNavigate } from "react-router-dom";
-import '../assets/css/stylesDashboard.css';
 
 const { Header, Sider, Content } = Layout;
 
