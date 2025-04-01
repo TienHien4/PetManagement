@@ -67,12 +67,12 @@ const PetManagementPage = () => {
                 {
                   key: '1',
                   icon: <AreaChartOutlined />,
-                  label: "",
+                  label:  <a href="/admin" style={{ textDecoration: "none", color: "inherit" }}>Thống kê</a>,
                 },
                 {
                   key: '2',
                   icon: '🐾',
-                  label: 'Thú cưng',
+                  label: '    Thú cưng',
                 },
                 {
                   key: '3',

@@ -92,7 +92,6 @@ public class LoginController {
     }
 
 
-
     @PostMapping("/api/logout")
     public ResponseEntity<String> Logout(@RequestBody LogoutRequest request) throws Exception {
         var result = authenticatedService.Logout(request);

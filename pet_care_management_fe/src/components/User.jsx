@@ -3,7 +3,7 @@ import { getToken } from '../services/localStorageService';
 import apiClient from '../services/customizeAxios';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import './Employee.css';
+import '../assets/css/user.css';
 import { Pagination } from 'antd';
 
 const User  = () => {
