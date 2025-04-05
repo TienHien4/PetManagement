@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceIplm implements UserService {
@@ -54,6 +55,18 @@ public class UserServiceIplm implements UserService {
     }
 
     @Override
+    public List<UserResponse> FindUsers(String keyword) {
+        var listUser = userRepo.searchUser(keyword);
+        var response = listUser.stream().map(
+                s -> {
+                    UserResponse userResponse = userMapper.toUserResponse(s);
+                    userResponse.setRoles(s.getRoles());
+                    return userResponse;
+                }).toList();
+        return response;
+    }
+
+    @Override
     public UserResponse UpdateUser(long id, UserRequest request) {
         User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("Not found user by id: " + id));
         userMapper.updateUser(user, request);
@@ -68,7 +81,17 @@ public class UserServiceIplm implements UserService {
 
     @Override
     public Page<UserResponse> Pagination(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return userRepo.findAll(pageable).map(s -> userMapper.toUserResponse(s));
+        Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+        Page<User> listUser = userRepo.findAll(pageable);
+
+        Page<UserResponse> listUserResponse = listUser.map(user -> {
+            UserResponse userResponse = userMapper.toUserResponse(user);
+            userResponse.setRoles(user.getRoles());
+            return userResponse;
+        });
+
+        return listUserResponse;
     }
+
+
 }

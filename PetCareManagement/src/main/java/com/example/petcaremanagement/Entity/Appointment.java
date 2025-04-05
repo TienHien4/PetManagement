@@ -19,12 +19,11 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private String name;
+    private String phoneNumber;
     private Date date;
-    private Time time;
-    private String note;
-    @Enumerated(EnumType.STRING)
-    private AppointmentStatus status = AppointmentStatus.PENDING;
+    private String services;
     @ManyToOne
-    @JoinColumn(name = "vet", nullable = false)
+    @JoinColumn(name = "vet", nullable = true)
     private Vet vet;
 }

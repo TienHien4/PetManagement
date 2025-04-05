@@ -6,8 +6,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+a {
+  text-decoration: none !important;
+}
+body {
+  font-family: "Times New Roman", Times, serif;
+}
 
-code {
+/* Đặc biệt chú ý đến các thẻ chứa tiếng Việt */
+h1, h2, h3, p, a, span {
+  font-family: "Times New Roman", Times, serif !important;
+}
+/* code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
-}
+} */

@@ -9,6 +9,7 @@ import java.util.List;
 public interface UserService {
     UserResponse CreateUser(UserRequest request);
     List<UserResponse> GetAllUser();
+    List<UserResponse> FindUsers(String keyword);
     UserResponse UpdateUser(long id, UserRequest request);
     void DeleteUser(long id);
     Page<UserResponse> Pagination(int pageNo, int pageSize);

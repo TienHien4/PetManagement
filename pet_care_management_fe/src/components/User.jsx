@@ -1,36 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { getToken } from '../services/localStorageService';
-import apiClient from '../services/customizeAxios';
+import axios from '../services/customizeAxios';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserAddOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import '../assets/css/user.css';
 import { Pagination } from 'antd';
 
-const User  = () => {
-    const [user, setUsers] = useState([]); // Danh sách nhân viên
-    const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-    const [totalPages, setTotalPages] = useState(0); // Tổng số trang
-    const [pageSize] = useState(5); // Số lượng mỗi trang
+const User = () => {
+    const [user, setUsers] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize] = useState(5);
+    const [search, setSearch] = useState("")
     const navigate = useNavigate();
+
 
     useEffect(() => {
         const accessToken = getToken();
         if (!accessToken) {
             navigate("/login");
         } else {
-            getUser(accessToken, currentPage, pageSize); // Lấy danh sách nhân viên
+            getUser(accessToken, currentPage, pageSize);
         }
-    }, [navigate, currentPage, pageSize]); // Gọi lại khi currentPage thay đổi
+    }, [navigate, currentPage, pageSize]);
 
     const getUser = async (accessToken, pageNo, pageSize) => {
         try {
-            const res = await apiClient.get("/api/user/getAll", {
+            const res = await axios.get("/api/user/getAll", {
                 params: { pageNo, pageSize },
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
             if (res && res.data) {
-                setUsers(res.data.content); // Lấy danh sách nhân viên từ `content`
-                setTotalPages(res.data.totalPages); // Cập nhật tổng số trang
+                setUsers(res.data.content);
+                setTotalPages(res.data.totalPages);
                 console.log(res.data);
             }
         } catch (error) {
@@ -39,32 +41,69 @@ const User  = () => {
     };
 
     const handlePageChange = (page) => {
-        setCurrentPage(page); // Cập nhật trang hiện tại
+        setCurrentPage(page);
     };
 
+    const handleFindUser = async (search) => {
+        try {
+            const accessToken = localStorage.getItem("accessToken")
+            const res = await axios.get(`/api/user/getUsers/${search}`, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+            console.log(res.data)
+            setUsers(res.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
+
         <div>
-            <Link to="/register">
-                <UserAddOutlined /> Thêm nhân viên
-            </Link>
-            <table className="table">
+            <h1 className="text-2xl font-bold" style={{ marginTop: "30px", marginBottom: "40px" }}>Quản Lý Tài Khoản</h1>
+            <div className="flex gap-2 mb-4" style={{ marginTop: "30px" }}>
+                <input style={{ width: "865px" }}
+                    type="text"
+                    placeholder="🔍 Tìm kiếm tài khoản..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="border border-gray-300 rounded-lg p-2 w-full"
+                />
+                <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                    onClick={() => handleFindUser(search)}
+                >
+                    <h6 style={{ color: "black", margin: 0 }}>Tìm</h6>
+                </button>
+
+
+
+            </div>
+
+
+
+            <table className="table" style={{ marginTop: "60px" }}>
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>Tên</th>
                         <th>Email</th>
-                        <th>Password</th>
-
+                        <th>Vai trò</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {user.map((item, index) => (
                         <tr key={index}>
                             <td>{item.userName}</td>
-                
                             <td>{item.email}</td>
-                            <td>{item.password}</td>
-                            <td style={{ width: 10 }}>
-                        
+                            <td>
+                                {item.roles && item.roles.length > 0
+                                    ? item.roles.map((role, i) => (
+                                        <span key={i}>
+                                            {role.name}{i < item.roles.length - 1 ? ', ' : ''}
+                                        </span>
+                                    ))
+                                    : 'Không có vai trò'}
                             </td>
                             <td>
                                 <Link to="/delete">
@@ -75,12 +114,12 @@ const User  = () => {
                     ))}
                 </tbody>
             </table>
-            {/* Sử dụng Pagination của Ant Design */}
+
             <Pagination
-                current={currentPage} // Trang hiện tại
-                pageSize={pageSize} // Số lượng mỗi trang
-                total={totalPages * pageSize} // Tổng số item
-                onChange={handlePageChange} // Hàm thay đổi trang
+                current={currentPage}
+                pageSize={pageSize}
+                total={totalPages * pageSize}
+                onChange={handlePageChange}
             />
         </div>
     );
