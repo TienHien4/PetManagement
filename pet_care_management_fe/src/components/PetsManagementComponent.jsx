@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const PetsManagement = () => {
   const navigate = useNavigate();
   const [pets, setPets] = useState([]);
+  const [petSearch, setPetSearch] = useState([])
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -29,6 +30,7 @@ const PetsManagement = () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (res && res.data) {
+        setPetSearch(null)
         setPets(res.data.content);
         setTotalPages(res.data.totalPages);
         console.log(res.data);
@@ -58,14 +60,15 @@ const PetsManagement = () => {
       const res = await axios.get("/api/pet/getAllPet", {}, {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
-      setPets(res.data)
+      setPetSearch(res.data)
     } else {
 
       try {
         const res = await axios.get(`/api/pet/getPets/${search}`, {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
-        setPets(res.data)
+        setPets(null)
+        setPetSearch(res.data)
 
       } catch (error) {
         console.error("Pet not found!", error);
@@ -106,8 +109,9 @@ const PetsManagement = () => {
         </a>
       </div>
 
-      <div className="flex gap-2 mb-4" >
-        <input style={{ width: "865px" }}
+      <div className="flex gap-2 mb-4">
+        <input
+          style={{ width: "865px" }}
           type="text"
           placeholder="🔍 Tìm kiếm thú cưng theo tên..."
           value={search}
@@ -118,7 +122,7 @@ const PetsManagement = () => {
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
           onClick={() => handleFindPetByKeyword(search)}
         >
-          <h6 style={{ color: "black", margin: 0 }}>Tìm</h6>
+          <h6 className="text-black m-0">Tìm</h6>
         </button>
 
         <select
@@ -129,9 +133,7 @@ const PetsManagement = () => {
           <option value="Dog">Chó</option>
           <option value="Cat">Mèo</option>
         </select>
-
       </div>
-
 
       <table style={{ width: "1315px" }}>
         <thead className="bg-gray-200">
@@ -145,7 +147,7 @@ const PetsManagement = () => {
           </tr>
         </thead>
         <tbody>
-          {pets.map((pet) => (
+          {(Array.isArray(petSearch) && petSearch.length > 0 ? petSearch : pets)?.map((pet) => (
             <tr key={pet.id} className="border-t">
               <td className="p-2">{pet.name}</td>
               <td className="p-2">{pet.species}</td>
@@ -153,14 +155,12 @@ const PetsManagement = () => {
               <td className="p-2">{pet.age}</td>
               <td className="p-2">{pet.ownerId}</td>
               <td className="p-2 flex gap-2">
-                <button style={{ color: "black" }}
+                <button
                   className="bg-yellow-500 text-black px-2 py-1 rounded-lg hover:bg-yellow-600"
-
                 >
                   <Edit size={16} />
-
                 </button>
-                <button style={{ color: "black" }}
+                <button
                   className="bg-red-500 text-black px-2 py-1 rounded-lg hover:bg-red-600"
                   onClick={() => handleDelete(pet.id)}
                 >
@@ -172,17 +172,22 @@ const PetsManagement = () => {
         </tbody>
       </table>
 
-
+      {/* Pagination chỉ hiển thị khi không đang tìm kiếm */}
       <div className="flex justify-center mt-4">
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={totalPages * pageSize}
-          onChange={handlePageChange}
-        />
+        {Array.isArray(pets) &&
+          pets.length > 0 &&
+          (!Array.isArray(petSearch) || petSearch.length === 0) && (
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalPages * pageSize}
+              onChange={handlePageChange}
+            />
+          )}
       </div>
     </div>
   );
+
 };
 
 export default PetsManagement;

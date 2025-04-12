@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../../assets/css/PetRegistrationForm.css';
-import axios  from '../../services/customizeAxios';
+import axios from '../../services/customizeAxios';
 
 const PetRegistrationForm = () => {
   const [name, setName] = useState("")
@@ -9,29 +9,29 @@ const PetRegistrationForm = () => {
   const [services, setServices] = useState("")
   const [date, setDate] = useState("")
   const handleSubmit = async () => {
-   const accessToken = localStorage.getItem("accessToken")
-   try{
+    const accessToken = localStorage.getItem("accessToken")
+    try {
 
-    const res = await axios.post("/api/appointment/createAppointment", 
-      {
-        name,
-        phoneNumber,
-        petSpecies,
-        services,
-        date
-      },
-      {
-          header: { Authorization:  `Bearer ${accessToken}`},
-      })
-    console.log(res.data);
-   }catch(error){
-    console.log(error)
-   }
+      const res = await axios.post("/api/appointment/createAppointment",
+        {
+          name,
+          phoneNumber,
+          petSpecies,
+          services,
+          date
+        },
+        {
+          header: { Authorization: `Bearer ${accessToken}` },
+        })
+      console.log(res.data);
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (
     <div className="body">
-     
+
       <div className="container">
         <div className="form-box">
           <h2>ĐĂNG KÝ KHÁM TƯ VẤN CHĂM SÓC THÚ CƯNG</h2>
@@ -73,9 +73,7 @@ const PetRegistrationForm = () => {
           </form>
         </div>
       </div>
-      <div className="activate-windows">
-        <p>Activate Windows<br />Go to Settings to activate Windows.</p>
-      </div>
+
     </div>
   );
 };

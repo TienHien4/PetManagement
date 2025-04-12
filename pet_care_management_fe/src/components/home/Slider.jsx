@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import dog from '../../assets/img/banner/dog.png';
+import '../../assets/css/style.css';
 
 const Slider = () => {
   return (

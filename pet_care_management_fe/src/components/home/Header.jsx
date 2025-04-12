@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/img/logo.png';
+import '../../assets/css/style.css';
 import axios from "axios";
 
 
@@ -43,7 +44,7 @@ const Header = () => {
   return (
     <header>
       <div className="header-area">
-        <div className="header-top_area">
+        <div className="header-top_area" style={{ padding: "7px" }}>
           <div className="container">
             <div className="row" style={{ width: "1300px" }}>
               <div className="col-lg-5 col-md-8">
@@ -70,7 +71,7 @@ const Header = () => {
         </div>
 
         <div id="sticky-header" className="main-header-area">
-          <div className="container">
+          <div className="container" style={{ height: "70px" }}>
             <div className="row align-items-center">
               <div className="col-xl-3 col-lg-3">
                 <div className="logo">

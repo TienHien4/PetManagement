@@ -3,6 +3,7 @@ import React from 'react';
 import s1 from "../../assets/img/service/service_icon_1.png";
 import s2 from "../../assets/img/service/service_icon_2.png";
 import s3 from "../../assets/img/service/service_icon_3.png";
+import '../../assets/css/style.css';
 
 const Services = () => {
   const services = [
@@ -26,8 +27,8 @@ const Services = () => {
 
   return (
     <div className="service_area">
-      <div className="container" style={{display: "flex", flexWrap: "wrap"}}>
-        <div style={{width: "100%"}} className="row justify-content-center">
+      <div className="container" style={{ display: "flex", flexWrap: "wrap" }}>
+        <div style={{ width: "100%" }} className="row justify-content-center">
           <div className="col-lg-7 col-md-10">
             <div className="section_title text-center mb-95">
               <h3>Dịch vụ dành cho mọi chú chó</h3>

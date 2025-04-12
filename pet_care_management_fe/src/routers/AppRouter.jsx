@@ -10,6 +10,11 @@ import Dashboard from '../pages/admin/DashboardPage';
 import UserManagementPage from '../pages/admin/UserManagementPage';
 import ServicesPage from '../pages/ServicesPage';
 import LoginPage from '../pages/login/LoginPage';
+import PetList from '../pages/Profile/PetList';
+import Schedule from '../pages/Profile/Schedule';
+import ChangePassword from '../pages/Profile/ChangePassword';
+import Notifications from '../pages/Profile/Notifications';
+import UserInformation from '../pages/Profile/UserInformation';
 
 
 const AppRouter = () => {
@@ -26,6 +31,11 @@ const AppRouter = () => {
                 <Route path="/admin" element={<Dashboard></Dashboard>} />
                 <Route path="/admin/addPet" element={<CreatePetForm></CreatePetForm>} />
                 <Route path='/services' element={<ServicesPage></ServicesPage>} />
+                <Route path="/user/profile" element={<UserInformation></UserInformation>} />
+                <Route path="/user/pets" element={<PetList></PetList>} />
+                <Route path="/user/schedule" element={<Schedule></Schedule>} />
+                <Route path="/user/changePassword" element={<ChangePassword></ChangePassword>} />
+                <Route path="/user/notifications" element={<Notifications></Notifications>} />
             </Routes>
         </Router>
     );

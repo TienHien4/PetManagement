@@ -1,6 +1,7 @@
 // components/PetCare.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../../assets/css/style.css';
 import petCare from "../../assets/img/about/pet_care.png";
 
 const PetCare = () => {

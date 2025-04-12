@@ -1,0 +1,293 @@
+.profile body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f5f5f5;
+}
+
+.profile {
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.profile .sidebar {
+    width: 250px;
+    background-color: #1c2526;
+    min-height: 100vh;
+    color: #c1c8c9;
+    font-family: sans-serif;
+}
+
+.profile .header {
+    background-color: #007bff;
+    padding: 15px 20px;
+    text-align: center;
+}
+
+.profile .project-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+.profile .nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile .nav-menu li {
+    padding: 15px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    color: #c1c8c9;
+}
+
+.profile .nav-menu li:hover {
+    background-color: #2a3435;
+}
+
+.profile .nav-menu li.active {
+    color: white;
+    background-color: #2a3435;
+}
+
+.profile .nav-menu .icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.profile .nav-menu a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.profile .main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+}
+
+.profile .user-information {
+    max-width: 600px;
+}
+
+.profile h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #000;
+    font-family: Arial, sans-serif;
+}
+
+.profile .user-form {
+    margin-top: 20px;
+}
+
+.profile .form-group {
+    margin-bottom: 20px;
+}
+
+.profile .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: normal;
+    color: #333;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.profile .form-group input,
+.profile .form-group select,
+.profile .form-group textarea {
+    width: 400px;
+    /* Đặt chiều rộng cố định để căn chỉnh thẳng hàng */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    /* Đảm bảo padding và border không làm thay đổi kích thước */
+}
+
+.profile .form-group input[readonly] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.profile .form-group textarea {
+    height: 100px;
+}
+
+.profile .email-wrapper {
+    position: relative;
+    display: inline-block;
+    /* Đổi từ flex sang inline-block để không ảnh hưởng đến chiều rộng */
+}
+
+.profile .email-wrapper input {
+    width: 400px;
+    /* Đảm bảo input có chiều rộng cố định */
+}
+
+.profile .add-email-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.profile .date-wrapper {
+    position: relative;
+    display: inline-block;
+    /* Đổi từ flex sang inline-block để không ảnh hưởng đến chiều rộng */
+}
+
+.profile .date-wrapper input {
+    width: 400px;
+    /* Đảm bảo input có chiều rộng cố định */
+}
+
+.profile .calendar-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #666;
+    cursor: pointer;
+}
+
+.profile .radio-group {
+    display: flex;
+    gap: 20px;
+    padding-left: 0;
+    /* Đảm bảo không có padding trái thừa */
+    /* Đảm bảo không có margin trái thừa */
+    align-items: center;
+    /* Căn giữa các radio button theo chiều dọc */
+    width: 400px;
+    /* Đặt chiều rộng giống với các ô input để căn chỉnh thẳng hàng */
+    margin-left: 100px;
+}
+
+.profile .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: normal;
+    font-size: 14px;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+.profile .radio-group input[type="radio"] {
+    margin: 0;
+    /* Xóa margin mặc định của radio button */
+}
+
+.profile .update-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.profile .update-btn:hover {
+    background-color: #0056b3;
+}
+
+.profile .save-btn,
+.profile .edit-btn {
+    background-color: #ff4d4f;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.profile .save-btn:hover,
+.profile .edit-btn:hover {
+    background-color: #e63946;
+}
+
+.profile table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.profile th,
+.profile td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile th {
+    background-color: #ff4d4f;
+    color: white;
+}
+
+.profile td button {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.profile td button:hover {
+    background-color: #e63946;
+}
+
+.profile .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.profile .modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 70%;
+    max-width: 500px;
+    position: relative;
+}
+
+.profile .close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.profile #notificationList {
+    list-style: none;
+    padding: 0;
+}
+
+.profile #notificationList li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/img/logo.png';
-
+import '../../assets/css/style.css';
 const Footer = () => {
   return (
     <footer className="footer">

@@ -46,7 +46,6 @@ public class LoginController {
 
     @GetMapping("/login/oauth2/code/google")
     public void oauth2SuccessGoogle(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Redirect với token gửi qua query parameter
         String redirectUrl = "http://localhost:3000/oauth2/redirect";
         response.sendRedirect(redirectUrl);
     }
