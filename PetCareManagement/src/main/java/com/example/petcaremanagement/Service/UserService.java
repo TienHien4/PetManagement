@@ -12,5 +12,7 @@ public interface UserService {
     List<UserResponse> FindUsers(String keyword);
     UserResponse UpdateUser(long id, UserRequest request);
     void DeleteUser(long id);
+    UserResponse GetUserById(long id);
+    UserResponse ChangePassword(long id, String newPassword);
     Page<UserResponse> Pagination(int pageNo, int pageSize);
 }

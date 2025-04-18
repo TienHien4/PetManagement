@@ -1,10 +1,13 @@
 import React from "react";
 import Sidebar from "./Sidebar";
 import "../../assets/css/profile.css";
+import Header from "../../components/home/Header";
+import { Footer } from "antd/es/layout/layout";
 
 function Notifications() {
     return (
         <div className="profile">
+            <Header></Header>
             <div style={{ display: "flex" }}>
                 <Sidebar />
                 <div className="main-content">
@@ -18,15 +21,9 @@ function Notifications() {
                         </ul>
                     </div>
                 </div>
-                <div className="image-section">
-                    <img
-                        src="https://via.placeholder.com/150"
-                        alt="User Image"
-                        className="pet-image"
-                    />
-                    <button className="edit-image-btn">Chọn Ảnh</button>
-                </div>
+
             </div>
+            <Footer></Footer>
         </div>
     );
 }

@@ -80,6 +80,25 @@ public class UserServiceIplm implements UserService {
     }
 
     @Override
+    public UserResponse GetUserById(long id) {
+        User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    public UserResponse ChangePassword(long id, String newPassword) {
+        User user = userRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+       BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        User savedUser = userRepo.save(user);
+        return userMapper.toUserResponse(savedUser);
+    }
+
+
+    @Override
     public Page<UserResponse> Pagination(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
         Page<User> listUser = userRepo.findAll(pageable);

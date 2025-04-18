@@ -14,7 +14,6 @@ public interface UserMapper {
     @Mapping(target = "listPets", ignore = true)
     User toUser(UserRequest request);
 
-    @Mapping(target = "listNotifications", ignore = true)
     @Mapping(target = "listPets", ignore = true)
     @Mapping(target = "roles", ignore = true)
     UserResponse toUserResponse(User user);

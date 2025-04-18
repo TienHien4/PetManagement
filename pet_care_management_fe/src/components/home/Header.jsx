@@ -62,15 +62,25 @@ const Header = () => {
                 </div>
               </div>
               <div className="col-lg-3 col-md-1">
-                <button onClick={handleLogout} style={{ backgroundColor: 'white', cursor: 'pointer', display: "flex", alignItems: "center", border: "none", background: "none" }}>
-                  <h5 style={{ color: "black", marginTop: "3px", color: "white" }}> <i style={{ fontSize: "30px" }} class="fa-solid fa-circle-user"></i> {localStorage.getItem("UserName") ? localStorage.getItem("UserName").toUpperCase() : "Guest"}</h5>
-                </button>
+                <div className="account-dropdown">
+                  <div className="account-icon">
+                    <i className="fa-solid fa-circle-user" style={{ fontSize: "30px", color: "white" }}></i>
+                    <span style={{ color: "white", marginLeft: "10px" }}>
+                      {localStorage.getItem("UserName") ? localStorage.getItem("UserName").toUpperCase() : "Guest"}
+                    </span>
+                  </div>
+                  <div className="dropdown-content">
+                    <Link to="/user/profile">Thông tin tài khoản</Link>
+                    <button onClick={handleLogout}>Đăng xuất</button>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
 
-        <div id="sticky-header" className="main-header-area">
+        <div id="sticky-header" className="main-header-area" style={{ backgroundColor: "bisque" }}>
           <div className="container" style={{ height: "70px" }}>
             <div className="row align-items-center">
               <div className="col-xl-3 col-lg-3">

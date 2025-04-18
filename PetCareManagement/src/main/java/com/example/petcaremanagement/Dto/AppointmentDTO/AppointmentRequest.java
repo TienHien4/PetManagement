@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -14,8 +15,8 @@ import java.util.Date;
 public class AppointmentRequest {
     private long id;
     private String name;
-    private String phoneNumber;
+    private String email;
     private Date date;
-    private String services;
+    private List<String> services;
     private long vetId;
 }

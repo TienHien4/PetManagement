@@ -4,21 +4,24 @@ import axios from '../../services/customizeAxios';
 
 const PetRegistrationForm = () => {
   const [name, setName] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("")
+  const [email, setEmail] = useState("")
   const [petSpecies, setPetSpecies] = useState("")
-  const [services, setServices] = useState("")
+  const [services, setServices] = useState([])
   const [date, setDate] = useState("")
+  const [vetId, setVetId] = useState(0)
   const handleSubmit = async () => {
+
     const accessToken = localStorage.getItem("accessToken")
     try {
 
       const res = await axios.post("/api/appointment/createAppointment",
         {
           name,
-          phoneNumber,
+          email,
           petSpecies,
           services,
-          date
+          date,
+          vetId
         },
         {
           header: { Authorization: `Bearer ${accessToken}` },
@@ -46,9 +49,9 @@ const PetRegistrationForm = () => {
             />
             <input
               type="text"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Số điện thoại"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
               required
             />
             <select name="pet-type" value={petSpecies} onChange={(e) => setPetSpecies(e.target.value)} required>
@@ -56,17 +59,46 @@ const PetRegistrationForm = () => {
               <option value="cho">Chó</option>
               <option value="meo">Mèo</option>
             </select>
-            <select name="service" value={services} onChange={(e) => setServices(e.target.value)} required>
-              <option value="" disabled selected>Dịch vụ</option>
-              <option value="kham">Khám</option>
-              <option value="tiem-phong">Tiêm phòng</option>
-              <option value="spa">Spa</option>
-            </select>
+            <div className="services-checkbox-group" style={{ display: "flex", alignItems: "center", margin: "20px 0" }}>
+              <label style={{ fontWeight: "bold", fontSize: "16px", marginRight: "30px", color: "white", minWidth: "80px" }}>
+                Dịch vụ:
+              </label>
+              {['Khám', 'Tiêm phòng', 'Spa'].map((service, index) => (
+                <div key={index} style={{ display: "flex", alignItems: "center", marginRight: "40px" }}>
+                  <input
+                    type="checkbox"
+                    id={`service-${index}`}
+                    value={service}
+                    checked={services.includes(service)}
+                    onChange={() => {
+                      if (services.includes(service)) {
+                        setServices(services.filter(s => s !== service));
+                      } else {
+                        setServices([...services, service]);
+                      }
+                    }}
+                    style={{ transform: "scale(1.4)", marginRight: "10px", cursor: "pointer" }}
+                  />
+                  <label htmlFor={`service-${index}`} style={{ fontWeight: "bold", fontSize: "15px", color: "white", cursor: "pointer" }}>
+                    {service}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               placeholder="Ngày khám (dd/mm/yyyy)"
+              required
+            />
+            <input
+              type="number"
+              value={vetId}
+              onChange={(e) => setVetId(e.target.value)}
+              placeholder="Mã bác sĩ"
               required
             />
             <button onClick={handleSubmit}>Đăng ký</button>

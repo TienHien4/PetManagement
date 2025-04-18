@@ -21,7 +21,6 @@ public class AppointmentController {
         var result = appointmentService.listAppointments();
         return ResponseEntity.ok().body(result);
     }
-
     @PostMapping("/createAppointment")
     public ResponseEntity<AppointmentResponse> CreateAppointment(
             @RequestBody AppointmentRequest request){

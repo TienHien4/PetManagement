@@ -24,6 +24,7 @@ const LoginPage = () => {
       });
       const roles = response.data.roles;
       console.log(response)
+      localStorage.setItem("Id", response.data.id);
       localStorage.setItem("UserName", response.data.userName);
 
       if (response.data.message !== "Login success!") {

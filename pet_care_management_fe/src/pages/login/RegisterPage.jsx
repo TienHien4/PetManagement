@@ -5,14 +5,24 @@ import { useNavigate } from "react-router-dom";
 const RegisterPage = () => {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
+    const [gender, setGender] = useState("");
+    const [dob, setDob] = useState("");
     const [repeatPassword, setRepeatPassword] = useState("");
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleRegister = async () => {
         if (password !== repeatPassword) {
-            setError("Passwords do not match!");
+            setError("Mật khẩu không khớp!");
+            return;
+        }
+        if (!gender) {
+            setError("Vui lòng chọn giới tính!");
+            return;
+        }
+        if (!dob) {
+            setError("Vui lòng chọn ngày sinh!");
             return;
         }
         setError("");
@@ -21,12 +31,15 @@ const RegisterPage = () => {
             const res = await axios.post("http://localhost:8080/api/user/create", {
                 userName,
                 password,
+                gender,
+                dob,
                 email
             });
             console.log("User registered:", res.data);
-            navigate("/login")
+            navigate("/login");
         } catch (error) {
             console.error("Registration failed:", error);
+            setError("Đăng ký thất bại. Vui lòng thử lại!");
         }
     };
 
@@ -71,6 +84,39 @@ const RegisterPage = () => {
                                                         placeholder="Your Email"
                                                     />
                                                     <label htmlFor="email">Email</label>
+                                                </div>
+                                            </div>
+
+                                            <div className="d-flex flex-row align-items-center mb-4">
+                                                <i className="fas fa-venus-mars fa-lg me-3 fa-fw"></i>
+                                                <div className="form-floating flex-fill mb-0">
+                                                    <select
+                                                        id="gender"
+                                                        className="form-select"
+                                                        value={gender}
+                                                        onChange={(e) => setGender(e.target.value)}
+                                                    >
+                                                        <option value="">Chọn giới tính</option>
+                                                        <option value="male">Nam</option>
+                                                        <option value="female">Nữ</option>
+                                                        <option value="other">Khác</option>
+                                                    </select>
+                                                    <label htmlFor="gender">Giới tính</label>
+                                                </div>
+                                            </div>
+
+                                            <div className="d-flex flex-row align-items-center mb-4">
+                                                <i className="fas fa-calendar-alt fa-lg me-3 fa-fw"></i>
+                                                <div className="form-floating flex-fill mb-0">
+                                                    <input
+                                                        id="dob"
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={dob}
+                                                        onChange={(e) => setDob(e.target.value)}
+                                                        placeholder="Date of Birth"
+                                                    />
+                                                    <label htmlFor="dob">Ngày sinh</label>
                                                 </div>
                                             </div>
 
@@ -128,7 +174,6 @@ const RegisterPage = () => {
                 </div>
             </div>
         </section>
-
     );
 };
 

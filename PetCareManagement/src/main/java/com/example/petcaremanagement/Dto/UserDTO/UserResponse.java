@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 @Data
@@ -19,7 +20,8 @@ public class UserResponse {
     private String userName;
     private String email;
     private String password;
+    private String gender;
+    private Date dob;
     private List<Long> listPets;
-    private List<Notification> listNotifications;
     private Set<Role> roles;
 }

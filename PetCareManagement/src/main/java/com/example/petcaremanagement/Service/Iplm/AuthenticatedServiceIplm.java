@@ -51,13 +51,14 @@ public class AuthenticatedServiceIplm implements AuthenticatedService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         var authen = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if(!authen){
-            throw new JwtException("Token is invalid in Au");
+            throw new JwtException("Password invalid");
         }
         Set<String> listRoles = user.getRoles()
                 .stream().map(s -> s.getName()).collect(Collectors.toSet());
         String accessToken = GeneratedToken(user);
         String refreshToken = GeneratedRefreshToken(user);
         return LoginResponse.builder()
+                .id(user.getId())
                 .userName(request.getUserName())
                 .roles(listRoles)
                 .token(accessToken)

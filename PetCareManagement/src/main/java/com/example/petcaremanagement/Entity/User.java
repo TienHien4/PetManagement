@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +21,9 @@ public class User {
     private String userName;
     private String email;
     private String password;
+    private Date dob;
     private String provider;
+    private String gender;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Pet> listPets;
 
