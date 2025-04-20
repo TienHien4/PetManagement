@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 public interface AppointmentMapper {
 
     @Mapping(target = "vet", ignore = true)
+    @Mapping(target = "services", ignore = true)
     Appointment toAppointment(AppointmentRequest request);
 
     @Mapping(target = "vetId", ignore = true)

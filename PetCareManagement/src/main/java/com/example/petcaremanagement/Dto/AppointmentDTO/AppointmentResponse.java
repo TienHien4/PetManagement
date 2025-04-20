@@ -1,6 +1,7 @@
 package com.example.petcaremanagement.Dto.AppointmentDTO;
 
-import com.example.petcaremanagement.Entity.Vet;
+
+import com.example.petcaremanagement.Entity.ServicesType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,6 @@ public class AppointmentResponse {
     private String name;
     private String email;
     private Date date;
-    private List<String> services;
+    private List<ServicesType> services;
     private long vetId;
 }

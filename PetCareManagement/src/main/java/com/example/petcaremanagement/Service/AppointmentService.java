@@ -12,4 +12,5 @@ public interface AppointmentService {
     AppointmentResponse UpdateAppointment(AppointmentRequest request);
     List<AppointmentResponse> listAppointments();
     Page<AppointmentResponse> pageAppointment(int pageNo, int pageSize);
+    List<AppointmentResponse> ListAppointmentsOfUser(long userId);
 }

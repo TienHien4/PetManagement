@@ -3,9 +3,13 @@ package com.example.petcaremanagement.Service.Iplm;
 import com.example.petcaremanagement.Dto.AppointmentDTO.AppointmentRequest;
 import com.example.petcaremanagement.Dto.AppointmentDTO.AppointmentResponse;
 import com.example.petcaremanagement.Entity.Appointment;
+import com.example.petcaremanagement.Entity.ServicesType;
+import com.example.petcaremanagement.Entity.User;
 import com.example.petcaremanagement.Entity.Vet;
 import com.example.petcaremanagement.Mapper.AppointmentMapper;
 import com.example.petcaremanagement.Repository.AppointmentRepository;
+import com.example.petcaremanagement.Repository.ServicesTypeRepository;
+import com.example.petcaremanagement.Repository.UserRepository;
 import com.example.petcaremanagement.Repository.VetRepository;
 import com.example.petcaremanagement.Service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +29,21 @@ public class AppointmentServiceIplm implements AppointmentService {
     private AppointmentMapper appointmentMapper;
     @Autowired
     private VetRepository vetRepo;
+    @Autowired
+    private ServicesTypeRepository servicesTypeRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public AppointmentResponse CreateAppointment(AppointmentRequest request) {
         Appointment appointment = appointmentMapper.toAppointment(request);
         Vet vet = vetRepo.findById(request.getVetId()).orElseThrow(() -> new RuntimeException("Vet not found"));
         appointment.setVet(vet);
+        List<ServicesType> services = request.getServices().stream().map(s -> {
+                ServicesType service = servicesTypeRepository.findByName(s);
+                return service;
+        }).toList();
+        appointment.setServices(services);
         appointmentRepository.save(appointment);
         var reponse = appointmentMapper.toAppointmentResponse(appointment);
         reponse.setVetId(request.getVetId());
@@ -57,6 +70,22 @@ public class AppointmentServiceIplm implements AppointmentService {
     @Override
     public Page<AppointmentResponse> pageAppointment(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo-1, pageSize);
-        return appointmentRepository.findAll(pageable).map(s -> appointmentMapper.toAppointmentResponse(s));
+        var listAppointment = appointmentRepository.findAll(pageable);
+        Page<AppointmentResponse> response = listAppointment.map(appointment -> {
+                 AppointmentResponse appointmentResponse = appointmentMapper.toAppointmentResponse(appointment);
+                 appointmentResponse.setVetId(appointment.getVet().getId());
+                 return appointmentResponse;
+        }
+        );
+        return response;
+
+    }
+
+    @Override
+    public List<AppointmentResponse> ListAppointmentsOfUser(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+
+        return null;
     }
 }

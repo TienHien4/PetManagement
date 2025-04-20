@@ -171,8 +171,6 @@ const PetsManagement = () => {
           ))}
         </tbody>
       </table>
-
-      {/* Pagination chỉ hiển thị khi không đang tìm kiếm */}
       <div className="flex justify-center mt-4">
         {Array.isArray(pets) &&
           pets.length > 0 &&

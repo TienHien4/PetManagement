@@ -8,7 +8,7 @@ const PetRegistrationForm = () => {
   const [petSpecies, setPetSpecies] = useState("")
   const [services, setServices] = useState([])
   const [date, setDate] = useState("")
-  const [vetId, setVetId] = useState(0)
+  const [vetId, setVetId] = useState(1)
   const handleSubmit = async () => {
 
     const accessToken = localStorage.getItem("accessToken")
@@ -63,7 +63,7 @@ const PetRegistrationForm = () => {
               <label style={{ fontWeight: "bold", fontSize: "16px", marginRight: "30px", color: "white", minWidth: "80px" }}>
                 Dịch vụ:
               </label>
-              {['Khám', 'Tiêm phòng', 'Spa'].map((service, index) => (
+              {['Khám bệnh', 'Tiêm phòng', 'Spa'].map((service, index) => (
                 <div key={index} style={{ display: "flex", alignItems: "center", marginRight: "40px" }}>
                   <input
                     type="checkbox"

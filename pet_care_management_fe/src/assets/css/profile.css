@@ -169,12 +169,7 @@
     gap: 20px;
     padding-left: 0;
     padding: 15px;
-    /* Đảm bảo không có padding trái thừa */
-    /* Đảm bảo không có margin trái thừa */
     align-items: center;
-    /* Căn giữa các radio button theo chiều dọc */
-    width: 400px;
-    /* Đặt chiều rộng giống với các ô input để căn chỉnh thẳng hàng */
     margin-left: 400px;
 }
 
@@ -190,7 +185,6 @@
 
 .profile .radio-group input[type="radio"] {
     margin: 0;
-    /* Xóa margin mặc định của radio button */
 }
 
 .profile .update-btn {

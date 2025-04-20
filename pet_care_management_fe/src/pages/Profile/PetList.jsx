@@ -1,10 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
+import axios from '../../services/customizeAxios';
 import "../../assets/css/profile.css";
 import Header from "../../components/home/Header";
 import Footer from "../../components/home/Footer";
+import { Pagination } from 'antd';
 
 function PetList() {
+    const [data, setData] = useState([])
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize] = useState(5);
+    const accessToken = localStorage.getItem("accessToken")
+    useEffect(() => {
+        const fetchData = async (accessToken, pageNo, pageSize) => {
+            const res = await axios.get("api/pet/getPets",
+                {
+                    params: { pageNo, pageSize },
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                }
+            )
+            console.log(res.data)
+            setData(res.data.content)
+            setTotalPages(res.data.totalPages)
+        }
+        fetchData(accessToken, currentPage, pageSize)
+    }, [accessToken])
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
     return (
         <div className="profile">
             <Header></Header>
@@ -26,22 +52,24 @@ function PetList() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Dog1</td>
-                                    <td>Chó</td>
-                                    <td>Poodle</td>
-                                    <td>2</td>
-                                    <td>5 kg</td>
-                                </tr>
-                                <tr>
-                                    <td>Cat1</td>
-                                    <td>Mèo</td>
-                                    <td>Ba Tư</td>
-                                    <td>1</td>
-                                    <td>3 kg</td>
-                                </tr>
+                                {data.map((item) => (
+                                    <tr key={item.id}>
+                                        <td>{item.name}</td>
+                                        <td>{item.species}</td>
+                                        <td>{item.breed}</td>
+                                        <td>{item.age}</td>
+                                        <td>{item.weight}</td>
+
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
+                        <Pagination
+                            current={currentPage}
+                            pageSize={pageSize}
+                            total={totalPages * pageSize}
+                            onChange={handlePageChange}
+                        />
                     </div>
                 </div>
 
