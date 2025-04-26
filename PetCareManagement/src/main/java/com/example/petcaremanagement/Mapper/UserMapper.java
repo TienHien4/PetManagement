@@ -10,7 +10,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "listNotifications", ignore = true)
+
     @Mapping(target = "listPets", ignore = true)
     User toUser(UserRequest request);
 
@@ -19,7 +19,6 @@ public interface UserMapper {
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "listNotifications", ignore = true)
     @Mapping(target = "listPets", ignore = true)
     @Mapping(target = "id", ignore = true)
     void updateUser(@MappingTarget User user, UserRequest userRequest);

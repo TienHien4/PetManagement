@@ -32,4 +32,9 @@ public class AppointmentController {
             @RequestParam int pageNo, @RequestParam(defaultValue = "5") int pageSize){
         return ResponseEntity.ok().body(appointmentService.pageAppointment(pageNo, pageSize));
     }
+    @GetMapping("/getAppointmentsByUser/{userId}")
+    public ResponseEntity<List<AppointmentResponse>> GetAppointmentByUser(@PathVariable long userId){
+        var result = appointmentService.ListAppointmentsOfUser(userId);
+        return ResponseEntity.ok().body(result);
+    }
 }

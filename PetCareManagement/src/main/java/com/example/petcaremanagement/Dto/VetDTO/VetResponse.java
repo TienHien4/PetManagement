@@ -19,5 +19,5 @@ public class VetResponse {
     private String phoneNumber;
     private String clinicAddress;
     private String specialty;
-    private List<Appointment> appointments;
+    private List<Long> appointments;
 }

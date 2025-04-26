@@ -106,4 +106,18 @@ public class PetServiceIplm implements PetService {
             return petResponse;
         });
     }
+
+    @Override
+    public List<PetResponse> GetPetsByUser(long userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        var listPets = petRepo.findByOwner(user);
+        var response = listPets.stream().map(
+                s -> {
+                    PetResponse petResponse = petMapper.toPetResponse(s);
+                    petResponse.setOwnerId(userId);
+                    return petResponse;
+                }
+        ).toList();
+        return response;
+    }
 }

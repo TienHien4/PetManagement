@@ -7,33 +7,24 @@ import Footer from "../../components/home/Footer";
 import { Pagination } from 'antd';
 
 function Schedule() {
+    const userId = localStorage.getItem("Id")
     const [data, setData] = useState([])
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
-    const [pageSize] = useState(5);
     const accessToken = localStorage.getItem("accessToken")
     useEffect(() => {
-        try {
-            const fetchData = async (accessToken, pageNo, pageSize) => {
-                const res = await axios.get("api/appointment/getAppointments",
-                    {
-                        params: { pageNo, pageSize },
-                        headers: { Authorization: `Bearer ${accessToken}` }
-                    }
-                )
-                console.log(res.data)
-                setData(res.data.content)
-                setTotalPages(res.data.totalPages)
+        const fetchData = async () => {
+            try {
+                const res = await axios.get(`api/appointment/getAppointmentsByUser/${userId}`, {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                console.log(res.data);
+                setData(res.data)
+            } catch (error) {
+                console.error(error);
             }
-            fetchData(accessToken, currentPage, pageSize)
-        } catch (error) {
-            console.log(error)
-        }
-    }, [accessToken])
+        };
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+        fetchData();
+    }, []);
     return (
         <div className="profile">
             <Header></Header>
@@ -73,12 +64,7 @@ function Schedule() {
                             </tbody>
 
                         </table>
-                        <Pagination
-                            current={currentPage}
-                            pageSize={pageSize}
-                            total={totalPages * pageSize}
-                            onChange={handlePageChange}
-                        />
+
                     </div>
                 </div>
 

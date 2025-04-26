@@ -24,5 +24,8 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "vet", nullable = true)
     private Vet vet;
+    @ManyToOne
+    @JoinColumn(name = "user", nullable = true)
+    private User user;
 
 }

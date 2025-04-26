@@ -18,4 +18,5 @@ public interface PetService {
     List<PetResponse> GetPetBySpecies(String species);
     void DeletePet(long id);
     Page<PetResponse> Pagination(int pageNo, int pageSize);
+    List<PetResponse> GetPetsByUser(long userId);
 }

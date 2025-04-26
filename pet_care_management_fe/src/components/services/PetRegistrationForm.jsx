@@ -3,13 +3,18 @@ import '../../assets/css/PetRegistrationForm.css';
 import axios from '../../services/customizeAxios';
 
 const PetRegistrationForm = () => {
+  const userID = localStorage.getItem("Id")
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [petSpecies, setPetSpecies] = useState("")
   const [services, setServices] = useState([])
   const [date, setDate] = useState("")
   const [vetId, setVetId] = useState(1)
-  const handleSubmit = async () => {
+  const [userId, setUserId] = useState(Number(userID))
+
+  const handleSubmit = async (e) => {
+
+    e.preventDefault()
 
     const accessToken = localStorage.getItem("accessToken")
     try {
@@ -21,7 +26,8 @@ const PetRegistrationForm = () => {
           petSpecies,
           services,
           date,
-          vetId
+          vetId,
+          userId
         },
         {
           header: { Authorization: `Bearer ${accessToken}` },

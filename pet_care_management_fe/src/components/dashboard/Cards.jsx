@@ -15,14 +15,16 @@ function Cards() {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
       setPetAmount(res1.data.length)
+
       // const res2 = await axios.get("/api/user/getAll", {
       //   headers: {Authorization: `Bearer ${accessToken}`}
       // })
       // setPetAmount(res1.data.length)
-      // const res3 = await axios.get("/api/pet/getAllPet", {
-      //   headers: {Authorization: `Bearer ${accessToken}`}
-      // })
-      // setPetAmount(res1.data.length)
+      const res3 = await axios.get("/api/vet/getAllVet", {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
+      setVetAmount(res3.data.length)
+
     }
     fetchData1()
   }, [])
@@ -46,7 +48,7 @@ function Cards() {
       <div className="card">
         <i className="fas fa-user-md icon green"></i>
         <div className="text">
-          <span className="value">-</span>
+          <span className="value">{vetAmount}</span>
           <span className="label">Bác sĩ thú y</span>
         </div>
       </div>

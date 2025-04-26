@@ -19,4 +19,5 @@ public class AppointmentRequest {
     private Date date;
     private List<String> services;
     private long vetId;
+    private long userId;
 }

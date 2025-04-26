@@ -1,8 +1,10 @@
 package com.example.petcaremanagement.Service.Iplm;
 
+import com.example.petcaremanagement.Dto.PetDTO.PetResponse;
 import com.example.petcaremanagement.Dto.VetDTO.VetRequest;
 import com.example.petcaremanagement.Dto.VetDTO.VetResponse;
 import com.example.petcaremanagement.Entity.Appointment;
+import com.example.petcaremanagement.Entity.Pet;
 import com.example.petcaremanagement.Entity.Vet;
 import com.example.petcaremanagement.Mapper.VetMapper;
 import com.example.petcaremanagement.Repository.AppointmentRepository;
@@ -51,7 +53,10 @@ public class VetServiceIplm implements VetService {
 
     @Override
     public List<VetResponse> GetAllVet() {
-        return null;
+        List<Vet> listVets = vetRepo.findAll();
+        List<VetResponse> listResponse = listVets.stream()
+                .map(vet -> vetMapper.toVetResponse(vet)).toList();
+        return listResponse;
     }
 
     @Override

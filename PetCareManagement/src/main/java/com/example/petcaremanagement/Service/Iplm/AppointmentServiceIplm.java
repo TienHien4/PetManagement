@@ -38,7 +38,9 @@ public class AppointmentServiceIplm implements AppointmentService {
     public AppointmentResponse CreateAppointment(AppointmentRequest request) {
         Appointment appointment = appointmentMapper.toAppointment(request);
         Vet vet = vetRepo.findById(request.getVetId()).orElseThrow(() -> new RuntimeException("Vet not found"));
+        User user = userRepository.findById(request.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
         appointment.setVet(vet);
+        appointment.setUser(user);
         List<ServicesType> services = request.getServices().stream().map(s -> {
                 ServicesType service = servicesTypeRepository.findByName(s);
                 return service;
@@ -74,6 +76,7 @@ public class AppointmentServiceIplm implements AppointmentService {
         Page<AppointmentResponse> response = listAppointment.map(appointment -> {
                  AppointmentResponse appointmentResponse = appointmentMapper.toAppointmentResponse(appointment);
                  appointmentResponse.setVetId(appointment.getVet().getId());
+                 appointmentResponse.setUserId(appointment.getUser().getId());
                  return appointmentResponse;
         }
         );
@@ -84,8 +87,15 @@ public class AppointmentServiceIplm implements AppointmentService {
     @Override
     public List<AppointmentResponse> ListAppointmentsOfUser(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
-
-        return null;
+        List<Appointment> listAppointment = appointmentRepository.findByUser(user);
+        var response = listAppointment.stream()
+                .map(s -> {
+                    AppointmentResponse appointmentResponse = appointmentMapper.toAppointmentResponse(s);
+                    appointmentResponse.setVetId(s.getVet().getId());
+                    return appointmentResponse;
+                }).toList();
+        return response;
     }
+
+
 }

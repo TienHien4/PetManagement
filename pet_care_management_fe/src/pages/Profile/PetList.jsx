@@ -7,29 +7,21 @@ import Footer from "../../components/home/Footer";
 import { Pagination } from 'antd';
 
 function PetList() {
+    const userId = localStorage.getItem("Id")
     const [data, setData] = useState([])
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
-    const [pageSize] = useState(5);
     const accessToken = localStorage.getItem("accessToken")
     useEffect(() => {
-        const fetchData = async (accessToken, pageNo, pageSize) => {
-            const res = await axios.get("api/pet/getPets",
+        const fetchData = async () => {
+            const res = await axios.get(`api/pet/getPetsByUser/${userId}`,
                 {
-                    params: { pageNo, pageSize },
                     headers: { Authorization: `Bearer ${accessToken}` }
                 }
             )
             console.log(res.data)
-            setData(res.data.content)
-            setTotalPages(res.data.totalPages)
+            setData(res.data)
         }
-        fetchData(accessToken, currentPage, pageSize)
-    }, [accessToken])
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+        fetchData()
+    }, [])
 
     return (
         <div className="profile">
@@ -64,12 +56,7 @@ function PetList() {
                                 ))}
                             </tbody>
                         </table>
-                        <Pagination
-                            current={currentPage}
-                            pageSize={pageSize}
-                            total={totalPages * pageSize}
-                            onChange={handlePageChange}
-                        />
+
                     </div>
                 </div>
 

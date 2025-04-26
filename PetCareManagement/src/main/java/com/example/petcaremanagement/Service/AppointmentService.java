@@ -13,4 +13,5 @@ public interface AppointmentService {
     List<AppointmentResponse> listAppointments();
     Page<AppointmentResponse> pageAppointment(int pageNo, int pageSize);
     List<AppointmentResponse> ListAppointmentsOfUser(long userId);
+
 }

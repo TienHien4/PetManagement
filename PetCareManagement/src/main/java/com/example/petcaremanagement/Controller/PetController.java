@@ -24,6 +24,7 @@ public class PetController {
     }
     @GetMapping("/getAllPet")
     public ResponseEntity<List<PetResponse>> GetAllPet(){
+
         return ResponseEntity.ok().body(petService.GetAllPet());
     }
     @GetMapping("/getPets/{keyword}")
@@ -40,6 +41,11 @@ public class PetController {
     public ResponseEntity<Page<PetResponse>> GetAllPets(@RequestParam int pageNo,
              @RequestParam(defaultValue = "5") int pageSize){
         return ResponseEntity.ok().body(petService.Pagination(pageNo, pageSize));
+    }
+    @GetMapping("/getPetsByUser/{userId}")
+    public ResponseEntity<List<PetResponse>> GetPetsByUserId(@PathVariable long userId){
+        var result = petService.GetPetsByUser(userId);
+        return ResponseEntity.ok().body(result);
     }
 
 

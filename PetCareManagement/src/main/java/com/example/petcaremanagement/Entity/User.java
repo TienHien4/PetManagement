@@ -26,10 +26,8 @@ public class User {
     private String gender;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Pet> listPets;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @Column(nullable = true)
-    private List<Notification> listNotifications;
+    private List<Appointment> appointments;
     @ManyToMany
     private Set<Role> roles;
 

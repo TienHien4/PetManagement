@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 public interface VetMapper {
     @Mapping(target = "appointments", ignore = true)
     Vet toVet(VetRequest request);
+    @Mapping(target = "appointments", ignore = true)
     VetResponse toVetResponse(Vet vet);
     @Mapping(target = "appointments", ignore = true)
     void updateVet(@MappingTarget Vet vet, VetRequest request);

@@ -11,8 +11,10 @@ public interface AppointmentMapper {
 
     @Mapping(target = "vet", ignore = true)
     @Mapping(target = "services", ignore = true)
+    @Mapping(target = "user", ignore = true)
     Appointment toAppointment(AppointmentRequest request);
 
     @Mapping(target = "vetId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     AppointmentResponse toAppointmentResponse(Appointment appointment);
 }

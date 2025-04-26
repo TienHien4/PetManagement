@@ -20,4 +20,5 @@ public class AppointmentResponse {
     private Date date;
     private List<ServicesType> services;
     private long vetId;
+    private long userId;
 }
