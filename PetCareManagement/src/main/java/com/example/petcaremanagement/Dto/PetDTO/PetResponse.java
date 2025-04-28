@@ -21,5 +21,7 @@ public class PetResponse {
     private Date dob;
     private float weight;
     private int age;
+    private String imageUrl;
     private long ownerId;
+
 }

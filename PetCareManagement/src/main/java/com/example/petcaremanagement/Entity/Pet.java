@@ -21,6 +21,7 @@ public class Pet {
     private Date dob;
     private float weight;
     private int age;
+    private String image;
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;

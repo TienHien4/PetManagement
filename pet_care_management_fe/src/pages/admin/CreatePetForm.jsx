@@ -12,12 +12,12 @@ const CreatePetForm = () => {
   const [gender, setGender] = useState("");
   const [weight, setWeight] = useState("");
   const [age, setAge] = useState("");
+  const [image, setImage] = useState(null)
   const navigate = useNavigate()
 
   const handleCreate = async () => {
-
     try {
-      const res = await axios.post("/api/pet/create", {
+      const petRequest = {
         name,
         ownerId,
         species,
@@ -26,14 +26,28 @@ const CreatePetForm = () => {
         gender,
         weight,
         age,
+      };
+
+      const formData = new FormData();
+      formData.append("petRequest", JSON.stringify(petRequest)); // gửi dưới dạng chuỗi JSON
+      if (image) {
+        formData.append("imageFile", image); // gửi file ảnh
+      }
+
+      const res = await axios.post("/api/pet/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+
       console.log(res.data);
-      navigate("/admin/petmanagement")
+      navigate("/admin/petmanagement");
     } catch (error) {
       console.error("Error creating pet:", error);
-      // Xử lý lỗi (hiển thị thông báo lỗi)
+      alert("Tạo thú cưng thất bại");
     }
   };
+
 
   return (
     <div className="pet-form-container">
@@ -126,6 +140,18 @@ const CreatePetForm = () => {
               value={age}
               onChange={(e) => setAge(e.target.value)}
             />
+          </div>
+        </div>
+        <div className="form-section">
+          <div className="input-group">
+            <div className="input-field">
+              <label>Ảnh thú cưng</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
+              />
+            </div>
           </div>
         </div>
       </div>

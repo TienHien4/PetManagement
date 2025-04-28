@@ -37,9 +37,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         httpSecurity.authorizeHttpRequests(request
-                -> request.requestMatchers(HttpMethod.GET, "/api/pet/**", "/oauth2/**", "/login/**").permitAll()
+                -> request.requestMatchers(HttpMethod.GET, "/api/pet/**", "/uploads/pets/**", "/oauth2/**", "/login/**").permitAll()
                 .requestMatchers(HttpMethod.POST,  "/api/user/create",
-                        "/login/**", "/api/pet/**", "/refreshToken", "/oauth2/**").permitAll()
+                        "/login/**", "/api/pet/**", "/uploads/pets/**", "/refreshToken", "/oauth2/**").permitAll()
                 .anyRequest().authenticated());
         httpSecurity.oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(

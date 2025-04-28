@@ -138,6 +138,7 @@ const PetsManagement = () => {
       <table style={{ width: "1315px" }}>
         <thead className="bg-gray-200">
           <tr>
+            <th className="p-2">Ảnh</th>
             <th className="p-2">Tên</th>
             <th className="p-2">Loài</th>
             <th className="p-2">Giống</th>
@@ -149,6 +150,13 @@ const PetsManagement = () => {
         <tbody>
           {(Array.isArray(petSearch) && petSearch.length > 0 ? petSearch : pets)?.map((pet) => (
             <tr key={pet.id} className="border-t">
+              <td className="p-2">
+                <img
+                  src={pet.imageUrl || 'https://via.placeholder.com/70'}
+                  alt={pet.name}
+                  style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "8px" }}
+                />
+              </td>
               <td className="p-2">{pet.name}</td>
               <td className="p-2">{pet.species}</td>
               <td className="p-2">{pet.breed}</td>
