@@ -49,16 +49,11 @@ public class PetController {
     @PostMapping("/create")
     public ResponseEntity<?> CreatePet(@RequestParam("imageFile") MultipartFile imageFile,
                                                  @RequestParam("petRequest") String petRequestJson) {
-        try {
+     
             PetRequest petRequest = new ObjectMapper().readValue(petRequestJson, PetRequest.class);
             PetResponse petResponse = petService.CreatePet(petRequest, imageFile);
 
             return ResponseEntity.ok().body(petResponse);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("OwnerId is not null"));
-        }
     }
 
     @PostMapping("/update/{id}")
