@@ -2,10 +2,12 @@ package com.example.petcaremanagement.Controller;
 
 import com.example.petcaremanagement.Dto.PetDTO.PetRequest;
 import com.example.petcaremanagement.Dto.PetDTO.PetResponse;
+import com.example.petcaremanagement.DtoError.ErrorResponse;
 import com.example.petcaremanagement.Service.PetService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,7 +47,7 @@ public class PetController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<PetResponse> CreatePet(@RequestParam("imageFile") MultipartFile imageFile,
+    public ResponseEntity<?> CreatePet(@RequestParam("imageFile") MultipartFile imageFile,
                                                  @RequestParam("petRequest") String petRequestJson) {
         try {
             PetRequest petRequest = new ObjectMapper().readValue(petRequestJson, PetRequest.class);
@@ -53,7 +55,9 @@ public class PetController {
 
             return ResponseEntity.ok().body(petResponse);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("OwnerId is not null"));
         }
     }
 
@@ -62,10 +66,7 @@ public class PetController {
                                                  @RequestParam("imageFile") MultipartFile imageFile,
                                                  @RequestParam("petRequest") String petRequestJson) {
         try {
-            // Convert JSON string to PetRequest object
             PetRequest petRequest = new ObjectMapper().readValue(petRequestJson, PetRequest.class);
-
-            // Call service to handle updating of Pet and image
             PetResponse petResponse = petService.UpdatePet(id, petRequest, imageFile);
 
             return ResponseEntity.ok().body(petResponse);

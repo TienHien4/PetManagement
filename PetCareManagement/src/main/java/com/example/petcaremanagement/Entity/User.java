@@ -30,6 +30,8 @@ public class User {
     private List<Appointment> appointments;
     @ManyToMany
     private Set<Role> roles;
+    @OneToOne(mappedBy = "user")
+    private ShoppingCart shoppingCart;
 
 
 }

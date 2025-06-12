@@ -1,6 +1,7 @@
 package com.example.petcaremanagement.Controller;
 
 import com.example.petcaremanagement.Dto.LoginDTO.*;
+import com.example.petcaremanagement.DtoError.ErrorResponse;
 import com.example.petcaremanagement.Entity.Role;
 import com.example.petcaremanagement.Entity.User;
 import com.example.petcaremanagement.Repository.RoleRepository;
@@ -18,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,10 +41,17 @@ public class LoginController {
     private RoleRepository roleRepo;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> Login(@RequestBody LoginRequest request){
-           var result = authenticatedService.Authenticated(request);
-           return ResponseEntity.ok().body(result);
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            var result = authenticatedService.Authenticated(request);
+            return ResponseEntity.ok(result);
+        } catch (JwtException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("Password is invalid!"));
+        }
     }
+
 
     @GetMapping("/login/oauth2/code/google")
     public void oauth2SuccessGoogle(HttpServletRequest request, HttpServletResponse response) throws IOException {

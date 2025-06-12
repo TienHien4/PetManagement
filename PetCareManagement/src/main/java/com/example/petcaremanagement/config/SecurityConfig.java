@@ -45,8 +45,10 @@ public class SecurityConfig {
                 .userInfoEndpoint(
                 userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService))
                 .loginPage("/login")
+
                 .defaultSuccessUrl("http://localhost:3000/oauth2/redirect", true)
                 .failureUrl("/login?error=true"));
+
         httpSecurity.exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -62,6 +64,7 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJWTDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter())));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.formLogin().disable();
         return httpSecurity.build();
     }
 

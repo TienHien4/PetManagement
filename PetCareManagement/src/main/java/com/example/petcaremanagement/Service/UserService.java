@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface UserService {
-    UserResponse CreateUser(UserRequest request);
+    UserResponse CreateUser(UserRequest request) throws Exception;
     List<UserResponse> GetAllUser();
     List<UserResponse> FindUsers(String keyword);
     UserResponse UpdateUser(long id, UserRequest request);

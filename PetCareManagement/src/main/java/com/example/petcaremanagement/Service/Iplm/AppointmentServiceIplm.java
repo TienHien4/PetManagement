@@ -49,6 +49,7 @@ public class AppointmentServiceIplm implements AppointmentService {
         appointmentRepository.save(appointment);
         var reponse = appointmentMapper.toAppointmentResponse(appointment);
         reponse.setVetId(request.getVetId());
+        reponse.setUserId(request.getUserId());
         return reponse;
     }
 

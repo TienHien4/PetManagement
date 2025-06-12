@@ -2,9 +2,11 @@ package com.example.petcaremanagement.Controller;
 
 import com.example.petcaremanagement.Dto.UserDTO.UserRequest;
 import com.example.petcaremanagement.Dto.UserDTO.UserResponse;
+import com.example.petcaremanagement.DtoError.ErrorResponse;
 import com.example.petcaremanagement.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +20,14 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<UserResponse> CreateUser(@RequestBody UserRequest request){
-        return ResponseEntity.ok().body(userService.CreateUser(request));
+    public ResponseEntity<?> CreateUser(@RequestBody UserRequest request){
+        try{
+            return ResponseEntity.ok().body(userService.CreateUser(request));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse("You need to enter complete information"));
+        }
     }
     @GetMapping("/getInfor/{id}")
     public ResponseEntity<UserResponse> GetUserByEmail(@PathVariable long id){

@@ -44,13 +44,10 @@ public class PetServiceIplm implements PetService {
         Pet pet = petMapper.toPet(request);
         User owner = userRepo.findById(request.getOwnerId()).orElseThrow(() ->
                 new RuntimeException("Owner not found with id: " + request.getOwnerId()));
-
         pet.setOwner(owner);
-
-        // Xử lý ảnh nếu có
         if (imageFile != null && !imageFile.isEmpty()) {
             String imagePath = saveImage(imageFile);
-            pet.setImage(imagePath);  // Set đường dẫn ảnh vào Pet
+            pet.setImage(imagePath);
         }
 
         petRepo.save(pet);
@@ -59,43 +56,27 @@ public class PetServiceIplm implements PetService {
         response.setOwnerId(pet.getOwner().getId());
         return response;
     }
-
-    // Phương thức cập nhật Pet với ảnh
     @Override
     public PetResponse UpdatePet(long id, PetRequest request, MultipartFile imageFile) {
         Pet pet = petRepo.findById(id).orElseThrow(() ->
                 new RuntimeException("Pet not found with id: " + id));
 
         petMapper.updatePet(pet, request);
-
-        // Xử lý ảnh nếu có
         if (imageFile != null && !imageFile.isEmpty()) {
             String imagePath = saveImage(imageFile);
-            pet.setImage(imagePath);  // Cập nhật ảnh mới vào Pet
+            pet.setImage(imagePath);
         }
-
         petRepo.save(pet);
         return petMapper.toPetResponse(pet);
     }
-
-    // Lưu ảnh vào thư mục và trả về đường dẫn ảnh
     private String saveImage(MultipartFile imageFile) {
         try {
-            // Lấy phần mở rộng của file (extension)
             String originalFilename = imageFile.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-
-            // Tạo tên ảnh mới với phần mở rộng đúng
             String imageName = UUID.randomUUID().toString() + extension;
-
             Path imagePath = Paths.get("uploads/pets", imageName);
-
-            // Tạo thư mục nếu chưa có
             Files.createDirectories(imagePath.getParent());
-
-            // Ghi file vào thư mục
             Files.write(imagePath, imageFile.getBytes());
-
             return imageName;
         } catch (IOException e) {
             throw new RuntimeException("Could not save image file: " + e.getMessage());

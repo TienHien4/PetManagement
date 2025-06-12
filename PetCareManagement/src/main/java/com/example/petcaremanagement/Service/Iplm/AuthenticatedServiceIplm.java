@@ -98,6 +98,12 @@ public class AuthenticatedServiceIplm implements AuthenticatedService {
         if (expTimeRefreshToken.before(new Date())) {
             throw new Exception("RefreshToken has expired");
         }
+        if(!ValidToken(request.getToken())){
+            throw new Exception("Token invalid");
+        }
+        if(!ValidToken(request.getRefreshToken())){
+            throw new Exception("RefreshToken invalid");
+        }
 
         SignedJWT signedAccessToken = SignedJWT.parse(request.getToken());
         String tokenId = signedAccessToken.getJWTClaimsSet().getJWTID();
@@ -110,10 +116,15 @@ public class AuthenticatedServiceIplm implements AuthenticatedService {
 
         invalidatedTokenRepo.save(invalidatedToken);
         var user = userRepo.findUserByUserName(signedRefreshToken.getJWTClaimsSet().getSubject());
+        Set<String> roles = user.getRoles().stream().map(s -> s.toString()).collect(Collectors.toSet());
         var newAccessToken = GeneratedToken(user);
 
         return LoginResponse.builder()
+                .id(user.getId())
+                .userName(user.getUserName())
                 .token(newAccessToken)
+                .refreshToken(request.getRefreshToken())
+                .roles(roles)
                 .message("Success")
                 .build();
     }

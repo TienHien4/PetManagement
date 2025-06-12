@@ -32,7 +32,7 @@ public class UserServiceIplm implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public UserResponse CreateUser(UserRequest request) {
+    public UserResponse CreateUser(UserRequest request) throws Exception {
 
         User user = userMapper.toUser(request);
         var response = userMapper.toUserResponse(user);
@@ -44,6 +44,9 @@ public class UserServiceIplm implements UserService {
         roles.add(r);
         response.setRoles(roles);
         user.setRoles(roles);
+        if(user.getUserName().isEmpty() || user.getPassword().isEmpty() || user.getEmail().isEmpty()){
+            throw new Exception("You need to enter complete information");
+        }
         userRepo.save(user);
         return response;
     }
@@ -70,7 +73,17 @@ public class UserServiceIplm implements UserService {
     public UserResponse UpdateUser(long id, UserRequest request) {
         User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("Not found user by id: " + id));
         userMapper.updateUser(user, request);
-        return userMapper.toUserResponse(userRepo.save(user));
+        var response = userMapper.toUserResponse(user);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        var r = roleRepo.findById("USER")
+                .orElseThrow(() -> new RuntimeException("Not found!"));
+        roles.add(r);
+        response.setRoles(roles);
+        user.setRoles(roles);
+        userRepo.save(user);
+        return response;
     }
 
     @Override
