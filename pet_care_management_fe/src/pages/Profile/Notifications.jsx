@@ -16,8 +16,7 @@ function Notifications() {
                         <p className="subtitle">Các thông báo từ hệ thống</p>
 
                         <ul className="notification-list" id="notificationList">
-                            <li>Hệ thống: Lịch khám của Dog1 vào ngày 15/04/2025 đã được xác nhận.</li>
-                            <li>Hệ thống: Mật khẩu của bạn đã được thay đổi thành công vào 09/04/2025.</li>
+
                         </ul>
                     </div>
                 </div>
