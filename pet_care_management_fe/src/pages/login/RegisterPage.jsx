@@ -24,7 +24,7 @@ const RegisterPage = () => {
         if (!dob) {
             setError("Vui lòng chọn ngày sinh!");
             return;
-        }
+        }  
         setError("");
 
         try {

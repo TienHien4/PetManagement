@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -20,8 +21,8 @@ public class ShoppingCart {
     private int id;
     private int totalItems;
     private double totalPrices;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy="cart")
-    private Set<CartItem> cartItem;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItem;
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;

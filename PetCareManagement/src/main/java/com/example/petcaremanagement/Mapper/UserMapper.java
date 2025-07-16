@@ -10,8 +10,9 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     @Mapping(target = "roles", ignore = true)
-
-    @Mapping(target = "listPets", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "appointments", ignore = true)
+    @Mapping(target = "shoppingCart", ignore = true)
     User toUser(UserRequest request);
 
     @Mapping(target = "listPets", ignore = true)

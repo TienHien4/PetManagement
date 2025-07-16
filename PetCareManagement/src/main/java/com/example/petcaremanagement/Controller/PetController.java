@@ -4,6 +4,7 @@ import com.example.petcaremanagement.Dto.PetDTO.PetRequest;
 import com.example.petcaremanagement.Dto.PetDTO.PetResponse;
 import com.example.petcaremanagement.DtoError.ErrorResponse;
 import com.example.petcaremanagement.Service.PetService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,7 @@ public class PetController {
 
     @PostMapping("/create")
     public ResponseEntity<?> CreatePet(@RequestParam("imageFile") MultipartFile imageFile,
-                                                 @RequestParam("petRequest") String petRequestJson) {
+                                                 @RequestParam("petRequest") String petRequestJson) throws JsonProcessingException {
      
             PetRequest petRequest = new ObjectMapper().readValue(petRequestJson, PetRequest.class);
             PetResponse petResponse = petService.CreatePet(petRequest, imageFile);

@@ -1,9 +1,7 @@
 package com.example.petcaremanagement.Mapper;
 
-import com.example.petcaremanagement.Dto.PetDTO.PetRequest;
 import com.example.petcaremanagement.Dto.ProductDTO.ProductRequest;
 import com.example.petcaremanagement.Dto.ProductDTO.ProductResponse;
-import com.example.petcaremanagement.Entity.Pet;
 import com.example.petcaremanagement.Entity.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

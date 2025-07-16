@@ -17,10 +17,10 @@ public class CartItem {
     private long id;
     private int quantity;
     private double totalPrice;
-    @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", referencedColumnName = "product_id")
-    private Product sp;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Product product;
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "shoppingCart_id", referencedColumnName = "shoppingCart_id")
     private ShoppingCart cart;
 }

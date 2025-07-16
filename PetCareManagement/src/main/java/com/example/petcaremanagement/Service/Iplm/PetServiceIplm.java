@@ -15,15 +15,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 
 @Service
 public class PetServiceIplm implements PetService {
@@ -38,6 +39,7 @@ public class PetServiceIplm implements PetService {
 
     @Autowired
     private UserMapper userMapper;
+    private static final Logger logger = LoggerFactory.getLogger(PetServiceIplm.class);
 
     @Override
     public PetResponse CreatePet(PetRequest request, MultipartFile imageFile) {
@@ -109,6 +111,7 @@ public class PetServiceIplm implements PetService {
         return listPets.stream().map(pet -> {
             PetResponse petResponse = petMapper.toPetResponse(pet);
             petResponse.setOwnerId(pet.getOwner().getId());
+
             return petResponse;
         }).toList();
     }
@@ -129,6 +132,9 @@ public class PetServiceIplm implements PetService {
     @Override
     public Page<PetResponse> Pagination(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize);
+        logger.info("Test");
+        logger.error("error");
+        logger.warn("warn");
         return petRepo.findAll(pageable).map(s -> {
             PetResponse petResponse = petMapper.toPetResponse(s);
             petResponse.setOwnerId(s.getOwner().getId());
