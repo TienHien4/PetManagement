@@ -55,7 +55,7 @@ public class PetController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> CreatePet(@RequestParam("imageFile") MultipartFile imageFile,
+    public ResponseEntity<?> CreatePet(@RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             @RequestParam("petRequest") String petRequestJson) throws JsonProcessingException {
 
         PetRequest petRequest = new ObjectMapper().readValue(petRequestJson, PetRequest.class);
@@ -66,7 +66,7 @@ public class PetController {
 
     @PostMapping("/update/{id}")
     public ResponseEntity<PetResponse> UpdatePet(@PathVariable long id,
-            @RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             @RequestParam("petRequest") String petRequestJson) {
         try {
             PetRequest petRequest = new ObjectMapper().readValue(petRequestJson, PetRequest.class);

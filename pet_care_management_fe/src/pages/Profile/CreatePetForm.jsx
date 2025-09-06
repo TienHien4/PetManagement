@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "../../services/customizeAxios"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
@@ -32,19 +32,76 @@ const CreatePetForm = () => {
       setImagePreview(null)
     }
   }
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          window.location.href = "/login"
+          return
+        }
+
+        // Try to get user ID from localStorage first
+        const storedUserId = localStorage.getItem('userId');
+        if (storedUserId) {
+          setOwnerId(parseInt(storedUserId));
+          return;
+        }
+
+        // If not in localStorage, try to decode from JWT token
+        try {
+          const payload = JSON.parse(atob(accessToken.split('.')[1]));
+          if (payload.userId) {
+            setOwnerId(payload.userId);
+            localStorage.setItem('userId', payload.userId);
+            return;
+          }
+          if (payload.sub) {
+            // Try to parse user ID from subject if it's numeric
+            const userId = parseInt(payload.sub);
+            if (!isNaN(userId)) {
+              setOwnerId(userId);
+              localStorage.setItem('userId', userId);
+              return;
+            }
+          }
+        } catch (e) {
+          console.log('Unable to decode JWT token');
+        }
+
+        // Last fallback: prompt user or redirect to login
+        alert('Không thể xác định thông tin người dùng. Vui lòng đăng nhập lại!');
+        window.location.href = "/login";
+
+      } catch (error) {
+        console.error('Error getting current user:', error);
+        alert('Lỗi xác thực người dùng. Vui lòng đăng nhập lại!');
+        window.location.href = "/login";
+      }
+    };
+
+    getCurrentUser();
+  }, []);
 
   const handleCreate = async () => {
     setIsLoading(true)
     try {
+      const accessToken = localStorage.getItem("accessToken")
+
+      if (!ownerId) {
+        alert("Không thể xác định chủ sở hữu. Vui lòng đăng nhập lại!")
+        return
+      }
+
       const petRequest = {
         name,
-        ownerId,
+        ownerId: parseInt(ownerId),
         species,
         breed,
         dob,
         gender,
-        weight,
-        age,
+        weight: parseFloat(weight) || 0,
+        age: parseInt(age) || 0,
       }
 
       const formData = new FormData()
@@ -53,27 +110,26 @@ const CreatePetForm = () => {
         formData.append("imageFile", image)
       }
 
-      const res = await axios.post("/api/pet/create", formData, {
+      const res = await axios.post("http://localhost:8080/api/pet/create", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${accessToken}`
         },
       })
 
       console.log(res.data)
-      // Show success message
       alert("Thêm thú cưng thành công!")
-      // Navigate back to pet management
-      window.location.href = "/admin/petmanagement"
+      window.location.href = "/user/pets"
     } catch (error) {
       console.error("Error creating pet:", error)
-      alert("Tạo thú cưng thất bại")
+      alert("Tạo thú cưng thất bại: " + (error.response?.data?.message || error.message))
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleCancel = () => {
-    window.location.href = "/admin/petmanagement"
+    window.location.href = "/user/pets"
   }
 
   return (
@@ -353,14 +409,14 @@ const CreatePetForm = () => {
                     <div className="form-group">
                       <label className="form-label">
                         <i className="bi bi-person"></i>
-                        ID Chủ sở hữu
+                        Chủ sở hữu (ID: {ownerId || 'Đang tải...'})
                       </label>
                       <input
-                        type="number"
+                        type="text"
                         className="form-control"
-                        value={ownerId}
-                        onChange={(e) => setOwnerId(e.target.value)}
-                        placeholder="Nhập ID chủ sở hữu"
+                        value={ownerId ? `User #${ownerId}` : 'Đang xác định chủ sở hữu...'}
+                        disabled
+                        style={{ backgroundColor: '#f8f9fa', color: '#6c757d' }}
                       />
                     </div>
                   </div>
@@ -517,10 +573,10 @@ const CreatePetForm = () => {
                   <i className="bi bi-x-circle me-2"></i>
                   Hủy bỏ
                 </button>
-                <button className="btn btn-primary-custom" onClick={handleCreate} disabled={isLoading}>
+                <button className="btn btn-primary-custom" onClick={handleCreate} disabled={isLoading || !ownerId}>
                   {isLoading && <span className="loading-spinner"></span>}
                   <i className="bi bi-plus-circle me-2"></i>
-                  {isLoading ? "Đang thêm..." : "Thêm thú cưng"}
+                  {isLoading ? "Đang thêm..." : !ownerId ? "Đang xác định chủ sở hữu..." : "Thêm thú cưng"}
                 </button>
               </div>
             </div>

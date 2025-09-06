@@ -1,30 +1,49 @@
 
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import axios from "axios"
+import { useState, useEffect } from "react"
+import { useParams, useNavigate, Link } from "react-router-dom"
+import axios from "../../services/customizeAxios"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 const AddHealthRecord = () => {
     const { petId } = useParams()
+    const navigate = useNavigate()
     const [pet, setPet] = useState(null)
+    const [vetList, setVetList] = useState([])
+    const [recordType, setRecordType] = useState('medical')
     const [loading, setLoading] = useState(true)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [formData, setFormData] = useState({
-        type: 'checkup',
-        date: new Date().toISOString().split('T')[0],
-        veterinarian: '',
-        clinic: '',
+    const [submitting, setSubmitting] = useState(false)
+    const [successMessage, setSuccessMessage] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+
+    // Medical record form
+    const [medicalForm, setMedicalForm] = useState({
+        recordDate: new Date().toISOString().split('T')[0],
         diagnosis: '',
         treatment: '',
-        weight: '',
-        temperature: '',
-        symptoms: [],
-        medications: '',
-        notes: '',
-        nextCheckup: ''
+        veterinarian: '',
+        clinic: '',
+        symptoms: '',
+        notes: ''
     })
-    const [errors, setErrors] = useState({})
+
+    // Vaccination form
+    const [vaccinationForm, setVaccinationForm] = useState({
+        vaccineName: '',
+        vaccinationDate: new Date().toISOString().split('T')[0],
+        nextDueDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default 1 year
+        veterinarian: '',
+        clinic: '',
+        batchNumber: '',
+        notes: ''
+    })
+
+    // Weight record form
+    const [weightForm, setWeightForm] = useState({
+        recordDate: new Date().toISOString().split('T')[0],
+        weight: '',
+        notes: ''
+    })
 
     useEffect(() => {
         const accessToken = localStorage.getItem("accessToken")
@@ -33,99 +52,191 @@ const AddHealthRecord = () => {
             return
         }
 
-        fetchPetInfo(accessToken)
+        fetchPet(accessToken)
+        fetchVetList()
     }, [petId])
 
-    const fetchPetInfo = async (accessToken) => {
+    const fetchVetList = async () => {
+        try {
+            const res = await axios.get("http://localhost:8080/api/vet/getAllVet")
+            console.log("Vet list:", res.data)
+            setVetList(res.data)
+        } catch (error) {
+            console.error("Error fetching vet list:", error)
+            setErrorMessage("Không thể tải danh sách bác sĩ!")
+        }
+    }
+
+    const fetchPet = async (accessToken) => {
         setLoading(true)
         try {
             const petRes = await axios.get(`http://localhost:8080/api/pet/${petId}`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
             setPet(petRes.data)
+
+            // Pre-fill weight form with pet's existing weight
+            if (petRes.data.weight) {
+                setWeightForm(prev => ({
+                    ...prev,
+                    weight: petRes.data.weight
+                }))
+            }
         } catch (error) {
-            console.error("Error fetching pet info:", error)
-            alert("Không thể tải thông tin thú cưng!")
+            console.error("Error fetching pet:", error)
+            setErrorMessage("Không thể tải thông tin thú cưng!")
         } finally {
             setLoading(false)
         }
     }
 
-    const symptomOptions = [
-        'Sốt', 'Ho', 'Tiêu chảy', 'Nôn mửa', 'Mất cảm giác', 'Khó thở',
-        'Yếu ớt', 'Không ăn', 'Ngứa', 'Đau', 'Khó đi lại', 'Khác'
-    ]
-
-    const validateForm = () => {
-        const newErrors = {}
-
-        if (!formData.date) {
-            newErrors.date = "Vui lòng chọn ngày khám"
-        }
-
-        if (!formData.veterinarian.trim()) {
-            newErrors.veterinarian = "Vui lòng nhập tên bác sĩ"
-        }
-
-        if (!formData.clinic.trim()) {
-            newErrors.clinic = "Vui lòng nhập tên phòng khám"
-        }
-
-        if (!formData.diagnosis.trim()) {
-            newErrors.diagnosis = "Vui lòng nhập chẩn đoán"
-        }
-
-        setErrors(newErrors)
-        return Object.keys(newErrors).length === 0
-    }
-
-    const handleInputChange = (field, value) => {
-        setFormData(prev => ({
+    const handleMedicalFormChange = (e) => {
+        const { name, value } = e.target
+        setMedicalForm(prev => ({
             ...prev,
-            [field]: value
+            [name]: value
         }))
+    }
 
-        if (errors[field]) {
-            setErrors(prev => ({
-                ...prev,
-                [field]: ''
-            }))
+    const handleMedicalVetChange = (e) => {
+        const vetId = e.target.value
+        const selectedVet = vetList.find(vet => vet.veterinarianId === parseInt(vetId))
+
+        setMedicalForm(prev => ({
+            ...prev,
+            veterinarian: selectedVet ? selectedVet.name : '',
+            clinic: selectedVet ? selectedVet.clinicAddress : ''
+        }))
+    }
+
+    const handleVaccinationFormChange = (e) => {
+        const { name, value } = e.target
+        setVaccinationForm(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
+
+    const handleVaccinationVetChange = (e) => {
+        const vetId = e.target.value
+        const selectedVet = vetList.find(vet => vet.veterinarianId === parseInt(vetId))
+
+        setVaccinationForm(prev => ({
+            ...prev,
+            veterinarian: selectedVet ? selectedVet.name : '',
+            clinic: selectedVet ? selectedVet.clinicAddress : ''
+        }))
+    }
+
+    const handleWeightFormChange = (e) => {
+        const { name, value } = e.target
+        setWeightForm(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
+
+    const submitMedicalRecord = async () => {
+        const accessToken = localStorage.getItem("accessToken")
+        try {
+            setSubmitting(true)
+
+            const payload = {
+                petId: parseInt(petId),
+                recordDate: medicalForm.recordDate,
+                diagnosis: medicalForm.diagnosis,
+                treatment: medicalForm.treatment,
+                veterinarian: medicalForm.veterinarian,
+                clinic: medicalForm.clinic,
+                symptoms: medicalForm.symptoms,
+                notes: medicalForm.notes
+            }
+
+            await axios.post('http://localhost:8080/api/medical-records', payload, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+
+            setSuccessMessage("Thêm hồ sơ bệnh án thành công!")
+            setTimeout(() => {
+                navigate(`/pet/health/${petId}`)
+            }, 2000)
+        } catch (error) {
+            console.error("Error adding medical record:", error)
+            setErrorMessage("Không thể thêm hồ sơ bệnh án!")
+        } finally {
+            setSubmitting(false)
         }
     }
 
-    const handleSymptomChange = (symptom) => {
-        const updatedSymptoms = formData.symptoms.includes(symptom)
-            ? formData.symptoms.filter(s => s !== symptom)
-            : [...formData.symptoms, symptom]
+    const submitVaccination = async () => {
+        const accessToken = localStorage.getItem("accessToken")
+        try {
+            setSubmitting(true)
 
-        handleInputChange('symptoms', updatedSymptoms)
+            const payload = {
+                petId: parseInt(petId),
+                vaccineName: vaccinationForm.vaccineName,
+                vaccinationDate: vaccinationForm.vaccinationDate,
+                nextDueDate: vaccinationForm.nextDueDate,
+                veterinarian: vaccinationForm.veterinarian,
+                clinic: vaccinationForm.clinic,
+                batchNumber: vaccinationForm.batchNumber,
+                notes: vaccinationForm.notes
+            }
+
+            await axios.post('http://localhost:8080/api/vaccinations', payload, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+
+            setSuccessMessage("Thêm thông tin tiêm chủng thành công!")
+            setTimeout(() => {
+                navigate(`/pet/health/${petId}`)
+            }, 2000)
+        } catch (error) {
+            console.error("Error adding vaccination:", error)
+            setErrorMessage("Không thể thêm thông tin tiêm chủng!")
+        } finally {
+            setSubmitting(false)
+        }
+    }
+
+    const submitWeightRecord = async () => {
+        const accessToken = localStorage.getItem("accessToken")
+        try {
+            setSubmitting(true)
+
+            const payload = {
+                petId: parseInt(petId),
+                weight: parseFloat(weightForm.weight),
+                recordDate: weightForm.recordDate,
+                notes: weightForm.notes
+            }
+
+            await axios.post('http://localhost:8080/api/weight-records', payload, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+
+            setSuccessMessage("Thêm thông tin cân nặng thành công!")
+            setTimeout(() => {
+                navigate(`/pet/health/${petId}`)
+            }, 2000)
+        } catch (error) {
+            console.error("Error adding weight record:", error)
+            setErrorMessage("Không thể thêm thông tin cân nặng!")
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        if (!validateForm()) {
-            return
-        }
-
-        setIsSubmitting(true)
-        const accessToken = localStorage.getItem("accessToken")
-
-        try {
-            // In a real app, this would be an API call to save the health record
-            console.log("Saving health record:", formData)
-
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000))
-
-            alert("Thêm hồ sơ sức khỏe thành công!")
-            window.location.href = `/pet/health/${petId}`
-
-        } catch (error) {
-            console.error("Error saving health record:", error)
-            alert("Có lỗi xảy ra khi lưu hồ sơ!")
-        } finally {
-            setIsSubmitting(false)
+        if (recordType === 'medical') {
+            await submitMedicalRecord()
+        } else if (recordType === 'vaccination') {
+            await submitVaccination()
+        } else if (recordType === 'weight') {
+            await submitWeightRecord()
         }
     }
 
@@ -231,59 +342,8 @@ const AddHealthRecord = () => {
           transform: translateY(-1px);
         }
 
-        .form-input.error, .form-select.error, .form-textarea.error {
-          border-color: #ff6b6b;
-          box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
-        }
-
-        .symptoms-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 10px;
-          margin-top: 10px;
-        }
-
-        .symptom-option {
-          position: relative;
-          cursor: pointer;
-        }
-
-        .symptom-checkbox {
-          position: absolute;
-          opacity: 0;
-          cursor: pointer;
-        }
-
-        .symptom-label {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 8px 12px;
-          border: 2px solid #e1e5e9;
-          border-radius: 8px;
-          background: white;
-          transition: all 0.3s ease;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .symptom-label:hover {
-          border-color: #667eea;
-        }
-
-        .symptom-checkbox:checked + .symptom-label {
-          border-color: #667eea;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-        }
-
-        .error-message {
-          color: #ff6b6b;
-          font-size: 14px;
-          margin-top: 5px;
-          display: flex;
-          align-items: center;
-          gap: 5px;
+        .form-check-input {
+          margin-right: 8px;
         }
 
         .form-actions {
@@ -360,10 +420,6 @@ const AddHealthRecord = () => {
             font-size: 24px;
           }
 
-          .symptoms-grid {
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-          }
-
           .form-actions {
             flex-direction: column;
           }
@@ -376,7 +432,7 @@ const AddHealthRecord = () => {
                         <div className="form-card">
                             <div className="form-header">
                                 <h1 className="form-title">THÊM HỒ SƠ SỨC KHỎE</h1>
-                                <p className="text-muted">Ghi lại thông tin khám bệnh cho thú cưng</p>
+                                <p className="text-muted">Ghi lại thông tin sức khỏe cho thú cưng</p>
                             </div>
 
                             {pet && (
@@ -396,244 +452,370 @@ const AddHealthRecord = () => {
                                 </div>
                             )}
 
+                            {successMessage && (
+                                <div className="alert alert-success">
+                                    <i className="bi bi-check-circle me-2"></i>
+                                    {successMessage}
+                                </div>
+                            )}
+
+                            {errorMessage && (
+                                <div className="alert alert-danger">
+                                    <i className="bi bi-exclamation-circle me-2"></i>
+                                    {errorMessage}
+                                </div>
+                            )}
+
                             <form onSubmit={handleSubmit}>
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                <i className="bi bi-clipboard-pulse me-2"></i>
-                                                Loại khám *
-                                            </label>
-                                            <select
-                                                className="form-select"
-                                                value={formData.type}
-                                                onChange={(e) => handleInputChange('type', e.target.value)}
-                                            >
-                                                <option value="checkup">Khám định kỳ</option>
-                                                <option value="illness">Khám bệnh</option>
-                                                <option value="vaccination">Tiêm chủng</option>
-                                                <option value="surgery">Phẫu thuật</option>
-                                                <option value="emergency">Cấp cứu</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                <i className="bi bi-calendar me-2"></i>
-                                                Ngày khám *
-                                            </label>
-                                            <input
-                                                type="date"
-                                                className={`form-input ${errors.date ? 'error' : ''}`}
-                                                value={formData.date}
-                                                onChange={(e) => handleInputChange('date', e.target.value)}
-                                            />
-                                            {errors.date && (
-                                                <div className="error-message">
-                                                    <i className="bi bi-exclamation-circle"></i>
-                                                    {errors.date}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                <i className="bi bi-person-badge me-2"></i>
-                                                Bác sĩ thú y *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className={`form-input ${errors.veterinarian ? 'error' : ''}`}
-                                                value={formData.veterinarian}
-                                                onChange={(e) => handleInputChange('veterinarian', e.target.value)}
-                                                placeholder="Nhập tên bác sĩ"
-                                            />
-                                            {errors.veterinarian && (
-                                                <div className="error-message">
-                                                    <i className="bi bi-exclamation-circle"></i>
-                                                    {errors.veterinarian}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                <i className="bi bi-hospital me-2"></i>
-                                                Phòng khám *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className={`form-input ${errors.clinic ? 'error' : ''}`}
-                                                value={formData.clinic}
-                                                onChange={(e) => handleInputChange('clinic', e.target.value)}
-                                                placeholder="Nhập tên phòng khám"
-                                            />
-                                            {errors.clinic && (
-                                                <div className="error-message">
-                                                    <i className="bi bi-exclamation-circle"></i>
-                                                    {errors.clinic}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                <i className="bi bi-speedometer2 me-2"></i>
-                                                Cân nặng (kg)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                step="0.1"
-                                                className="form-input"
-                                                value={formData.weight}
-                                                onChange={(e) => handleInputChange('weight', e.target.value)}
-                                                placeholder="VD: 5.2"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                <i className="bi bi-thermometer me-2"></i>
-                                                Nhiệt độ (°C)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                step="0.1"
-                                                className="form-input"
-                                                value={formData.temperature}
-                                                onChange={(e) => handleInputChange('temperature', e.target.value)}
-                                                placeholder="VD: 38.5"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
+                                {/* Record Type Selection */}
                                 <div className="form-group">
                                     <label className="form-label">
-                                        <i className="bi bi-exclamation-triangle me-2"></i>
-                                        Triệu chứng
+                                        <i className="bi bi-clipboard-pulse me-2"></i>
+                                        Loại hồ sơ sức khỏe *
                                     </label>
-                                    <div className="symptoms-grid">
-                                        {symptomOptions.map((symptom) => (
-                                            <div key={symptom} className="symptom-option">
-                                                <input
-                                                    type="checkbox"
-                                                    id={`symptom-${symptom}`}
-                                                    className="symptom-checkbox"
-                                                    checked={formData.symptoms.includes(symptom)}
-                                                    onChange={() => handleSymptomChange(symptom)}
-                                                />
-                                                <label htmlFor={`symptom-${symptom}`} className="symptom-label">
-                                                    {symptom}
-                                                </label>
+                                    <div className="d-flex gap-3">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="recordType"
+                                                id="medical"
+                                                value="medical"
+                                                checked={recordType === 'medical'}
+                                                onChange={(e) => setRecordType(e.target.value)}
+                                            />
+                                            <label className="form-check-label" htmlFor="medical">
+                                                Hồ sơ bệnh án
+                                            </label>
+                                        </div>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="recordType"
+                                                id="vaccination"
+                                                value="vaccination"
+                                                checked={recordType === 'vaccination'}
+                                                onChange={(e) => setRecordType(e.target.value)}
+                                            />
+                                            <label className="form-check-label" htmlFor="vaccination">
+                                                Tiêm chủng
+                                            </label>
+                                        </div>
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="recordType"
+                                                id="weight"
+                                                value="weight"
+                                                checked={recordType === 'weight'}
+                                                onChange={(e) => setRecordType(e.target.value)}
+                                            />
+                                            <label className="form-check-label" htmlFor="weight">
+                                                Cân nặng
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Medical Record Form */}
+                                {recordType === 'medical' && (
+                                    <>
+                                        <div className="row">
+
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-person-badge me-2"></i>
+                                                        Bác sĩ thú y
+                                                    </label>
+                                                    <select
+                                                        className="form-input"
+                                                        name="veterinarian"
+                                                        value={medicalForm.veterinarian}
+                                                        onChange={handleMedicalVetChange}
+                                                    >
+                                                        <option value="">Chọn bác sĩ</option>
+                                                        {vetList.map((vet) => (
+                                                            <option key={vet.veterinarianId} value={vet.veterinarianId}>
+                                                                {vet.name} - {vet.clinicAddress}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">
-                                        <i className="bi bi-clipboard-check me-2"></i>
-                                        Chẩn đoán *
-                                    </label>
-                                    <textarea
-                                        className={`form-textarea ${errors.diagnosis ? 'error' : ''}`}
-                                        value={formData.diagnosis}
-                                        onChange={(e) => handleInputChange('diagnosis', e.target.value)}
-                                        placeholder="Nhập kết quả chẩn đoán của bác sĩ"
-                                        rows={3}
-                                    />
-                                    {errors.diagnosis && (
-                                        <div className="error-message">
-                                            <i className="bi bi-exclamation-circle"></i>
-                                            {errors.diagnosis}
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-calendar me-2"></i>
+                                                        Ngày khám *
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-input"
+                                                        name="recordDate"
+                                                        value={medicalForm.recordDate}
+                                                        onChange={handleMedicalFormChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
                                         </div>
-                                    )}
-                                </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">
-                                        <i className="bi bi-bandaid me-2"></i>
-                                        Phương pháp điều trị
-                                    </label>
-                                    <textarea
-                                        className="form-textarea"
-                                        value={formData.treatment}
-                                        onChange={(e) => handleInputChange('treatment', e.target.value)}
-                                        placeholder="Mô tả phương pháp điều trị"
-                                        rows={3}
-                                    />
-                                </div>
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-exclamation-triangle me-2"></i>
+                                                        Triệu chứng
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-input"
+                                                        name="symptoms"
+                                                        value={medicalForm.symptoms}
+                                                        onChange={handleMedicalFormChange}
+                                                        placeholder="Mô tả triệu chứng"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">
-                                        <i className="bi bi-capsule me-2"></i>
-                                        Thuốc được kê
-                                    </label>
-                                    <textarea
-                                        className="form-textarea"
-                                        value={formData.medications}
-                                        onChange={(e) => handleInputChange('medications', e.target.value)}
-                                        placeholder="Danh sách thuốc và liều dùng"
-                                        rows={2}
-                                    />
-                                </div>
+                                        <div className="form-group">
+                                            <label className="form-label">
+                                                <i className="bi bi-clipboard-check me-2"></i>
+                                                Chẩn đoán *
+                                            </label>
+                                            <textarea
+                                                className="form-textarea"
+                                                name="diagnosis"
+                                                value={medicalForm.diagnosis}
+                                                onChange={handleMedicalFormChange}
+                                                placeholder="Nhập kết quả chẩn đoán của bác sĩ"
+                                                rows={3}
+                                                required
+                                            />
+                                        </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">
-                                        <i className="bi bi-calendar-plus me-2"></i>
-                                        Lịch khám tiếp theo
-                                    </label>
-                                    <input
-                                        type="date"
-                                        className="form-input"
-                                        value={formData.nextCheckup}
-                                        onChange={(e) => handleInputChange('nextCheckup', e.target.value)}
-                                    />
-                                </div>
+                                        <div className="form-group">
+                                            <label className="form-label">
+                                                <i className="bi bi-bandaid me-2"></i>
+                                                Phương pháp điều trị
+                                            </label>
+                                            <textarea
+                                                className="form-textarea"
+                                                name="treatment"
+                                                value={medicalForm.treatment}
+                                                onChange={handleMedicalFormChange}
+                                                placeholder="Mô tả phương pháp điều trị"
+                                                rows={3}
+                                            />
+                                        </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">
-                                        <i className="bi bi-journal-text me-2"></i>
-                                        Ghi chú
-                                    </label>
-                                    <textarea
-                                        className="form-textarea"
-                                        value={formData.notes}
-                                        onChange={(e) => handleInputChange('notes', e.target.value)}
-                                        placeholder="Ghi chú thêm về tình trạng sức khỏe"
-                                        rows={3}
-                                    />
-                                </div>
+                                        <div className="form-group">
+                                            <label className="form-label">
+                                                <i className="bi bi-journal-text me-2"></i>
+                                                Ghi chú
+                                            </label>
+                                            <textarea
+                                                className="form-textarea"
+                                                name="notes"
+                                                value={medicalForm.notes}
+                                                onChange={handleMedicalFormChange}
+                                                placeholder="Ghi chú thêm về tình trạng sức khỏe"
+                                                rows={3}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Vaccination Form */}
+                                {recordType === 'vaccination' && (
+                                    <>
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-shield-check me-2"></i>
+                                                        Tên vaccine *
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-input"
+                                                        name="vaccineName"
+                                                        value={vaccinationForm.vaccineName}
+                                                        onChange={handleVaccinationFormChange}
+                                                        placeholder="VD: Rabies, DHPP"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-calendar me-2"></i>
+                                                        Ngày tiêm *
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-input"
+                                                        name="vaccinationDate"
+                                                        value={vaccinationForm.vaccinationDate}
+                                                        onChange={handleVaccinationFormChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-calendar-plus me-2"></i>
+                                                        Ngày tiêm tiếp theo
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-input"
+                                                        name="nextDueDate"
+                                                        value={vaccinationForm.nextDueDate}
+                                                        onChange={handleVaccinationFormChange}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-upc-scan me-2"></i>
+                                                        Số lô vaccine
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-input"
+                                                        name="batchNumber"
+                                                        value={vaccinationForm.batchNumber}
+                                                        onChange={handleVaccinationFormChange}
+                                                        placeholder="Nhập số lô vaccine"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-person-badge me-2"></i>
+                                                        Bác sĩ thú y
+                                                    </label>
+                                                    <select
+                                                        className="form-input"
+                                                        name="veterinarian"
+                                                        value={vaccinationForm.veterinarian}
+                                                        onChange={handleVaccinationVetChange}
+                                                    >
+                                                        <option value="">Chọn bác sĩ</option>
+                                                        {vetList.map((vet) => (
+                                                            <option key={vet.veterinarianId} value={vet.veterinarianId}>
+                                                                {vet.name} - {vet.clinicAddress}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">
+                                                <i className="bi bi-journal-text me-2"></i>
+                                                Ghi chú
+                                            </label>
+                                            <textarea
+                                                className="form-textarea"
+                                                name="notes"
+                                                value={vaccinationForm.notes}
+                                                onChange={handleVaccinationFormChange}
+                                                placeholder="Ghi chú về vaccine hoặc phản ứng"
+                                                rows={3}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Weight Record Form */}
+                                {recordType === 'weight' && (
+                                    <>
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-calendar me-2"></i>
+                                                        Ngày cân *
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-input"
+                                                        name="recordDate"
+                                                        value={weightForm.recordDate}
+                                                        onChange={handleWeightFormChange}
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label">
+                                                        <i className="bi bi-speedometer2 me-2"></i>
+                                                        Cân nặng (kg) *
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.1"
+                                                        className="form-input"
+                                                        name="weight"
+                                                        value={weightForm.weight}
+                                                        onChange={handleWeightFormChange}
+                                                        placeholder="VD: 5.2"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">
+                                                <i className="bi bi-journal-text me-2"></i>
+                                                Ghi chú
+                                            </label>
+                                            <textarea
+                                                className="form-textarea"
+                                                name="notes"
+                                                value={weightForm.notes}
+                                                onChange={handleWeightFormChange}
+                                                placeholder="Ghi chú về cân nặng"
+                                                rows={3}
+                                            />
+                                        </div>
+                                    </>
+                                )}
 
                                 <div className="form-actions">
-                                    <button
-                                        type="button"
+                                    <Link
+                                        to={`/pet/health/${petId}`}
                                         className="btn-cancel"
-                                        onClick={() => window.location.href = `/pet/health/${petId}`}
                                     >
                                         Hủy
-                                    </button>
+                                    </Link>
                                     <button
                                         type="submit"
                                         className="btn-submit"
-                                        disabled={isSubmitting}
+                                        disabled={submitting}
                                     >
-                                        {isSubmitting ? (
+                                        {submitting ? (
                                             <>
                                                 <span className="loading-spinner"></span>
                                                 Đang lưu...

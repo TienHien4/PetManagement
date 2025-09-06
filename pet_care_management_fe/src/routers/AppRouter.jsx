@@ -6,6 +6,7 @@ import OAuthRedirect from '../components/OAuthRedirect';
 import RegisterPage from '../pages/login/RegisterPage';
 import PetManagementPage from '../pages/admin/PetManagementPage';
 import CreatePetForm from '../pages/Profile/CreatePetForm';
+import EditPetForm from '../pages/Profile/EditPetForm';
 import Dashboard from '../pages/admin/DashboardPage';
 import UserManagementPage from '../pages/admin/UserManagementPage';
 import ServicesPage from '../pages/ServicesPage';
@@ -42,6 +43,7 @@ const AppRouter = () => {
                 <Route path="/admin/petmanagement" element={<PetManagementPage></PetManagementPage>} />
                 <Route path="/admin" element={<Dashboard></Dashboard>} />
                 <Route path="/pet/add" element={<CreatePetForm></CreatePetForm>} />
+                <Route path="/pet/edit/:petId" element={<EditPetForm></EditPetForm>} />
                 <Route path='/services' element={<ServicesPage></ServicesPage>} />
                 <Route path="/user/profile" element={<UserInformation></UserInformation>} />
                 <Route path="/user/pets" element={<PetList></PetList>} />

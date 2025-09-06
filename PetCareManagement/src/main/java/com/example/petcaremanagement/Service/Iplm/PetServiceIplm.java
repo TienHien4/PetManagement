@@ -24,8 +24,6 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 @Service
 public class PetServiceIplm implements PetService {
     @Autowired
@@ -44,8 +42,8 @@ public class PetServiceIplm implements PetService {
     @Override
     public PetResponse CreatePet(PetRequest request, MultipartFile imageFile) {
         Pet pet = petMapper.toPet(request);
-        User owner = userRepo.findById(request.getOwnerId()).orElseThrow(() ->
-                new RuntimeException("Owner not found with id: " + request.getOwnerId()));
+        User owner = userRepo.findById(request.getOwnerId())
+                .orElseThrow(() -> new RuntimeException("Owner not found with id: " + request.getOwnerId()));
         pet.setOwner(owner);
         if (imageFile != null && !imageFile.isEmpty()) {
             String imagePath = saveImage(imageFile);
@@ -56,12 +54,18 @@ public class PetServiceIplm implements PetService {
 
         PetResponse response = petMapper.toPetResponse(pet);
         response.setOwnerId(pet.getOwner().getId());
+
+        // Build image URL
+        if (pet.getImage() != null && !pet.getImage().isEmpty()) {
+            response.setImageUrl("http://localhost:8080/uploads/pets/" + pet.getImage());
+        }
+
         return response;
     }
+
     @Override
     public PetResponse UpdatePet(long id, PetRequest request, MultipartFile imageFile) {
-        Pet pet = petRepo.findById(id).orElseThrow(() ->
-                new RuntimeException("Pet not found with id: " + id));
+        Pet pet = petRepo.findById(id).orElseThrow(() -> new RuntimeException("Pet not found with id: " + id));
 
         petMapper.updatePet(pet, request);
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -71,6 +75,7 @@ public class PetServiceIplm implements PetService {
         petRepo.save(pet);
         return petMapper.toPetResponse(pet);
     }
+
     private String saveImage(MultipartFile imageFile) {
         try {
             String originalFilename = imageFile.getOriginalFilename();
@@ -85,7 +90,6 @@ public class PetServiceIplm implements PetService {
         }
     }
 
-
     @Override
     public List<PetResponse> GetAllPet() {
         List<Pet> listPets = petRepo.findAll();
@@ -98,8 +102,7 @@ public class PetServiceIplm implements PetService {
 
     @Override
     public PetResponse GetPetById(long id) {
-        Pet pet = petRepo.findById(id).orElseThrow(() ->
-                new RuntimeException("Pet not found with id: " + id));
+        Pet pet = petRepo.findById(id).orElseThrow(() -> new RuntimeException("Pet not found with id: " + id));
         PetResponse response = petMapper.toPetResponse(pet);
         response.setOwnerId(pet.getOwner().getId());
         return response;
@@ -124,8 +127,7 @@ public class PetServiceIplm implements PetService {
 
     @Override
     public void DeletePet(long id) {
-        Pet pet = petRepo.findById(id).orElseThrow(() ->
-                new RuntimeException("Pet not found with id: " + id));
+        Pet pet = petRepo.findById(id).orElseThrow(() -> new RuntimeException("Pet not found with id: " + id));
         petRepo.delete(pet);
     }
 
@@ -144,8 +146,7 @@ public class PetServiceIplm implements PetService {
 
     @Override
     public List<PetResponse> GetPetsByUser(long userId) {
-        User user = userRepo.findById(userId).orElseThrow(() ->
-                new RuntimeException("User not found"));
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         List<Pet> listPets = petRepo.findByOwner(user);
         return listPets.stream().map(s -> {
             PetResponse petResponse = petMapper.toPetResponse(s);

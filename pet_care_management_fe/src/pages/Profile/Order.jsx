@@ -696,7 +696,6 @@ const UserOrders = () => {
               <i className="bi bi-bag-fill me-2"></i>
               Đơn hàng của tôi
             </h1>
-
             <div className="header-right ms-auto d-flex gap-2">
               <button className="toggle-btn btn btn-outline-secondary" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
                 <i className={`bi ${sidebarCollapsed ? "bi-list" : "bi-x-lg"}`}></i>
@@ -806,7 +805,7 @@ const UserOrders = () => {
                   <div className="empty-icon">🛒</div>
                   <h5>Chưa có đơn hàng nào</h5>
                   <p>Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
-                  <button className="btn btn-primary mt-3" onClick={() => (window.location.href = "/shop")}>
+                  <button className="btn btn-primary mt-3" onClick={() => (window.location.href = "/products")}>
                     <i className="bi bi-shop me-2"></i>
                     Bắt đầu mua sắm
                   </button>

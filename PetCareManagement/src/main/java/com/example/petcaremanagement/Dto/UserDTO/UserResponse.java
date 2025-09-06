@@ -1,6 +1,5 @@
 package com.example.petcaremanagement.Dto.UserDTO;
 import com.example.petcaremanagement.Dto.PetDTO.PetResponse;
-import com.example.petcaremanagement.Entity.Notification;
 import com.example.petcaremanagement.Entity.Pet;
 import com.example.petcaremanagement.Entity.Role;
 import lombok.AllArgsConstructor;
