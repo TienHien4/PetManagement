@@ -12,6 +12,7 @@ public interface AppointmentMapper {
     @Mapping(target = "vet", ignore = true)
     @Mapping(target = "services", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "status", constant = "PENDING")
     Appointment toAppointment(AppointmentRequest request);
 
     @Mapping(target = "vetId", ignore = true)

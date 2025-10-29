@@ -23,7 +23,8 @@ public class Vet {
     private String specialty;
     @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL)
     private List<Appointment> appointments;
-
-
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

@@ -1,4 +1,5 @@
 package com.example.petcaremanagement.Mapper;
+
 import com.example.petcaremanagement.Dto.PetDTO.PetResponse;
 import com.example.petcaremanagement.Dto.PetDTO.PetRequest;
 import com.example.petcaremanagement.Entity.Pet;
@@ -17,8 +18,8 @@ public interface PetMapper {
     @Mapping(target = "weightRecords", ignore = true)
     Pet toPet(PetRequest request);
 
-    @Mapping(target = "ownerId", source = "owner.id")
-    @Mapping(target = "imageUrl", source = "image")
+    @Mapping(target = "userId", source = "owner.id")
+    @Mapping(target = "image", source = "image")
     PetResponse toPetResponse(Pet pet);
 
     @Mapping(target = "owner", ignore = true)

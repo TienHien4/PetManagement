@@ -20,4 +20,14 @@ public class AppointmentRequest {
     private List<String> services;
     private long vetId;
     private long userId;
+
+    // Pet information fields
+    private Long petId;
+    private String petName;
+    private String petType;
+    private String petBreed;
+    private String petAge;
+    private String petWeight;
+    private String petGender;
+    private String petImageUrl;
 }

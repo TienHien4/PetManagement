@@ -8,9 +8,16 @@ import java.util.List;
 
 public interface VetService {
     VetResponse CreateVet(VetRequest request);
-    VetResponse UpdateVet(long id,VetRequest request);
+
+    VetResponse UpdateVet(long id, VetRequest request);
+
     void DeleteVet(long id);
+
     List<VetResponse> GetAllVet();
+
     VetResponse GetVetById(long id);
+
     Page<VetResponse> Pagination(int pageNo, int pageSize);
+
+    VetResponse getVetByEmail(String email);
 }

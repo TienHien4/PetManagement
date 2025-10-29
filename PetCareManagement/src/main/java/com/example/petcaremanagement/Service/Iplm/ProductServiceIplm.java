@@ -5,6 +5,7 @@ import com.example.petcaremanagement.Dto.ProductDTO.ProductResponse;
 import com.example.petcaremanagement.Entity.Product;
 import com.example.petcaremanagement.Mapper.ProductMapper;
 import com.example.petcaremanagement.Repository.ProductRepository;
+import com.example.petcaremanagement.Service.CloudinaryService;
 import com.example.petcaremanagement.Service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,41 +13,57 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ProductServiceIplm implements ProductService {
     @Autowired
     private ProductRepository productRepository;
+
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
     @Override
     public ProductResponse CreateProduct(ProductRequest request, MultipartFile multipartFile) {
-        Product p = productMapper.toProduct(request);
-        if(multipartFile != null && !multipartFile.isEmpty()){
-            String imagePath = saveImage(multipartFile);
-            p.setImage(imagePath);
+        try {
+            Product p = productMapper.toProduct(request);
+
+            // Upload image to Cloudinary if provided
+            if (multipartFile != null && !multipartFile.isEmpty()) {
+                String imageUrl = handleImageUpload(multipartFile);
+                p.setImage(imageUrl);
+            }
+
+            productRepository.save(p);
+            return productMapper.toProductResponse(p);
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating product: " + e.getMessage(), e);
         }
-        productRepository.save(p);
-        var response = productMapper.toProductResponse(p);
-        return response;
     }
 
     @Override
     public ProductResponse UpdateProduct(long id, ProductRequest request, MultipartFile multipartFile) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
-        productMapper.updateProduct(product, request);
-        if(multipartFile != null && !multipartFile.isEmpty()){
-            String imagePath = saveImage(multipartFile);
-            product.setImage(imagePath);
+        try {
+            Product product = productRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+            productMapper.updateProduct(product, request);
+
+            // Upload new image to Cloudinary if provided
+            if (multipartFile != null && !multipartFile.isEmpty()) {
+                String imageUrl = handleImageUpload(multipartFile);
+                product.setImage(imageUrl);
+            }
+
+            productRepository.save(product);
+            return productMapper.toProductResponse(product);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating product: " + e.getMessage(), e);
         }
-        productRepository.save(product);
-        return productMapper.toProductResponse(product);
     }
 
     @Override
@@ -79,17 +96,35 @@ public class ProductServiceIplm implements ProductService {
         return products.stream().map(s -> productMapper.toProductResponse(s)).toList();
     }
 
-    private String saveImage(MultipartFile imageFile) {
+    /**
+     * Private method to handle image upload with validation
+     * 
+     * @param imageFile The image file to upload
+     * @return The URL of uploaded image or null if no file provided
+     */
+    private String handleImageUpload(MultipartFile imageFile) {
+        if (imageFile == null || imageFile.isEmpty()) {
+            return null;
+        }
+
         try {
-            String originalFilename = imageFile.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String imageName = UUID.randomUUID().toString() + extension;
-            Path imagePath = Paths.get("uploads/products", imageName);
-            Files.createDirectories(imagePath.getParent());
-            Files.write(imagePath, imageFile.getBytes());
-            return imageName;
-        } catch (IOException e) {
-            throw new RuntimeException("Could not save image file: " + e.getMessage());
+            // Validate file size (max 5MB)
+            long maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (imageFile.getSize() > maxSize) {
+                throw new RuntimeException("Image size must be less than 5MB");
+            }
+
+            // Validate file type
+            String contentType = imageFile.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new RuntimeException("File must be an image (jpg, png, etc.)");
+            }
+
+            // Upload to Cloudinary in product_images folder
+            return cloudinaryService.uploadImage(imageFile, "product_images");
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error uploading image: " + e.getMessage(), e);
         }
     }
 }

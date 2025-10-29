@@ -1,4 +1,5 @@
 package com.example.petcaremanagement.Entity;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,7 @@ public class User {
     private long id;
     private String userName;
     private String email;
+    @Column(nullable = true)
     private String password;
     private Date dob;
     private String provider;
@@ -32,6 +34,7 @@ public class User {
     private Set<Role> roles;
     @OneToOne(mappedBy = "user")
     private ShoppingCart shoppingCart;
-
+    @OneToOne(mappedBy = "user")
+    private Vet vet;
 
 }

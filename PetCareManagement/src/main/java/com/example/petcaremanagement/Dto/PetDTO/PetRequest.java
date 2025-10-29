@@ -1,4 +1,5 @@
 package com.example.petcaremanagement.Dto.PetDTO;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,6 @@ public class PetRequest {
     private Date dob;
     private float weight;
     private int age;
-    private long ownerId;
+    private long userId;
 
 }
-

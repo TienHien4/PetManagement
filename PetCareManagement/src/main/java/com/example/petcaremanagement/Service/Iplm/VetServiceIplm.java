@@ -35,8 +35,7 @@ public class VetServiceIplm implements VetService {
                     Appointment appointment = appointmentRepo.findById(s)
                             .orElseThrow(() -> new RuntimeException("Apponintment not found"));
                     return appointment;
-                }
-        ).toList();
+                }).toList();
         vet.setAppointments(appointments);
         return vetMapper.toVetResponse(vet);
     }
@@ -67,5 +66,12 @@ public class VetServiceIplm implements VetService {
     @Override
     public Page<VetResponse> Pagination(int pageNo, int pageSize) {
         return null;
+    }
+
+    @Override
+    public VetResponse getVetByEmail(String email) {
+        Vet vet = vetRepo.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("Vet not found with user email: " + email));
+        return vetMapper.toVetResponse(vet);
     }
 }

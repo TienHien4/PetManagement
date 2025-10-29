@@ -16,6 +16,6 @@ public class ProductResponse {
     private String type;
     private int quantity;
     private float price;
-    private String imageUrl;
+    private String image;
     private float salePercent;
 }

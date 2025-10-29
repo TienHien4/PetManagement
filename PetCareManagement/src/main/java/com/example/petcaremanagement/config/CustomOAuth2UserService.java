@@ -42,10 +42,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .provider(provider)
                     .email(email)
                     .userName(name)
+                    .password("OAUTH2_USER_NO_PASSWORD") // Placeholder password for OAuth2 users
                     .build();
             userRepo.save(newUser);
         }
         return oAuth2User;
     }
 }
-

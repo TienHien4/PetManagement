@@ -44,7 +44,7 @@ public class UserServiceIplm implements UserService {
         roles.add(r);
         response.setRoles(roles);
         user.setRoles(roles);
-        if(user.getUserName().isEmpty() || user.getPassword().isEmpty() || user.getEmail().isEmpty()){
+        if (user.getUserName().isEmpty() || user.getPassword().isEmpty() || user.getEmail().isEmpty()) {
             throw new Exception("You need to enter complete information");
         }
         userRepo.save(user);
@@ -103,13 +103,12 @@ public class UserServiceIplm implements UserService {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-       BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
         user.setPassword(encodedPassword);
         User savedUser = userRepo.save(user);
         return userMapper.toUserResponse(savedUser);
     }
-
 
     @Override
     public Page<UserResponse> Pagination(int pageNo, int pageSize) {
@@ -125,5 +124,22 @@ public class UserServiceIplm implements UserService {
         return listUserResponse;
     }
 
+    @Override
+    public User getUserByEmail(String email) {
+        User user = userRepo.findUserByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found with email: " + email);
+        }
+        return user;
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        User user = userRepo.findUserByUserName(username);
+        if (user == null) {
+            throw new RuntimeException("User not found with username: " + username);
+        }
+        return user;
+    }
 
 }
