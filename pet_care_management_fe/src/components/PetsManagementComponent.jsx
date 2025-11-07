@@ -441,7 +441,7 @@ const PetsManagement = () => {
                   <tr key={pet.id}>
                     <td>
                       <img
-                        src={pet.imageUrl || "/placeholder.svg?height=60&width=60"}
+                        src={pet.image || "/placeholder.svg?height=60&width=60"}
                         alt={pet.name}
                         className="pet-image"
                       />
@@ -458,7 +458,7 @@ const PetsManagement = () => {
                     <td>
                       <span className="badge bg-secondary">{pet.age} tuổi</span>
                     </td>
-                    <td>ID: {pet.ownerId}</td>
+                    <td>ID: {pet.userId}</td>
                     <td>
                       <button className="action-btn btn-edit" onClick={() => handleEditPet(pet.id)} title="Chỉnh sửa">
                         <Edit size={16} />

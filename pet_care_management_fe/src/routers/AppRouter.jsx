@@ -5,6 +5,7 @@ import HomePage from '../pages/HomePage';
 import OAuthRedirect from '../components/OAuthRedirect';
 import RegisterPage from '../pages/login/RegisterPage';
 import PetManagementPage from '../pages/admin/PetManagementPage';
+import ProductManagementPage from '../pages/admin/ProductManagementPage';
 import CreatePetForm from '../pages/Profile/CreatePetForm';
 import EditPetForm from '../pages/Profile/EditPetForm';
 import Dashboard from '../pages/admin/DashboardPage';
@@ -26,36 +27,133 @@ import HealthDashboard from '../pages/Profile/HealthDashboard';
 import AddHealthRecord from '../pages/Profile/AddHealthRecord';
 import PetHealth from '../pages/Profile/PetHealth';
 
+// VET Components
+import VetLayout from '../pages/vet/VetLayout';
+import VetDashboard from '../pages/vet/VetDashboard';
+import VetAppointments from '../pages/vet/VetAppointments';
+
+
+// Route Components
+import ProtectedRoute from '../components/ProtectedRoute';
+import RoleBasedRedirect from '../components/RoleBasedRedirect';
+
 
 const AppRouter = () => {
     return (
         <Router>
             <Routes>
                 <Route path="/login" element={<LoginPage></LoginPage>} />
-                <Route path="/" element={<LoginPage />} />
+                <Route path="/" element={<RoleBasedRedirect />} />
                 <Route path="/register" element={<RegisterPage></RegisterPage>} />
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/news" element={<NewsPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/oauth2/redirect" element={<OAuthRedirect />} />
-                <Route path="/admin/usermanagement" element={<UserManagementPage></UserManagementPage>} />
-                <Route path="/admin/petmanagement" element={<PetManagementPage></PetManagementPage>} />
-                <Route path="/admin" element={<Dashboard></Dashboard>} />
-                <Route path="/pet/add" element={<CreatePetForm></CreatePetForm>} />
-                <Route path="/pet/edit/:petId" element={<EditPetForm></EditPetForm>} />
-                <Route path='/services' element={<ServicesPage></ServicesPage>} />
-                <Route path="/user/profile" element={<UserInformation></UserInformation>} />
-                <Route path="/user/pets" element={<PetList></PetList>} />
-                <Route path="/user/schedule" element={<Schedule></Schedule>} />
-                <Route path="/user/changePassword" element={<ChangePassword></ChangePassword>} />
-                <Route path="/user/orders" element={<Order></Order>} />
+
+                {/* Admin Routes */}
+                <Route path="/admin/usermanagement" element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                        <UserManagementPage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/petmanagement" element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                        <PetManagementPage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/productmanagement" element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                        <ProductManagementPage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                        <Dashboard />
+                    </ProtectedRoute>
+                } />
+                <Route path='/admin/orders' element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                        <OrderManagement />
+                    </ProtectedRoute>
+                } />
+
+                {/* User Routes */}
+                <Route path="/pet/add" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <CreatePetForm />
+                    </ProtectedRoute>
+                } />
+                <Route path="/pet/edit/:petId" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <EditPetForm />
+                    </ProtectedRoute>
+                } />
+                <Route path='/services' element={<ServicesPage />} />
+                <Route path="/user/profile" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <UserInformation />
+                    </ProtectedRoute>
+                } />
+                <Route path="/user/pets" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <PetList />
+                    </ProtectedRoute>
+                } />
+                <Route path="/user/schedule" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <Schedule />
+                    </ProtectedRoute>
+                } />
+                <Route path="/user/changePassword" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <ChangePassword />
+                    </ProtectedRoute>
+                } />
+                <Route path="/user/orders" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <Order />
+                    </ProtectedRoute>
+                } />
                 <Route path='/products' element={<ProductPage />} />
-                <Route path='/shopping-cart' element={<ShoppingCart />} />
-                <Route path='/admin/orders' element={<OrderManagement />} />
-                <Route path="/pet/health-dashboard" element={<HealthDashboard />} />
-                <Route path="/pet/health/:petId" element={<PetHealth />} />
-                <Route path="/pet/health/:petId/add" element={<AddHealthRecord />} />
+                <Route path='/shopping-cart' element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <ShoppingCart />
+                    </ProtectedRoute>
+                } />
+                <Route path="/pet/health-dashboard" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <HealthDashboard />
+                    </ProtectedRoute>
+                } />
+                <Route path="/pet/health/:petId" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <PetHealth />
+                    </ProtectedRoute>
+                } />
+                <Route path="/pet/health/:petId/add" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <AddHealthRecord />
+                    </ProtectedRoute>
+                } />
+
+                {/* VET Routes */}
+                <Route path="/vet" element={
+                    <ProtectedRoute allowedRoles={['VET']}>
+                        <VetLayout />
+                    </ProtectedRoute>
+                }>
+                    <Route path="dashboard" element={<VetDashboard />} />
+                    <Route path="appointments" element={<VetAppointments />} />
+                </Route>
+
+                {/* Unauthorized page */}
+                <Route path="/unauthorized" element={
+                    <div className="container text-center mt-5">
+                        <h1>403 - Unauthorized</h1>
+                        <p>Bạn không có quyền truy cập trang này.</p>
+                    </div>
+                } />
             </Routes>
         </Router>
     );

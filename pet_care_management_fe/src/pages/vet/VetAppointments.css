@@ -1,0 +1,247 @@
+/* VET Appointments Styles */
+.vet-appointments {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.page-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+/* Date Group Cards */
+.date-group-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.date-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+}
+
+.date-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Appointment Table */
+.appointment-table {
+    margin-bottom: 0;
+}
+
+.appointment-table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+    padding: 15px;
+    border-top: none;
+}
+
+.appointment-table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.appointment-row:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+/* Time Cell */
+.time-cell {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    font-weight: 600;
+    color: #1976d2;
+    min-width: 80px;
+}
+
+/* Appointment ID */
+.appointment-id {
+    background-color: #f0f0f0;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #666;
+}
+
+/* Customer Info */
+.customer-info {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+/* Status Badge */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+    transform: translateY(-1px);
+}
+
+.btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: #28a745;
+    border-color: #28a745;
+    transform: translateY(-1px);
+}
+
+/* Filter Controls */
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #6c757d;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Results Summary */
+.results-summary {
+    background-color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+/* Empty State */
+.empty-icon {
+    font-size: 3rem;
+    color: #dee2e6;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .vet-appointments {
+        padding: 15px;
+    }
+
+    .appointment-table {
+        font-size: 0.875rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .btn {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+
+    .time-cell {
+        min-width: 60px;
+        font-size: 0.85rem;
+    }
+
+    .appointment-id {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+    }
+
+    .customer-info {
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .date-header {
+        padding: 10px 15px;
+    }
+
+    .appointment-table thead th,
+    .appointment-table tbody td {
+        padding: 10px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Loading States */
+.loading-row {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}

@@ -2,39 +2,56 @@ package com.example.petcaremanagement.Service.Iplm;
 
 import com.example.petcaremanagement.Dto.AppointmentDTO.AppointmentRequest;
 import com.example.petcaremanagement.Dto.AppointmentDTO.AppointmentResponse;
-import com.example.petcaremanagement.Entity.Appointment;
-import com.example.petcaremanagement.Entity.ServicesType;
-import com.example.petcaremanagement.Entity.User;
-import com.example.petcaremanagement.Entity.Vet;
+import com.example.petcaremanagement.Dto.EmailDTO.EmailEvent;
+import com.example.petcaremanagement.Entity.*;
+import com.example.petcaremanagement.Enum.EmailEventType;
 import com.example.petcaremanagement.Mapper.AppointmentMapper;
-import com.example.petcaremanagement.Repository.AppointmentRepository;
-import com.example.petcaremanagement.Repository.ServicesTypeRepository;
-import com.example.petcaremanagement.Repository.UserRepository;
-import com.example.petcaremanagement.Repository.VetRepository;
+import com.example.petcaremanagement.Repository.*;
 import com.example.petcaremanagement.Service.AppointmentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.petcaremanagement.Service.EmailProducerService;
+import com.example.petcaremanagement.Service.EmailService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceIplm implements AppointmentService {
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-    @Autowired
-    private AppointmentMapper appointmentMapper;
-    @Autowired
-    private VetRepository vetRepo;
-    @Autowired
-    private ServicesTypeRepository servicesTypeRepository;
-    @Autowired
-    private UserRepository userRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final AppointmentMapper appointmentMapper;
+    private final VetRepository vetRepo;
+    private final ServicesTypeRepository servicesTypeRepository;
+    private final UserRepository userRepository;
+    private final PetRepository petRepository;
+    private final EmailService emailService;
+    private final EmailProducerService emailProducerService;
+
+
+    public AppointmentServiceIplm(
+            AppointmentRepository appointmentRepository,
+            AppointmentMapper appointmentMapper,
+            VetRepository vetRepo,
+            ServicesTypeRepository servicesTypeRepository,
+            UserRepository userRepository,
+            PetRepository petRepository,
+            EmailService emailService,
+            EmailProducerService emailProducerService) {
+        this.appointmentRepository = appointmentRepository;
+        this.appointmentMapper = appointmentMapper;
+        this.vetRepo = vetRepo;
+        this.servicesTypeRepository = servicesTypeRepository;
+        this.userRepository = userRepository;
+        this.petRepository = petRepository;
+        this.emailService = emailService;
+        this.emailProducerService = emailProducerService;
+    }
 
     @Override
     public AppointmentResponse CreateAppointment(AppointmentRequest request) {
@@ -51,6 +68,10 @@ public class AppointmentServiceIplm implements AppointmentService {
             User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
             appointment.setUser(user);
+
+            // Validate pet
+            Pet pet = petRepository.findById(request.getPetId())
+                    .orElseThrow(() -> new RuntimeException("Pet not found"));
 
             // Find and set services
             if (request.getServices() != null && !request.getServices().isEmpty()) {
@@ -72,6 +93,9 @@ public class AppointmentServiceIplm implements AppointmentService {
 
             // Save appointment
             appointment = appointmentRepository.save(appointment);
+
+            // Send notification
+            emailService.sendAppointmentConfirmation(appointment, user, pet);
 
             // Create response
             AppointmentResponse response = appointmentMapper.toAppointmentResponse(appointment);
@@ -190,6 +214,37 @@ public class AppointmentServiceIplm implements AppointmentService {
     }
 
     @Override
+    @Transactional
+    public AppointmentResponse updateAppointmentStatus(Long id, String status) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        String oldStatus = appointment.getStatus();
+        appointment.setStatus(status);
+
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+
+        Pet pet = petRepository.findById(appointment.getPetId())
+                .orElseThrow(() -> new RuntimeException("Pet not found"));
+
+        // GỬI EMAIL THÔNG BÁO THAY ĐỔI TRẠNG THÁI
+        try {
+            emailService.sendAppointmentStatusUpdate(
+                    updatedAppointment,
+                    appointment.getUser(),
+                    pet,
+                    oldStatus,
+                    status
+            );
+        } catch (Exception e) {
+            System.err.println("Failed to send status update email: " + e.getMessage());
+        }
+
+        return convertToResponse(updatedAppointment);
+    }
+
+
+    @Override
     public AppointmentResponse updateAppointmentStatusByVetUserId(Long appointmentId, String status, Long userId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
@@ -289,6 +344,18 @@ public class AppointmentServiceIplm implements AppointmentService {
         } catch (Exception e) {
             throw new RuntimeException("Invalid date format. Use yyyy-MM-dd");
         }
+    }
+
+    private AppointmentResponse convertToResponse(Appointment appointment) {
+        AppointmentResponse response = new AppointmentResponse();
+        response.setId(appointment.getId());
+        response.setUserId(appointment.getUser().getId());
+        response.setName(appointment.getUser().getUserName());
+        response.setPetId(appointment.getPetId());
+        response.setPetName(appointment.getPetName());
+        response.setDate(appointment.getDate());
+        response.setStatus(appointment.getStatus());
+        return response;
     }
 
 }

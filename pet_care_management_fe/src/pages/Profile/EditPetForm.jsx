@@ -10,7 +10,7 @@ const EditPetForm = () => {
     const { petId } = useParams()
     const navigate = useNavigate()
     const [name, setName] = useState("")
-    const [ownerId, setOwnerId] = useState("")
+    const [userId, setUserId] = useState("")
     const [species, setSpecies] = useState("")
     const [breed, setBreed] = useState("")
     const [dob, setDob] = useState("")
@@ -36,7 +36,7 @@ const EditPetForm = () => {
     const fetchPetData = async (accessToken) => {
         setIsLoadingData(true)
         try {
-            const response = await axios.get(`http://localhost:8080/api/pet/${petId}`, {
+            const response = await axios.get(`/api/pet/${petId}`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
 
@@ -45,15 +45,15 @@ const EditPetForm = () => {
 
             // Fill form with existing data
             setName(petData.name || "")
-            setOwnerId(petData.ownerId?.toString() || "")
+            setUserId(petData.userId?.toString() || "")
             setSpecies(petData.species || "")
             setBreed(petData.breed || "")
             setDob(petData.dob || "")
             setGender(petData.gender || "")
             setWeight(petData.weight?.toString() || "")
             setAge(petData.age?.toString() || "")
-            setExistingImageUrl(petData.imageUrl || "")
-            setImagePreview(petData.imageUrl || null)
+            setExistingImageUrl(petData.image || "")
+            setImagePreview(petData.image || null)
 
         } catch (error) {
             console.error("Error fetching pet data:", error)
@@ -66,56 +66,106 @@ const EditPetForm = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0]
-        setImage(file)
 
         if (file) {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                setImagePreview(reader.result)
+            // Validate file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert("Kích thước ảnh không được vượt quá 5MB!");
+                e.target.value = null;
+                return;
             }
-            reader.readAsDataURL(file)
+
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                alert("Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF!");
+                e.target.value = null;
+                return;
+            }
+
+            setImage(file);
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
         } else {
-            setImagePreview(existingImageUrl)
+            setImage(null);
+            setImagePreview(existingImageUrl);
         }
     }
 
     const handleUpdate = async () => {
-        setIsLoading(true)
+        // Validation
+        if (!name.trim()) {
+            alert("Vui lòng nhập tên thú cưng!");
+            return;
+        }
+
+        if (!species) {
+            alert("Vui lòng chọn loại thú cưng!");
+            return;
+        }
+
+        setIsLoading(true);
         try {
-            const accessToken = localStorage.getItem("accessToken")
+            const accessToken = localStorage.getItem("accessToken");
 
             const petRequest = {
-                name,
-                ownerId: parseInt(ownerId),
+                name: name.trim(),
+                userId: userId ? parseInt(userId) : null,
                 species,
-                breed,
-                dob,
-                gender,
-                weight: parseFloat(weight),
-                age: parseInt(age),
-            }
+                breed: breed.trim() || null,
+                dob: dob || null,
+                gender: gender || null,
+                weight: weight ? parseFloat(weight) : null,
+                age: age ? parseInt(age) : 0,
+            };
 
-            const formData = new FormData()
-            formData.append("petRequest", JSON.stringify(petRequest))
+            const formData = new FormData();
+            formData.append("petRequest", JSON.stringify(petRequest));
+
             if (image) {
-                formData.append("imageFile", image)
+                formData.append("imageFile", image);
             }
 
-            const res = await axios.post(`http://localhost:8080/api/pet/update/${petId}`, formData, {
+            const res = await axios.post(`/api/pet/update/${petId}`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${accessToken}`
                 },
-            })
+            });
 
-            console.log(res.data)
-            alert("Cập nhật thú cưng thành công!")
-            navigate("/user/pets")
+            console.log("Pet updated successfully:", res.data);
+            alert("Cập nhật thú cưng thành công!");
+            navigate("/user/pets");
         } catch (error) {
-            console.error("Error updating pet:", error)
-            alert("Cập nhật thú cưng thất bại")
+            console.error("Error updating pet:", error);
+
+            let errorMessage = "Cập nhật thú cưng thất bại!";
+
+            if (error.response) {
+                if (error.response.status === 401) {
+                    errorMessage = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!";
+                    setTimeout(() => {
+                        navigate("/login");
+                    }, 2000);
+                } else if (error.response.data?.message) {
+                    errorMessage = error.response.data.message;
+                } else if (typeof error.response.data === 'string') {
+                    errorMessage = error.response.data;
+                }
+            } else if (error.request) {
+                errorMessage = "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng!";
+            } else {
+                errorMessage = error.message;
+            }
+
+            alert(errorMessage);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
@@ -418,8 +468,8 @@ const EditPetForm = () => {
                                             <input
                                                 type="number"
                                                 className="form-control"
-                                                value={ownerId}
-                                                onChange={(e) => setOwnerId(e.target.value)}
+                                                value={userId}
+                                                onChange={(e) => setUserId(e.target.value)}
                                                 placeholder="Nhập ID chủ sở hữu"
                                                 disabled
                                             />

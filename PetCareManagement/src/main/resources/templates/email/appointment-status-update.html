@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập Nhật Trạng Thái Lịch Khám</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7fa;
+            padding: 20px;
+        }
+
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.95;
+            margin: 5px 0;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 20px;
+            color: #4facfe;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .message {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .status-change-container {
+            background: linear-gradient(135deg, #fff5f5 0%, #f0f9ff 100%);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .status-change-title {
+            color: #4facfe;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .status-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+        }
+
+        .status-badge.pending {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-badge.confirmed {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.cancelled {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-badge.completed {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .status-arrow {
+            font-size: 30px;
+            color: #4facfe;
+            animation: slideRight 1.5s infinite;
+        }
+
+        @keyframes slideRight {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(10px);
+            }
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            border-left: 5px solid #4facfe;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .info-card h3 {
+            color: #4facfe;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(79, 172, 254, 0.1);
+            align-items: flex-start;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #4facfe;
+            min-width: 160px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 15px;
+            flex: 1;
+        }
+
+        .highlight-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+
+        .highlight-box strong {
+            color: #0c5460;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box p {
+            color: #0c5460;
+            line-height: 1.8;
+            margin: 5px 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 14px 35px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: #4facfe;
+            margin-bottom: 15px;
+        }
+
+        .footer-contact {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-contact span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer-disclaimer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4facfe, transparent);
+            margin: 25px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-wrapper">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">🔔</div>
+            <h1>Cập Nhật Trạng Thái Lịch Khám</h1>
+            <p>Pet Care Management System</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">Xin chào <strong th:text="${userName}">Quý khách</strong>! 👋</p>
+
+            <p class="message">
+                Lịch khám cho thú cưng <strong th:text="${petName}">Max</strong> của bạn đã có cập nhật trạng thái mới.
+                Vui lòng kiểm tra thông tin chi tiết bên dưới.
+            </p>
+
+            <!-- Status Change Visualization -->
+            <div class="status-change-container">
+                <div class="status-change-title">
+                    🔄 Thay Đổi Trạng Thái
+                </div>
+                <div class="status-flow">
+                    <span class="status-badge pending" th:text="${oldStatus}">Chờ xác nhận</span>
+                    <span class="status-arrow">➜</span>
+                    <span class="status-badge confirmed" th:text="${newStatus}">Đã xác nhận</span>
+                </div>
+            </div>
+
+            <!-- Appointment Details -->
+            <div class="info-card">
+                <h3>📋 Thông Tin Lịch Khám</h3>
+
+                <div class="info-row">
+                    <span class="info-label">🆔 Mã lịch khám:</span>
+                    <span class="info-value"><strong th:text="${appointmentId}">APT001</strong></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">🐕 Tên thú cưng:</span>
+                    <span class="info-value" th:text="${petName}">Max</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">🏷️ Loại:</span>
+                    <span class="info-value" th:text="${petSpecies}">Chó</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">📅 Ngày khám:</span>
+                    <span class="info-value" th:text="${appointmentDate}">15/10/2025</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">⏰ Giờ khám:</span>
+                    <span class="info-value" th:text="${appointmentTime}">10:00 AM</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">📝 Lý do khám:</span>
+                    <span class="info-value" th:text="${reason}">Khám sức khỏe định kỳ</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Conditional Messages Based on Status -->
+            <div class="highlight-box" th:if="${newStatus == 'Đã xác nhận'}">
+                <strong>✅ Lịch Khám Đã Được Xác Nhận</strong>
+                <p>
+                    Lịch khám của bạn đã được xác nhận thành công.
+                    Vui lòng đến đúng giờ và mang theo sổ tiêm chủng của thú cưng.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Lưu ý:</strong> Đến trước giờ hẹn 15 phút để hoàn tất thủ tục.
+                </p>
+            </div>
+
+            <div class="highlight-box" th:if="${newStatus == 'Đã hủy'}"
+                style="background: #f8d7da; border-color: #f5c6cb; border-left-color: #dc3545;">
+                <strong style="color: #721c24;">❌ Lịch Khám Đã Bị Hủy</strong>
+                <p style="color: #721c24;">
+                    Lịch khám của bạn đã bị hủy. Nếu cần đặt lại lịch khám mới,
+                    vui lòng truy cập website hoặc liên hệ hotline để được hỗ trợ.
+                </p>
+            </div>
+
+            <div class="highlight-box" th:if="${newStatus == 'Hoàn thành'}"
+                style="background: #d4edda; border-color: #c3e6cb; border-left-color: #28a745;">
+                <strong style="color: #155724;">🎉 Lịch Khám Đã Hoàn Thành</strong>
+                <p style="color: #155724;">
+                    Cảm ơn bạn đã sử dụng dịch vụ của Pet Care Management.
+                    Hy vọng thú cưng của bạn đã có một buổi khám sức khỏe tốt!
+                </p>
+                <p style="margin-top: 10px; color: #155724;">
+                    Bạn có thể xem chi tiết kết quả khám và lịch sử điều trị trong tài khoản của mình.
+                </p>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="button-container">
+                <a href="http://localhost:3000/user/appointments" class="cta-button">
+                    📱 Xem Chi Tiết Lịch Khám
+                </a>
+            </div>
+
+            <p class="message" style="text-align: center; color: #4facfe; margin-top: 20px;">
+                Nếu có thắc mắc, vui lòng liên hệ hotline: 1900-xxxx
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">🐾 Pet Care Management</div>
+
+            <div class="footer-contact">
+                <span>📞 Hotline: 1900-xxxx</span>
+                <span>📧 Email: support@petcare.com</span>
+            </div>
+
+            <p style="margin: 15px 0;">
+                📍 Địa chỉ: 123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh
+            </p>
+
+            <div class="footer-disclaimer">
+                Email này được gửi tự động từ hệ thống Pet Care Management.<br>
+                Vui lòng không trả lời trực tiếp email này. Nếu cần hỗ trợ, xin liên hệ hotline hoặc email support.
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

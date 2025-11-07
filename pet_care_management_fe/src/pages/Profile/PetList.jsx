@@ -5,6 +5,7 @@ import { Edit, Trash2 } from "lucide-react"
 import axios from "axios"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
+import VetPagination from "../../components/VetPagination"
 
 const PetList = () => {
   const [pets, setPets] = useState([])
@@ -110,43 +111,6 @@ const PetList = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
-  }
-
-  const renderPagination = () => {
-    if (totalPages <= 1) return null
-
-    const pages = []
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button
-          key={i}
-          className={`btn me-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`}
-          onClick={() => handlePageChange(i)}
-        >
-          {i}
-        </button>,
-      )
-    }
-
-    return (
-      <div className="d-flex justify-content-center align-items-center mt-4">
-        <button
-          className="btn btn-outline-primary me-1"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <i className="bi bi-chevron-left"></i>
-        </button>
-        {pages}
-        <button
-          className="btn btn-outline-primary"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <i className="bi bi-chevron-right"></i>
-        </button>
-      </div>
-    )
   }
 
   if (loading) {
@@ -870,7 +834,7 @@ const PetList = () => {
                       return (
                         <div key={pet.id} className="pet-card">
                           <img
-                            src={pet.imageUrl || "/placeholder.svg?height=200&width=350"}
+                            src={pet.image || "/placeholder.svg?height=200&width=350"}
                             alt={pet.name}
                             className="pet-image"
                           />
@@ -961,7 +925,14 @@ const PetList = () => {
                   </div>
 
                   {/* Pagination */}
-                  {renderPagination()}
+                  <VetPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={pets.length}
+                    itemsPerPage={petsPerPage}
+                    onPageChange={handlePageChange}
+                    itemName="thú cưng"
+                  />
                 </>
               ) : (
                 <div className="empty-state">

@@ -5,6 +5,7 @@ import axios from "axios"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import Header from "../../components/home/Header"
+import VetPagination from "../../components/VetPagination"
 
 const Schedule = () => {
   const [appointments, setAppointments] = useState([])
@@ -12,6 +13,8 @@ const Schedule = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [appointmentsPerPage] = useState(6)
+  const [vetNames, setVetNames] = useState({})
+  const [statusConfig, setStatusConfig] = useState({})
 
   useEffect(() => {
     const userId = localStorage.getItem("userId")
@@ -33,7 +36,22 @@ const Schedule = () => {
       })
 
       console.log(res.data)
-      setAppointments(res.data || [])
+
+      // Tính toán tổng tiền cố định cho mỗi appointment
+      const appointmentsWithTotal = res.data.map(appointment => ({
+        ...appointment,
+        totalPrice: appointment.services && appointment.services.length > 0
+          ? appointment.services.reduce((total, service) => total + service.price, 0)
+          : 0
+      }))
+
+      setAppointments(appointmentsWithTotal || [])
+
+      // Extract và set status configuration từ appointment data
+      extractStatusConfig(appointmentsWithTotal || [])
+
+      // Fetch thông tin bác sĩ cho tất cả appointments
+      await fetchVetNames(accessToken, appointmentsWithTotal || [])
     } catch (error) {
       console.error("Error fetching appointments:", error)
       alert("Không thể tải danh sách lịch khám!")
@@ -42,18 +60,112 @@ const Schedule = () => {
     }
   }
 
+  const extractStatusConfig = (appointments) => {
+    // Lấy tất cả unique status từ appointments
+    const uniqueStatuses = [...new Set(appointments.map(app => app.status))]
+
+    // Tạo status config động dựa trên status có sẵn
+    const dynamicStatusConfig = {}
+
+    uniqueStatuses.forEach(status => {
+      const statusLower = status?.toLowerCase()
+      switch (statusLower) {
+        case 'pending':
+          dynamicStatusConfig[status] = {
+            label: "Chờ xác nhận",
+            className: "badge bg-warning text-dark"
+          }
+          break
+        case 'confirmed':
+          dynamicStatusConfig[status] = {
+            label: "Đã xác nhận",
+            className: "badge bg-success"
+          }
+          break
+        case 'completed':
+          dynamicStatusConfig[status] = {
+            label: "Hoàn thành",
+            className: "badge bg-primary"
+          }
+          break
+        case 'cancelled':
+          dynamicStatusConfig[status] = {
+            label: "Đã hủy",
+            className: "badge bg-danger"
+          }
+          break
+        default:
+          // Fallback cho status không xác định - vẫn dịch sang tiếng Việt
+          const vietnameseStatus = getVietnameseStatus(status)
+          dynamicStatusConfig[status] = {
+            label: vietnameseStatus,
+            className: "badge bg-secondary"
+          }
+      }
+    })
+
+    setStatusConfig(dynamicStatusConfig)
+  }
+
+  // Hàm helper để dịch status sang tiếng Việt
+  const getVietnameseStatus = (status) => {
+    if (!status) return "Không xác định"
+
+    const statusTranslations = {
+      'PENDING': 'Chờ xác nhận',
+      'CONFIRMED': 'Đã xác nhận',
+      'COMPLETED': 'Hoàn thành',
+      'CANCELLED': 'Đã hủy',
+      'APPROVED': 'Đã duyệt',
+      'REJECTED': 'Đã từ chối',
+      'IN_PROGRESS': 'Đang tiến hành',
+      'SCHEDULED': 'Đã lên lịch'
+    }
+
+    const upperStatus = status.toUpperCase()
+    return statusTranslations[upperStatus] || status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+  }
+
+  const fetchVetNames = async (accessToken, appointments) => {
+    try {
+      const vetIds = [...new Set(appointments.map(app => app.vetId))]
+      const vetNamesMap = {}
+
+      // Fetch tất cả bác sĩ một lần
+      const vetRes = await axios.get("http://localhost:8080/api/vet/getAllVet", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+
+      // Map thông tin bác sĩ theo ID
+      const allVets = vetRes.data || []
+      vetIds.forEach(vetId => {
+        const vet = allVets.find(v => v.id === vetId)
+        vetNamesMap[vetId] = vet ? vet.name : `Bác sĩ ${vetId}`
+      })
+
+      setVetNames(vetNamesMap)
+    } catch (error) {
+      console.error("Error fetching vet names:", error)
+      // Fallback với tên mặc định
+      const vetIds = [...new Set(appointments.map(app => app.vetId))]
+      const fallbackVetNames = {}
+      vetIds.forEach(vetId => {
+        fallbackVetNames[vetId] = `Bác sĩ ${vetId}`
+      })
+      setVetNames(fallbackVetNames)
+    }
+  }
+
   const handleGoBack = () => {
     window.history.back()
   }
 
   const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: { label: "Chờ xác nhận", className: "badge bg-warning text-dark" },
-      confirmed: { label: "Đã xác nhận", className: "badge bg-success" },
-      completed: { label: "Hoàn thành", className: "badge bg-primary" },
-      cancelled: { label: "Đã hủy", className: "badge bg-danger" },
+    // Sử dụng statusConfig động từ state
+    const config = statusConfig[status] || {
+      label: getVietnameseStatus(status),
+      className: "badge bg-secondary"
     }
-    const config = statusConfig[status] || statusConfig.pending
     return <span className={config.className}>{config.label}</span>
   }
 
@@ -65,43 +177,6 @@ const Schedule = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page)
-  }
-
-  const renderPagination = () => {
-    if (totalPages <= 1) return null
-
-    const pages = []
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button
-          key={i}
-          className={`btn me-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`}
-          onClick={() => handlePageChange(i)}
-        >
-          {i}
-        </button>,
-      )
-    }
-
-    return (
-      <div className="d-flex justify-content-center align-items-center mt-4">
-        <button
-          className="btn btn-outline-primary me-1"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          <i className="bi bi-chevron-left"></i>
-        </button>
-        {pages}
-        <button
-          className="btn btn-outline-primary"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          <i className="bi bi-chevron-right"></i>
-        </button>
-      </div>
-    )
   }
   if (loading) {
     return (
@@ -448,11 +523,15 @@ const Schedule = () => {
 
         .card-body {
           padding: 40px;
+          display: flex;
+          flex-direction: column;
+          min-height: 400px; /* Chiều cao tối thiểu để total-price có chỗ rơi xuống */
         }
 
         .appointments-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+          grid-auto-rows: 1fr; /* Tất cả rows có chiều cao bằng nhau */
           gap: 24px;
           margin-bottom: 32px;
         }
@@ -464,6 +543,9 @@ const Schedule = () => {
           overflow: hidden;
           transition: all 0.3s ease;
           border: 1px solid #f1f3f4;
+          display: flex;
+          flex-direction: column;
+          height: 100%; /* Chiếm hết chiều cao của grid cell */
         }
 
         .appointment-card:hover {
@@ -488,6 +570,9 @@ const Schedule = () => {
 
         .appointment-info {
           padding: 24px;
+          display: flex;
+          flex-direction: column;
+          flex: 1; /* Chiếm hết không gian còn lại */
         }
 
         .info-row {
@@ -522,6 +607,7 @@ const Schedule = () => {
           border-radius: 12px;
           padding: 16px;
           margin-top: 16px;
+          flex-shrink: 0; /* Không co lại */
         }
 
         .services-title {
@@ -561,7 +647,10 @@ const Schedule = () => {
           padding: 16px;
           border-radius: 12px;
           text-align: center;
-          margin-top: 16px;
+          margin-top: auto; /* Tự động đẩy xuống cuối */
+          margin-bottom: 0;
+          order: 999; /* Đảm bảo luôn ở cuối */
+          flex-shrink: 0; /* Không co lại */
         }
 
         .total-label {
@@ -823,7 +912,7 @@ const Schedule = () => {
                           <div className="info-row">
                             <i className="bi bi-person-badge info-icon"></i>
                             <span className="info-label">Bác sĩ:</span>
-                            <span className="info-value">ID: {appointment.vetId}</span>
+                            <span className="info-value">{vetNames[appointment.vetId] || `Bác sĩ ${appointment.vetId}`}</span>
                           </div>
 
                           <div className="info-row">
@@ -849,24 +938,29 @@ const Schedule = () => {
                                   <span className="service-price">{service.price.toLocaleString()} VND</span>
                                 </div>
                               ))}
-                              <div className="total-price">
-                                <p className="total-label">Tổng chi phí</p>
-                                <h4 className="total-amount">
-                                  {appointment.services
-                                    .reduce((total, service) => total + service.price, 0)
-                                    .toLocaleString()}{" "}
-                                  VND
-                                </h4>
-                              </div>
                             </div>
                           )}
+
+                          {/* Chỉ hiển thị số tiền */}
+                          <div className="total-price">
+                            <h4 className="total-amount">
+                              {appointment.totalPrice.toLocaleString()} VND
+                            </h4>
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Pagination */}
-                  {renderPagination()}
+                  <VetPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={appointments.length}
+                    itemsPerPage={appointmentsPerPage}
+                    onPageChange={handlePageChange}
+                    itemName="lịch khám"
+                  />
                 </>
               ) : (
                 <div className="empty-state">

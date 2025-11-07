@@ -517,6 +517,15 @@ const UserManagementPage = () => {
               </button>
             </li>
             <li>
+              <button
+                className={`menu-item ${window.location.pathname === "/admin/productmanagement" ? "active" : ""}`}
+                onClick={() => handleNavigation("/admin/productmanagement")}
+              >
+                <i className="bi bi-box-seam menu-icon"></i>
+                <span className="menu-text">Sản phẩm</span>
+              </button>
+            </li>
+            <li>
               <button className="menu-item active">
                 <i className="bi bi-person menu-icon"></i>
                 <span className="menu-text">Tài khoản</span>

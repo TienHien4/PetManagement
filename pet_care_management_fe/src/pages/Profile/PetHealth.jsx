@@ -523,7 +523,7 @@ const PetHealth = () => {
                             <div className="pet-overview">
                                 <div className="pet-info-grid">
                                     <img
-                                        src={pet.imageUrl || "/placeholder.svg?height=80&width=80"}
+                                        src={pet.image || "/placeholder.svg?height=80&width=80"}
                                         alt={pet.name}
                                         className="pet-avatar"
                                     />

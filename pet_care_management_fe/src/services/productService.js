@@ -1,16 +1,19 @@
-import axios from 'axios';
+import apiClient from './customizeAxios';
 
 const API_BASE = '/api/product';
 
-function getAuthHeaders() {
-    const accessToken = localStorage.getItem('accessToken');
-    return accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : {};
-}
-
-export const getAllProducts = () => axios.get(`${API_BASE}/getAllProduct`, getAuthHeaders());
-export const getProductPagination = (pageNo, pageSize = 5) => axios.get(`${API_BASE}/getProducts`, { params: { pageNo, pageSize }, ...getAuthHeaders() });
-export const getProductById = (id) => axios.get(`${API_BASE}/getProductById/${id}`, getAuthHeaders());
-export const getProductByKeyword = (keyword) => axios.get(`${API_BASE}/getProductByKeyword/${keyword}`, getAuthHeaders());
-export const createProduct = (formData) => axios.post(`${API_BASE}/createProduct`, formData, getAuthHeaders());
-export const updateProduct = (id, formData) => axios.post(`${API_BASE}/update/${id}`, formData, getAuthHeaders());
-export const deleteProduct = (id) => axios.post(`${API_BASE}/delete/${id}`, {}, getAuthHeaders());
+export const getAllProducts = () => apiClient.get(`${API_BASE}/getAllProduct`);
+export const getProductPagination = (pageNo, pageSize = 5) => apiClient.get(`${API_BASE}/getProducts`, { params: { pageNo, pageSize } });
+export const getProductById = (id) => apiClient.get(`${API_BASE}/getProductById/${id}`);
+export const getProductByKeyword = (keyword) => apiClient.get(`${API_BASE}/getProductByKeyword/${keyword}`);
+export const createProduct = (formData) => {
+    return apiClient.post(`${API_BASE}/createProduct`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+};
+export const updateProduct = (id, formData) => {
+    return apiClient.post(`${API_BASE}/update/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+};
+export const deleteProduct = (id) => apiClient.post(`${API_BASE}/delete/${id}`, {});

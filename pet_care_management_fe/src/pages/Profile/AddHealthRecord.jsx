@@ -438,7 +438,7 @@ const AddHealthRecord = () => {
                             {pet && (
                                 <div className="pet-info">
                                     <img
-                                        src={pet.imageUrl || "/placeholder.svg?height=60&width=60"}
+                                        src={pet.image || "/placeholder.svg?height=60&width=60"}
                                         alt={pet.name}
                                         className="pet-avatar"
                                     />

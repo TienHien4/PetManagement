@@ -23,6 +23,8 @@ public interface AppointmentService {
     // Methods for VET role
     List<AppointmentResponse> getAppointmentsByVetEmail(String email);
 
+    AppointmentResponse updateAppointmentStatus(Long id, String status);
+
     List<AppointmentResponse> getAppointmentsByVetUserId(Long userId);
 
     List<AppointmentResponse> getCompletedAppointmentsByVetEmail(String email);

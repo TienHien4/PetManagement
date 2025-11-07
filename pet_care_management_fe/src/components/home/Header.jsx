@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import logo from '../../assets/img/logo.png';
+import useCartCount from '../../hooks/useCartCount';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 
@@ -11,6 +12,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [userName, setUserName] = useState("")
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const { cartCount } = useCartCount()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,6 +66,7 @@ const Header = () => {
     { href: "/news", label: "Tin tức", icon: "bi-newspaper" },
     { href: "/services", label: "Dịch vụ", icon: "bi-heart-pulse" },
     { href: "/products", label: "Sản phẩm", icon: "bi-box-seam" },
+    { href: "/shopping-cart", label: "Giỏ hàng", icon: "bi-cart3" },
     { href: "/contact", label: "Liên hệ", icon: "bi-telephone" },
   ]
 
@@ -330,6 +333,33 @@ const Header = () => {
 
         .nav-icon {
           font-size: 16px;
+        }
+
+        .cart-badge {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+          color: white;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          font-size: 11px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid white;
+          min-width: 20px;
+          z-index: 1;
+        }
+
+        .nav-item.cart-item {
+          position: relative;
+        }
+
+        .nav-item.cart-item .nav-icon {
+          position: relative;
         }
 
         .mobile-menu-btn {
@@ -605,8 +635,17 @@ const Header = () => {
               <div className="col-lg-8 col-md-6 col-4" style={{ marginLeft: "80px" }}>
                 <nav className="main-nav">
                   {navigationItems.map((item, index) => (
-                    <a key={index} href={item.href} className="nav-item">
-                      <i className={`bi ${item.icon} nav-icon`}></i>
+                    <a
+                      key={index}
+                      href={item.href}
+                      className={`nav-item ${item.href === '/shopping-cart' ? 'cart-item' : ''}`}
+                    >
+                      <div style={{ position: 'relative' }}>
+                        <i className={`bi ${item.icon} nav-icon`}></i>
+                        {item.href === '/shopping-cart' && cartCount > 0 && (
+                          <span className="cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>
+                        )}
+                      </div>
                       <span>{item.label}</span>
                     </a>
                   ))}
@@ -638,8 +677,39 @@ const Header = () => {
 
           <nav className="mobile-nav">
             {navigationItems.map((item, index) => (
-              <a key={index} href={item.href} className="mobile-nav-item" onClick={() => setIsMobileMenuOpen(false)}>
-                <i className={`bi ${item.icon}`}></i>
+              <a
+                key={index}
+                href={item.href}
+                className="mobile-nav-item"
+                onClick={() => setIsMobileMenuOpen(false)}
+                style={{ position: 'relative' }}
+              >
+                <div style={{ position: 'relative' }}>
+                  <i className={`bi ${item.icon}`}></i>
+                  {item.href === '/shopping-cart' && cartCount > 0 && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '-8px',
+                        right: '-8px',
+                        background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '18px',
+                        height: '18px',
+                        fontSize: '10px',
+                        fontWeight: '700',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px solid white',
+                        minWidth: '18px'
+                      }}
+                    >
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                  )}
+                </div>
                 <span>{item.label}</span>
               </a>
             ))}

@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  kafka:
+    image: apache/kafka:3.8.1
+    container_name: kafka
+    ports:
+      - "9092:9092"  # Broker
+      - "9093:9093"  # Controller
+    environment:
+      KAFKA_CLUSTER_ID: "5L6g3nShT-eMCtK--X86sw"
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_NODE_ID: 1
+
+      # Listeners
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.1.238:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      # Controller quorum (dùng IP thật của host)
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@192.168.1.238:9093"
+
+      # Kafka config
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_DIRS: /bitnami/kafka/data
+    volumes:
+      - D:\DATN_KTPM\kafka-data:/bitnami/kafka/data

@@ -7,7 +7,7 @@ import "bootstrap-icons/font/bootstrap-icons.css"
 
 const CreatePetForm = () => {
   const [name, setName] = useState("")
-  const [ownerId, setOwnerId] = useState("")
+  const [userId, setUserId] = useState("")
   const [species, setSpecies] = useState("")
   const [breed, setBreed] = useState("")
   const [dob, setDob] = useState("")
@@ -20,16 +20,34 @@ const CreatePetForm = () => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0]
-    setImage(file)
 
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result)
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        alert("Kích thước ảnh không được vượt quá 5MB!");
+        e.target.value = null;
+        return;
       }
-      reader.readAsDataURL(file)
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        alert("Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF!");
+        e.target.value = null;
+        return;
+      }
+
+      setImage(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     } else {
-      setImagePreview(null)
+      setImage(null);
+      setImagePreview(null);
     }
   }
   useEffect(() => {
@@ -44,7 +62,7 @@ const CreatePetForm = () => {
         // Try to get user ID from localStorage first
         const storedUserId = localStorage.getItem('userId');
         if (storedUserId) {
-          setOwnerId(parseInt(storedUserId));
+          setUserId(parseInt(storedUserId));
           return;
         }
 
@@ -52,16 +70,16 @@ const CreatePetForm = () => {
         try {
           const payload = JSON.parse(atob(accessToken.split('.')[1]));
           if (payload.userId) {
-            setOwnerId(payload.userId);
+            setUserId(payload.userId);
             localStorage.setItem('userId', payload.userId);
             return;
           }
           if (payload.sub) {
             // Try to parse user ID from subject if it's numeric
-            const userId = parseInt(payload.sub);
-            if (!isNaN(userId)) {
-              setOwnerId(userId);
-              localStorage.setItem('userId', userId);
+            const parsedUserId = parseInt(payload.sub);
+            if (!isNaN(parsedUserId)) {
+              setUserId(parsedUserId);
+              localStorage.setItem('userId', parsedUserId);
               return;
             }
           }
@@ -84,47 +102,82 @@ const CreatePetForm = () => {
   }, []);
 
   const handleCreate = async () => {
-    setIsLoading(true)
-    try {
-      const accessToken = localStorage.getItem("accessToken")
+    // Validation
+    if (!name.trim()) {
+      alert("Vui lòng nhập tên thú cưng!");
+      return;
+    }
 
-      if (!ownerId) {
-        alert("Không thể xác định chủ sở hữu. Vui lòng đăng nhập lại!")
-        return
-      }
+    if (!species) {
+      alert("Vui lòng chọn loại thú cưng!");
+      return;
+    }
+
+    if (!userId) {
+      alert("Không thể xác định chủ sở hữu. Vui lòng đăng nhập lại!");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const accessToken = localStorage.getItem("accessToken");
 
       const petRequest = {
-        name,
-        ownerId: parseInt(ownerId),
+        name: name.trim(),
+        userId: parseInt(userId),
         species,
-        breed,
-        dob,
-        gender,
-        weight: parseFloat(weight) || 0,
-        age: parseInt(age) || 0,
-      }
+        breed: breed.trim() || null,
+        dob: dob || null,
+        gender: gender || null,
+        weight: weight ? parseFloat(weight) : null,
+        age: age ? parseInt(age) : 0,
+      };
 
-      const formData = new FormData()
-      formData.append("petRequest", JSON.stringify(petRequest))
+      const formData = new FormData();
+      formData.append("petRequest", JSON.stringify(petRequest));
+
       if (image) {
-        formData.append("imageFile", image)
+        formData.append("imageFile", image);
       }
 
-      const res = await axios.post("http://localhost:8080/api/pet/create", formData, {
+      const res = await axios.post("/api/pet/create", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${accessToken}`
         },
-      })
+      });
 
-      console.log(res.data)
-      alert("Thêm thú cưng thành công!")
-      window.location.href = "/user/pets"
+      console.log("Pet created successfully:", res.data);
+      alert("Thêm thú cưng thành công!");
+      window.location.href = "/user/pets";
     } catch (error) {
-      console.error("Error creating pet:", error)
-      alert("Tạo thú cưng thất bại: " + (error.response?.data?.message || error.message))
+      console.error("Error creating pet:", error);
+
+      let errorMessage = "Tạo thú cưng thất bại!";
+
+      if (error.response) {
+        // Server responded with error
+        if (error.response.status === 401) {
+          errorMessage = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!";
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 2000);
+        } else if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        }
+      } else if (error.request) {
+        // Request made but no response
+        errorMessage = "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng!";
+      } else {
+        // Other errors
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -409,12 +462,12 @@ const CreatePetForm = () => {
                     <div className="form-group">
                       <label className="form-label">
                         <i className="bi bi-person"></i>
-                        Chủ sở hữu (ID: {ownerId || 'Đang tải...'})
+                        Chủ sở hữu (ID: {userId || 'Đang tải...'})
                       </label>
                       <input
                         type="text"
                         className="form-control"
-                        value={ownerId ? `User #${ownerId}` : 'Đang xác định chủ sở hữu...'}
+                        value={userId ? `User #${userId}` : 'Đang xác định chủ sở hữu...'}
                         disabled
                         style={{ backgroundColor: '#f8f9fa', color: '#6c757d' }}
                       />
@@ -573,10 +626,10 @@ const CreatePetForm = () => {
                   <i className="bi bi-x-circle me-2"></i>
                   Hủy bỏ
                 </button>
-                <button className="btn btn-primary-custom" onClick={handleCreate} disabled={isLoading || !ownerId}>
+                <button className="btn btn-primary-custom" onClick={handleCreate} disabled={isLoading || !userId || !name.trim() || !species}>
                   {isLoading && <span className="loading-spinner"></span>}
                   <i className="bi bi-plus-circle me-2"></i>
-                  {isLoading ? "Đang thêm..." : !ownerId ? "Đang xác định chủ sở hữu..." : "Thêm thú cưng"}
+                  {isLoading ? "Đang thêm..." : !userId ? "Đang xác định chủ sở hữu..." : "Thêm thú cưng"}
                 </button>
               </div>
             </div>

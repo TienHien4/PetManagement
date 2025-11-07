@@ -7,100 +7,100 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 const HealthDashboard = () => {
-    const [pets, setPets] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [selectedFilter, setSelectedFilter] = useState('all')
+  const [pets, setPets] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedFilter, setSelectedFilter] = useState('all')
 
-    useEffect(() => {
-        const accessToken = localStorage.getItem("accessToken")
-        if (!accessToken) {
-            window.location.href = "/login"
-            return
-        }
-
-        fetchPets(accessToken)
-    }, [])
-
-    const fetchPets = async (accessToken) => {
-        setLoading(true)
-        try {
-            const petsRes = await axios.get("http://localhost:8080/api/pet/getAllPet", {
-                headers: { Authorization: `Bearer ${accessToken}` }
-            })
-            setPets(petsRes.data)
-        } catch (error) {
-            console.error("Error fetching pets:", error)
-            alert("Không thể tải danh sách thú cưng!")
-        } finally {
-            setLoading(false)
-        }
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken")
+    if (!accessToken) {
+      window.location.href = "/login"
+      return
     }
 
-    const getHealthStatus = (pet) => {
-        // Mock logic for health status based on last checkup
-        const lastCheckup = pet.lastCheckup || "2024-01-01"
-        const daysSinceCheckup = Math.floor((new Date() - new Date(lastCheckup)) / (1000 * 60 * 60 * 24))
+    fetchPets(accessToken)
+  }, [])
 
-        if (daysSinceCheckup > 365) {
-            return { status: 'critical', text: 'Cần khám ngay', color: 'danger', days: daysSinceCheckup }
-        } else if (daysSinceCheckup > 180) {
-            return { status: 'warning', text: 'Cần khám sớm', color: 'warning', days: daysSinceCheckup }
-        } else {
-            return { status: 'good', text: 'Tốt', color: 'success', days: daysSinceCheckup }
-        }
+  const fetchPets = async (accessToken) => {
+    setLoading(true)
+    try {
+      const petsRes = await axios.get("http://localhost:8080/api/pet/getAllPet", {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
+      setPets(petsRes.data)
+    } catch (error) {
+      console.error("Error fetching pets:", error)
+      alert("Không thể tải danh sách thú cưng!")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getHealthStatus = (pet) => {
+    // Mock logic for health status based on last checkup
+    const lastCheckup = pet.lastCheckup || "2024-01-01"
+    const daysSinceCheckup = Math.floor((new Date() - new Date(lastCheckup)) / (1000 * 60 * 60 * 24))
+
+    if (daysSinceCheckup > 365) {
+      return { status: 'critical', text: 'Cần khám ngay', color: 'danger', days: daysSinceCheckup }
+    } else if (daysSinceCheckup > 180) {
+      return { status: 'warning', text: 'Cần khám sớm', color: 'warning', days: daysSinceCheckup }
+    } else {
+      return { status: 'good', text: 'Tốt', color: 'success', days: daysSinceCheckup }
+    }
+  }
+
+  const getVaccinationStatus = (pet) => {
+    // Mock vaccination status
+    const vaccines = pet.vaccines || []
+    const dueVaccines = vaccines.filter(v => v.status === 'due').length
+
+    if (dueVaccines > 0) {
+      return { status: 'due', text: `${dueVaccines} mũi đến hạn`, color: 'warning' }
+    }
+    return { status: 'current', text: 'Đã cập nhật', color: 'success' }
+  }
+
+  const filteredPets = pets.filter(pet => {
+    if (selectedFilter === 'all') return true
+    const health = getHealthStatus(pet)
+    return health.status === selectedFilter
+  })
+
+  const getFilterCounts = () => {
+    const counts = {
+      all: pets.length,
+      good: 0,
+      warning: 0,
+      critical: 0
     }
 
-    const getVaccinationStatus = (pet) => {
-        // Mock vaccination status
-        const vaccines = pet.vaccines || []
-        const dueVaccines = vaccines.filter(v => v.status === 'due').length
-
-        if (dueVaccines > 0) {
-            return { status: 'due', text: `${dueVaccines} mũi đến hạn`, color: 'warning' }
-        }
-        return { status: 'current', text: 'Đã cập nhật', color: 'success' }
-    }
-
-    const filteredPets = pets.filter(pet => {
-        if (selectedFilter === 'all') return true
-        const health = getHealthStatus(pet)
-        return health.status === selectedFilter
+    pets.forEach(pet => {
+      const health = getHealthStatus(pet)
+      counts[health.status]++
     })
 
-    const getFilterCounts = () => {
-        const counts = {
-            all: pets.length,
-            good: 0,
-            warning: 0,
-            critical: 0
-        }
+    return counts
+  }
 
-        pets.forEach(pet => {
-            const health = getHealthStatus(pet)
-            counts[health.status]++
-        })
+  const filterCounts = getFilterCounts()
 
-        return counts
-    }
-
-    const filterCounts = getFilterCounts()
-
-    if (loading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
-                <div className="text-center">
-                    <div className="spinner-border text-primary mb-3" role="status" style={{ width: "3rem", height: "3rem" }}>
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                    <p className="text-muted fs-5">Đang tải thông tin...</p>
-                </div>
-            </div>
-        )
-    }
-
+  if (loading) {
     return (
-        <>
-            <style jsx>{`
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status" style={{ width: "3rem", height: "3rem" }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted fs-5">Đang tải thông tin...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <style jsx>{`
         .dashboard-container {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           min-height: 100vh;
@@ -421,162 +421,162 @@ const HealthDashboard = () => {
         }
       `}</style>
 
-            <div className="dashboard-container">
-                <div className="dashboard-content">
-                    <div className="header-section">
-                        <h1 className="dashboard-title">TỔNG QUAN SỨC KHỎE</h1>
-                        <p className="dashboard-subtitle">Theo dõi tình trạng sức khỏe của tất cả thú cưng</p>
-                    </div>
+      <div className="dashboard-container">
+        <div className="dashboard-content">
+          <div className="header-section">
+            <h1 className="dashboard-title">TỔNG QUAN SỨC KHỎE</h1>
+            <p className="dashboard-subtitle">Theo dõi tình trạng sức khỏe của tất cả thú cưng</p>
+          </div>
 
-                    <div className="stats-section">
-                        <div
-                            className={`stat-card ${selectedFilter === 'all' ? 'active' : ''}`}
-                            onClick={() => setSelectedFilter('all')}
-                        >
-                            <i className="bi bi-heart-pulse stat-icon text-primary"></i>
-                            <div className="stat-number">{filterCounts.all}</div>
-                            <p className="stat-label">Tổng số thú cưng</p>
-                        </div>
-
-                        <div
-                            className={`stat-card ${selectedFilter === 'good' ? 'active' : ''}`}
-                            onClick={() => setSelectedFilter('good')}
-                        >
-                            <i className="bi bi-check-circle stat-icon text-success"></i>
-                            <div className="stat-number">{filterCounts.good}</div>
-                            <p className="stat-label">Sức khỏe tốt</p>
-                        </div>
-
-                        <div
-                            className={`stat-card ${selectedFilter === 'warning' ? 'active' : ''}`}
-                            onClick={() => setSelectedFilter('warning')}
-                        >
-                            <i className="bi bi-exclamation-triangle stat-icon text-warning"></i>
-                            <div className="stat-number">{filterCounts.warning}</div>
-                            <p className="stat-label">Cần chú ý</p>
-                        </div>
-
-                        <div
-                            className={`stat-card ${selectedFilter === 'critical' ? 'active' : ''}`}
-                            onClick={() => setSelectedFilter('critical')}
-                        >
-                            <i className="bi bi-x-circle stat-icon text-danger"></i>
-                            <div className="stat-number">{filterCounts.critical}</div>
-                            <p className="stat-label">Cần khám ngay</p>
-                        </div>
-                    </div>
-
-                    <div className="pets-section">
-                        <div className="section-header">
-                            <h2 className="section-title">
-                                {selectedFilter === 'all' ? 'Tất cả thú cưng' :
-                                    selectedFilter === 'good' ? 'Thú cưng có sức khỏe tốt' :
-                                        selectedFilter === 'warning' ? 'Thú cưng cần chú ý' :
-                                            'Thú cưng cần khám ngay'} ({filteredPets.length})
-                            </h2>
-                        </div>
-
-                        {filteredPets.length > 0 ? (
-                            <div className="pets-grid">
-                                {filteredPets.map((pet) => {
-                                    const healthStatus = getHealthStatus(pet)
-                                    const vaccinationStatus = getVaccinationStatus(pet)
-
-                                    return (
-                                        <div key={pet.id} className="pet-card">
-                                            <div className="pet-header">
-                                                <img
-                                                    src={pet.imageUrl || "/placeholder.svg?height=60&width=60"}
-                                                    alt={pet.name}
-                                                    className="pet-avatar"
-                                                />
-                                                <div className="pet-info">
-                                                    <h5>{pet.name}</h5>
-                                                    <p className="pet-details">
-                                                        {pet.species === "Dog" ? "🐕 Chó" : pet.species === "Cat" ? "🐱 Mèo" : pet.species} •
-                                                        {pet.breed} • {pet.age} tuổi
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="health-indicators">
-                                                <div className="health-indicator">
-                                                    <div className="indicator-label">Tình trạng sức khỏe</div>
-                                                    <div className={`indicator-value text-${healthStatus.color}`}>
-                                                        {healthStatus.text}
-                                                    </div>
-                                                </div>
-                                                <div className="health-indicator">
-                                                    <div className="indicator-label">Tiêm chủng</div>
-                                                    <div className={`indicator-value text-${vaccinationStatus.color}`}>
-                                                        {vaccinationStatus.text}
-                                                    </div>
-                                                </div>
-                                                <div className="health-indicator">
-                                                    <div className="indicator-label">Khám lần cuối</div>
-                                                    <div className="indicator-value">
-                                                        {healthStatus.days} ngày trước
-                                                    </div>
-                                                </div>
-                                                <div className="health-indicator">
-                                                    <div className="indicator-label">Cân nặng</div>
-                                                    <div className="indicator-value">
-                                                        {pet.weight || 'Chưa cập nhật'} kg
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="pet-actions">
-                                                <Link
-                                                    to={`/pet/health/${pet.id}`}
-                                                    className="action-btn btn-primary-custom"
-                                                >
-                                                    <i className="bi bi-eye"></i>
-                                                    Xem chi tiết
-                                                </Link>
-                                                <Link
-                                                    to={`/pet/health/${pet.id}/add`}
-                                                    className="action-btn btn-outline-custom"
-                                                >
-                                                    <i className="bi bi-plus-circle"></i>
-                                                    Thêm hồ sơ
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        ) : (
-                            <div className="empty-state">
-                                <i className="bi bi-search empty-icon"></i>
-                                <h3 className="empty-title">Không tìm thấy thú cưng</h3>
-                                <p className="empty-text">
-                                    {selectedFilter === 'all'
-                                        ? 'Bạn chưa có thú cưng nào được đăng ký.'
-                                        : 'Không có thú cưng nào phù hợp với bộ lọc đã chọn.'
-                                    }
-                                </p>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="emergency-section">
-                        <h3 className="emergency-title">
-                            <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                            Trường hợp khẩn cấp?
-                        </h3>
-                        <p className="emergency-text">
-                            Nếu thú cưng của bạn có triệu chứng bất thường hoặc cần cấp cứu ngay lập tức
-                        </p>
-                        <a href="tel:1900-1234" className="emergency-btn">
-                            <i className="bi bi-telephone-fill"></i>
-                            Gọi hotline: 1900-1234
-                        </a>
-                    </div>
-                </div>
+          <div className="stats-section">
+            <div
+              className={`stat-card ${selectedFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setSelectedFilter('all')}
+            >
+              <i className="bi bi-heart-pulse stat-icon text-primary"></i>
+              <div className="stat-number">{filterCounts.all}</div>
+              <p className="stat-label">Tổng số thú cưng</p>
             </div>
-        </>
-    )
+
+            <div
+              className={`stat-card ${selectedFilter === 'good' ? 'active' : ''}`}
+              onClick={() => setSelectedFilter('good')}
+            >
+              <i className="bi bi-check-circle stat-icon text-success"></i>
+              <div className="stat-number">{filterCounts.good}</div>
+              <p className="stat-label">Sức khỏe tốt</p>
+            </div>
+
+            <div
+              className={`stat-card ${selectedFilter === 'warning' ? 'active' : ''}`}
+              onClick={() => setSelectedFilter('warning')}
+            >
+              <i className="bi bi-exclamation-triangle stat-icon text-warning"></i>
+              <div className="stat-number">{filterCounts.warning}</div>
+              <p className="stat-label">Cần chú ý</p>
+            </div>
+
+            <div
+              className={`stat-card ${selectedFilter === 'critical' ? 'active' : ''}`}
+              onClick={() => setSelectedFilter('critical')}
+            >
+              <i className="bi bi-x-circle stat-icon text-danger"></i>
+              <div className="stat-number">{filterCounts.critical}</div>
+              <p className="stat-label">Cần khám ngay</p>
+            </div>
+          </div>
+
+          <div className="pets-section">
+            <div className="section-header">
+              <h2 className="section-title">
+                {selectedFilter === 'all' ? 'Tất cả thú cưng' :
+                  selectedFilter === 'good' ? 'Thú cưng có sức khỏe tốt' :
+                    selectedFilter === 'warning' ? 'Thú cưng cần chú ý' :
+                      'Thú cưng cần khám ngay'} ({filteredPets.length})
+              </h2>
+            </div>
+
+            {filteredPets.length > 0 ? (
+              <div className="pets-grid">
+                {filteredPets.map((pet) => {
+                  const healthStatus = getHealthStatus(pet)
+                  const vaccinationStatus = getVaccinationStatus(pet)
+
+                  return (
+                    <div key={pet.id} className="pet-card">
+                      <div className="pet-header">
+                        <img
+                          src={pet.image || "/placeholder.svg?height=60&width=60"}
+                          alt={pet.name}
+                          className="pet-avatar"
+                        />
+                        <div className="pet-info">
+                          <h5>{pet.name}</h5>
+                          <p className="pet-details">
+                            {pet.species === "Dog" ? "🐕 Chó" : pet.species === "Cat" ? "🐱 Mèo" : pet.species} •
+                            {pet.breed} • {pet.age} tuổi
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="health-indicators">
+                        <div className="health-indicator">
+                          <div className="indicator-label">Tình trạng sức khỏe</div>
+                          <div className={`indicator-value text-${healthStatus.color}`}>
+                            {healthStatus.text}
+                          </div>
+                        </div>
+                        <div className="health-indicator">
+                          <div className="indicator-label">Tiêm chủng</div>
+                          <div className={`indicator-value text-${vaccinationStatus.color}`}>
+                            {vaccinationStatus.text}
+                          </div>
+                        </div>
+                        <div className="health-indicator">
+                          <div className="indicator-label">Khám lần cuối</div>
+                          <div className="indicator-value">
+                            {healthStatus.days} ngày trước
+                          </div>
+                        </div>
+                        <div className="health-indicator">
+                          <div className="indicator-label">Cân nặng</div>
+                          <div className="indicator-value">
+                            {pet.weight || 'Chưa cập nhật'} kg
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pet-actions">
+                        <Link
+                          to={`/pet/health/${pet.id}`}
+                          className="action-btn btn-primary-custom"
+                        >
+                          <i className="bi bi-eye"></i>
+                          Xem chi tiết
+                        </Link>
+                        <Link
+                          to={`/pet/health/${pet.id}/add`}
+                          className="action-btn btn-outline-custom"
+                        >
+                          <i className="bi bi-plus-circle"></i>
+                          Thêm hồ sơ
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <i className="bi bi-search empty-icon"></i>
+                <h3 className="empty-title">Không tìm thấy thú cưng</h3>
+                <p className="empty-text">
+                  {selectedFilter === 'all'
+                    ? 'Bạn chưa có thú cưng nào được đăng ký.'
+                    : 'Không có thú cưng nào phù hợp với bộ lọc đã chọn.'
+                  }
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="emergency-section">
+            <h3 className="emergency-title">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              Trường hợp khẩn cấp?
+            </h3>
+            <p className="emergency-text">
+              Nếu thú cưng của bạn có triệu chứng bất thường hoặc cần cấp cứu ngay lập tức
+            </p>
+            <a href="tel:1900-1234" className="emergency-btn">
+              <i className="bi bi-telephone-fill"></i>
+              Gọi hotline: 1900-1234
+            </a>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }
 
 export default HealthDashboard

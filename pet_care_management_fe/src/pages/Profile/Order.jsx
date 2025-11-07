@@ -15,10 +15,28 @@ const UserOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null)
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId")
-    const accessToken = localStorage.getItem("accessToken")
+    // Thử lấy từ cả hai cách lưu token
+    let accessToken = localStorage.getItem("accessToken") || localStorage.getItem("token")
+    let userId = localStorage.getItem("userId")
+
+    // Nếu không có userId, thử lấy từ user object
+    if (!userId) {
+      const user = localStorage.getItem("user")
+      if (user) {
+        try {
+          const userObj = JSON.parse(user)
+          userId = userObj.id
+        } catch (e) {
+          console.error("Error parsing user data:", e)
+        }
+      }
+    }
+
+    console.log("Order - Token:", accessToken ? "Available" : "Missing")
+    console.log("Order - UserId:", userId ? userId : "Missing")
 
     if (!accessToken || !userId) {
+      console.error("Missing authentication data")
       window.location.href = "/login"
       return
     }
@@ -29,10 +47,31 @@ const UserOrders = () => {
   const fetchOrders = async (accessToken, userId) => {
     setLoading(true)
     try {
+      console.log(`Fetching orders for userId: ${userId}`)
+
+      // Kiểm tra đơn hàng của user cụ thể
       const res = await axios.get(`/api/orders/user/${userId}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
-      console.log(res.data)
+      console.log(`Orders for user ${userId}:`, res.data)
+
+      // Debug: Kiểm tra tất cả orders trong hệ thống
+      try {
+        const allOrdersRes = await axios.get(`/api/orders`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        console.log("All orders in system:", allOrdersRes.data)
+        console.log("Total orders:", allOrdersRes.data?.length || 0)
+
+        // Tìm orders có userId = 9
+        const userOrdersFromAll = allOrdersRes.data?.filter(order =>
+          order.user_id === parseInt(userId) || order.userId === parseInt(userId)
+        ) || []
+        console.log(`User ${userId} orders from all orders:`, userOrdersFromAll)
+      } catch (debugError) {
+        console.log("Could not fetch all orders for debug:", debugError.message)
+      }
+
       setOrders(res.data)
     } catch (error) {
       console.error("Error fetching orders:", error)
@@ -44,33 +83,6 @@ const UserOrders = () => {
 
   const handleGoBack = () => {
     window.history.back()
-  }
-
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      completed: {
-        label: "Hoàn thành",
-        className: "badge bg-success",
-      },
-      pending: {
-        label: "Chờ xử lý",
-        className: "badge bg-warning text-dark",
-      },
-      processing: {
-        label: "Đang xử lý",
-        className: "badge bg-info",
-      },
-      cancelled: {
-        label: "Đã hủy",
-        className: "badge bg-danger",
-      },
-      shipped: {
-        label: "Đang giao",
-        className: "badge bg-primary",
-      },
-    }
-    const config = statusConfig[status] || statusConfig.pending
-    return <span className={config.className}>{config.label}</span>
   }
 
   // Pagination logic
@@ -739,7 +751,7 @@ const UserOrders = () => {
                         <div className="order-header">
                           <div className="d-flex justify-content-between align-items-center w-100">
                             <div className="order-id">#{order.orderId}</div>
-                            {getStatusBadge(order.status)}
+                            <span className="badge bg-success">Đã đặt hàng</span>
                           </div>
                         </div>
 
@@ -759,7 +771,7 @@ const UserOrders = () => {
                             </div>
                             <div className="order-detail">
                               <i className="bi bi-box"></i>
-                              <span>{order.orderItems?.length || 0} sản phẩm</span>
+                              <span>{order.totalQuantity || 0} sản phẩm</span>
                             </div>
                             <div className="order-detail">
                               <i className="bi bi-truck"></i>
@@ -774,8 +786,8 @@ const UserOrders = () => {
                                 <i className="bi bi-list-ul me-2"></i>
                                 Sản phẩm đã đặt:
                               </h6>
-                              {order.orderItems.slice(0, 2).map((item) => (
-                                <div key={item.orderItemId} className="order-item">
+                              {order.orderItems.slice(0, 2).map((item, index) => (
+                                <div key={item.orderItemId || index} className="order-item">
                                   <div>
                                     <div className="item-name">{item.product?.name || "Sản phẩm"}</div>
                                     <div className="item-details">Số lượng: {item.quantity}</div>

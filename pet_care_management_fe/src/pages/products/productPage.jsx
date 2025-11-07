@@ -1,21 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import axios from '../../services/customizeAxios';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from '../../services/customizeAxios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../../components/home/Header';
 import Footer from '../../components/home/Footer';
 
 const ProductPage = () => {
+    const navigate = useNavigate();
 
 
     const [activeTab, setActiveTab] = useState('tab-1');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [modalImageError, setModalImageError] = useState(false);
+    const [productImageErrors, setProductImageErrors] = useState(new Map());
 
     useEffect(() => {
-        const accessToken = localStorage.getItem('accessToken');
+        // Thử lấy từ cả hai cách lưu token  
+        const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token')
+        console.log("ProductPage - Token:", accessToken ? "Available" : "Missing")
         getAllProducts(accessToken);
         // eslint-disable-next-line
     }, [navigate]);
@@ -26,13 +32,11 @@ const ProductPage = () => {
             const res = await axios.get('/api/product/getAllProduct', {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
-            // Chuyển đổi imageUrl thành image để đồng bộ với phần render bên dưới
-            const products = res.data.map(product => ({
-                ...product,
-                image: product.imageUrl // FE dùng product.image để hiển thị
-            }));
-            setProducts(products);
+            // Backend đã trả về field 'image' trực tiếp, không cần chuyển đổi
+            setProducts(res.data);
             setLoading(false);
+            // Reset product image errors when products change
+            setProductImageErrors(new Map());
         } catch (err) {
             setError('Không thể tải sản phẩm.');
             setLoading(false);
@@ -42,24 +46,77 @@ const ProductPage = () => {
 
     const handleTabChange = (tab) => setActiveTab(tab);
 
-
-    // Điều hướng đến trang chi tiết sản phẩm
-    const handleViewDetail = (productId) => {
-        navigate(`/products/${productId}`);
+    // Hiển thị modal chi tiết sản phẩm
+    const handleViewDetail = (product) => {
+        setSelectedProduct(product);
+        setShowModal(true);
+        setModalImageError(false); // Reset image error when opening modal
     };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedProduct(null);
+        setModalImageError(false); // Reset image error when closing modal
+    };
+
+    // Prevent modal image error infinite loop
+    const handleModalImageError = useCallback((e) => {
+        if (!modalImageError) {
+            setModalImageError(true);
+            e.target.src = '/placeholder.svg?height=300&width=300';
+        }
+    }, [modalImageError]);
+
+    // Prevent product list image error infinite loop
+    const handleProductImageError = useCallback((productId) => {
+        setProductImageErrors(prev => {
+            if (!prev.has(productId)) {
+                const newMap = new Map(prev);
+                newMap.set(productId, true);
+                return newMap;
+            }
+            return prev;
+        });
+    }, []);
 
     // Thêm sản phẩm vào giỏ hàng (theo chuẩn BE mới: trả về CartItemResponse, xử lý lỗi rõ ràng)
     const handleAddToCart = async (product) => {
-        const accessToken = localStorage.getItem('accessToken');
-        const userId = localStorage.getItem('userId');
+        // Thử lấy từ cả hai cách lưu token
+        let accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token')
+        let userId = localStorage.getItem('userId')
+
+        // Nếu không có userId, thử lấy từ user object
+        if (!userId) {
+            const user = localStorage.getItem('user')
+            if (user) {
+                try {
+                    const userObj = JSON.parse(user)
+                    userId = userObj.id
+                } catch (e) {
+                    console.error("Error parsing user data:", e)
+                }
+            }
+        }
+
+        console.log("AddToCart - Token:", accessToken ? "Available" : "Missing")
+        console.log("AddToCart - UserId:", userId ? userId : "Missing")
+        console.log("AddToCart - Product:", product)
+
         if (!userId) {
             alert('Bạn cần đăng nhập để thêm vào giỏ hàng!');
             navigate('/login');
             return;
         }
+
+        if (!accessToken) {
+            alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!');
+            navigate('/login');
+            return;
+        }
+
         try {
             // BE mới: trả về CartItemResponse, không cần check lại dữ liệu trả về ở đây
-            await axios.post(
+            const response = await axios.post(
                 '/api/shopping-cart/add',
                 { quantity: 1 },
                 {
@@ -67,7 +124,17 @@ const ProductPage = () => {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 }
             );
-            alert('Đã thêm vào giỏ hàng!');
+            console.log("Add to cart response:", response.data)
+
+            // Trigger cart count update
+            window.dispatchEvent(new CustomEvent('cartUpdated'));
+
+            // Hiển thị thông báo chi tiết và hướng dẫn
+            const confirmCheckout = window.confirm(
+                `✅ Đã thêm "${product.name}" vào giỏ hàng!\n\n`
+            )
+
+
         } catch (err) {
             if (err.response && err.response.status === 401) {
                 alert('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!');
@@ -137,10 +204,10 @@ const ProductPage = () => {
                                                                 <div className="position-relative bg-light overflow-hidden" style={{ height: 180, minHeight: 180, maxHeight: 180 }}>
                                                                     <img
                                                                         className="img-fluid w-100 h-100 object-fit-cover product-img"
-                                                                        src={product.image}
+                                                                        src={productImageErrors.has(product.id) ? '/placeholder.svg?height=180&width=180' : product.image}
                                                                         alt={product.name}
                                                                         style={{ objectFit: 'cover', height: 180, width: '100%', minHeight: 180, maxHeight: 180, aspectRatio: '1/1', background: '#f8f9fa' }}
-                                                                        onError={e => { e.target.onerror = null; e.target.src = '/placeholder.svg?height=180&width=180'; }}
+                                                                        onError={() => handleProductImageError(product.id)}
                                                                     />
                                                                     {product.salePercent > 0 && (
                                                                         <span className="badge bg-danger position-absolute top-0 end-0 m-2">-{product.salePercent}%</span>
@@ -158,7 +225,7 @@ const ProductPage = () => {
                                                                     </div>
                                                                 </div>
                                                                 <div className="card-footer d-flex p-0 border-top bg-white gap-2" style={{ minHeight: 48, maxHeight: 48, height: 48 }}>
-                                                                    <button className="btn d-flex align-items-center justify-content-center px-3 py-2 btn-outline-primary rounded-start-3 fw-semibold gap-1" style={{ fontSize: 15, height: 40, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', transition: 'background 0.2s' }} onClick={() => handleViewDetail(product.id)}>
+                                                                    <button className="btn d-flex align-items-center justify-content-center px-3 py-2 btn-outline-primary rounded-start-3 fw-semibold gap-1" style={{ fontSize: 15, height: 40, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', transition: 'background 0.2s' }} onClick={() => handleViewDetail(product)}>
                                                                         <i className="fa fa-eye text-primary"></i>
                                                                         <span className="d-none d-md-inline">Xem chi tiết</span>
                                                                         <span className="d-inline d-md-none">Chi tiết</span>
@@ -212,6 +279,83 @@ const ProductPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal chi tiết sản phẩm */}
+            {showModal && selectedProduct && (
+                <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-lg modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Chi tiết sản phẩm</h5>
+                                <button type="button" className="btn-close" onClick={handleCloseModal}></button>
+                            </div>
+                            <div className="modal-body">
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <img
+                                            src={modalImageError ? '/placeholder.svg?height=300&width=300' : selectedProduct.image}
+                                            alt={selectedProduct.name}
+                                            className="img-fluid rounded"
+                                            style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+                                            onError={handleModalImageError}
+                                        />
+                                    </div>
+                                    <div className="col-md-6">
+                                        <h4 className="fw-bold mb-3">{selectedProduct.name}</h4>
+
+                                        <div className="mb-3">
+                                            <span className="badge bg-secondary me-2">
+                                                {selectedProduct.type || 'Chưa phân loại'}
+                                            </span>
+                                            {selectedProduct.salePercent > 0 && (
+                                                <span className="badge bg-danger">Giảm {selectedProduct.salePercent}%</span>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <h5 className="text-success fw-bold">
+                                                {selectedProduct.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                            </h5>
+                                            {selectedProduct.salePercent > 0 && (
+                                                <span className="text-muted text-decoration-line-through">
+                                                    {(selectedProduct.price / (1 - selectedProduct.salePercent / 100)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <strong>Mô tả:</strong>
+                                            <p className="mt-2">{selectedProduct.description || 'Chưa có mô tả chi tiết.'}</p>
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <strong>Tình trạng:</strong>
+                                            <span className="ms-2 badge bg-success">Còn hàng</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
+                                    Đóng
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={() => {
+                                        handleAddToCart(selectedProduct);
+                                        handleCloseModal();
+                                    }}
+                                >
+                                    <i className="fa fa-shopping-bag me-2"></i>
+                                    Thêm vào giỏ hàng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Footer />
         </div>
     );

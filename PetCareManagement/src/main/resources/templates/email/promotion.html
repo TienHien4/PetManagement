@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+    }
+
+    .email-container {
+      max-width: 650px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .fireworks-bg {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      padding: 50px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fireworks-bg::before {
+      content: '🎆';
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 40px;
+      animation: sparkle 2s infinite;
+    }
+
+    .fireworks-bg::after {
+      content: '🎇';
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 40px;
+      animation: sparkle 2s infinite 1s;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .header-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .header-title {
+      color: white;
+      font-size: 42px;
+      font-weight: 800;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .header-subtitle {
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .content {
+      padding: 50px 40px;
+    }
+
+    .greeting {
+      font-size: 22px;
+      color: #ff6b6b;
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+
+    .intro-text {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #555;
+      margin-bottom: 30px;
+    }
+
+    .promotion-box {
+      background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+      border: 4px dashed #ff6b6b;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin: 30px 0;
+      position: relative;
+    }
+
+    .promotion-box::before {
+      content: '🎁';
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 50px;
+    }
+
+    .promotion-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ff6b6b;
+      margin: 20px 0;
+      text-transform: uppercase;
+    }
+
+    .discount-circle {
+      width: 180px;
+      height: 180px;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 30px auto;
+      box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .discount-text {
+      color: white;
+      font-size: 56px;
+      font-weight: 900;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .promotion-description {
+      font-size: 17px;
+      line-height: 1.8;
+      color: #333;
+      margin: 25px 0;
+    }
+
+    .code-container {
+      background: white;
+      border: 3px solid #ff6b6b;
+      border-radius: 15px;
+      padding: 25px;
+      margin: 30px 0;
+    }
+
+    .code-label {
+      font-size: 14px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .promo-code {
+      font-family: 'Courier New', monospace;
+      font-size: 36px;
+      font-weight: 900;
+      color: #ff6b6b;
+      letter-spacing: 5px;
+      padding: 15px;
+      background: #fff5f5;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .valid-until {
+      font-size: 15px;
+      color: #666;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      padding: 18px 50px;
+      border-radius: 50px;
+      text-decoration: none;
+      margin: 30px 0;
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5);
+    }
+
+    .benefits-list {
+      background: #f8f9ff;
+      border-left: 5px solid #667eea;
+      padding: 25px 30px;
+      margin: 30px 0;
+      border-radius: 10px;
+    }
+
+    .benefits-list h3 {
+      color: #667eea;
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    .benefits-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .benefits-list li {
+      padding: 10px 0;
+      color: #555;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .benefits-list li::before {
+      content: '✓';
+      color: #667eea;
+      font-weight: 900;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .note-box {
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+      padding: 20px;
+      margin: 25px 0;
+      border-radius: 8px;
+    }
+
+    .note-box strong {
+      color: #856404;
+    }
+
+    .footer {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .footer h3 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .footer-contact {
+      font-size: 15px;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 10px 0;
+    }
+
+    .footer-social {
+      margin: 25px 0;
+    }
+
+    .social-icon {
+      font-size: 28px;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 20px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div class="email-container">
+  <!-- Header -->
+  <div class="fireworks-bg">
+    <div class="header-icon">🎊</div>
+    <h1 class="header-title">CHÚC MỪNG NĂM MỚI</h1>
+    <p class="header-subtitle">Pet Care Management</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <p class="greeting">Kính gửi <strong th:text="${userName}">Quý Khách</strong>! 🎉</p>
+
+    <p class="intro-text">
+      Nhân dịp năm mới, <strong>Pet Care Management</strong> xin gửi đến bạn lời chúc sức khỏe,
+      hạnh phúc và thành công! Cảm ơn bạn đã tin tưởng và đồng hành cùng chúng tôi trong thời gian qua.
+    </p>
+
+    <!-- Promotion Box -->
+    <div class="promotion-box">
+      <h2 class="promotion-title" th:text="${promotionTitle}">Khuyến Mãi Đặc Biệt</h2>
+
+      <div class="discount-circle">
+        <span class="discount-text" th:text="${discountPercent}">20%</span>
+      </div>
+
+      <p class="promotion-description" th:text="${promotionDescription}">
+        Giảm giá 20% cho tất cả dịch vụ đặt lịch khám!
+      </p>
+
+      <div class="code-container">
+        <p class="code-label">Mã Khuyến Mãi</p>
+        <div class="promo-code" th:text="${promotionCode}">NEWYEAR2025</div>
+        <p class="valid-until">
+          ⏰ Có hiệu lực đến: <strong th:text="${validUntil}">31/01/2025</strong>
+        </p>
+      </div>
+
+      <a href="http://localhost:3000/services" class="cta-button">
+        📅 ĐẶT LỊCH NGAY
+      </a>
+    </div>
+
+    <!-- Benefits -->
+    <div class="benefits-list">
+      <h3>🎁 Ưu Đãi Áp Dụng Cho:</h3>
+      <ul>
+        <li>Khám sức khỏe tổng quát cho thú cưng</li>
+        <li>Tiêm phòng và vắc-xin định kỳ</li>
+        <li>Spa & grooming chuyên nghiệp</li>
+        <li>Tư vấn dinh dưỡng và chăm sóc</li>
+        <li>Khám chuyên khoa (da liễu, nội khoa, ngoại khoa)</li>
+      </ul>
+    </div>
+
+    <!-- Note -->
+    <div class="note-box">
+      <p style="margin: 0;">
+        <strong>⚠️ Lưu ý:</strong> Nhập mã <strong th:text="${promotionCode}">NEWYEAR2025</strong>
+        khi đặt lịch để nhận ưu đãi. Số lượng có hạn, nhanh tay đặt lịch ngay hôm nay!
+      </p>
+    </div>
+
+    <p style="text-align: center; margin-top: 40px; font-size: 16px; color: #666;">
+      💝 Chúc bạn và gia đình một năm mới tràn đầy niềm vui!<br>
+      🐾 Chúc các bé thú cưng luôn khỏe mạnh và hạnh phúc!
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <h3>🐾 Pet Care Management</h3>
+    <p class="footer-contact">📞 Hotline: <strong>1900-xxxx</strong></p>
+    <p class="footer-contact">📧 Email: <strong>support@petcare.com</strong></p>
+    <p class="footer-contact">📍 123 Đường ABC, Quận XYZ, TP. HCM</p>
+
+    <div class="footer-social">
+      <a href="#" class="social-icon">📘</a>
+      <a href="#" class="social-icon">📷</a>
+      <a href="#" class="social-icon">🐦</a>
+    </div>
+
+    <p class="footer-note">
+      Email này được gửi tự động từ hệ thống Pet Care Management.<br>
+      Vui lòng không trả lời email này.
+    </p>
+  </div>
+</div>
+</body>
+</html>

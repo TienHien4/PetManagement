@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import axios from "../../services/customizeAxios"
 import Header from "../../components/home/Header"
@@ -16,6 +16,7 @@ const ProductDetail = () => {
     const [error, setError] = useState(null)
     const [quantity, setQuantity] = useState(1)
     const [activeTab, setActiveTab] = useState("description")
+    const [imageError, setImageError] = useState(false)
 
     useEffect(() => {
         let isMounted = true;
@@ -48,6 +49,14 @@ const ProductDetail = () => {
         console.log(`Thêm ${quantity} sản phẩm ${product.name} vào giỏ hàng`)
     }
 
+    // Prevent image error infinite loop
+    const handleImageError = useCallback((e) => {
+        if (!imageError) {
+            setImageError(true)
+            e.target.src = "/placeholder.svg?height=500&width=500"
+        }
+    }, [imageError])
+
     // Do not return early on error; always render the layout
 
     // Nếu chưa có product, chỉ render layout với placeholder, không nháy
@@ -67,6 +76,11 @@ const ProductDetail = () => {
     if (product && product.images && Array.isArray(product.images) && product.images.length > 0) {
         mainImage = product.images[0] || "/placeholder.svg?height=500&width=500";
     }
+
+    // Reset image error when product changes
+    useEffect(() => {
+        setImageError(false)
+    }, [product])
 
     // Nếu lỗi, vẫn render layout nhưng hiển thị thông báo lỗi trong phần info
 
@@ -126,13 +140,10 @@ const ProductDetail = () => {
                                                     </span>
                                                 </div>
                                                 <img
-                                                    src={mainImage}
+                                                    src={imageError ? "/placeholder.svg?height=500&width=500" : mainImage}
                                                     alt={displayProduct.name}
                                                     className="main-product-image"
-                                                    onError={e => {
-                                                        e.target.onerror = null;
-                                                        e.target.src = "/placeholder.svg?height=500&width=500";
-                                                    }}
+                                                    onError={handleImageError}
                                                 />
                                                 <div className="image-zoom-hint">
                                                     <i className="fas fa-search-plus"></i>

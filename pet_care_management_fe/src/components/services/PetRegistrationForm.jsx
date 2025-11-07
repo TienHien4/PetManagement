@@ -1,14 +1,17 @@
 
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import axios from "../../services/customizeAxios"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 const PetRegistrationForm = () => {
+  const navigate = useNavigate()
   const userID = localStorage.getItem("userId")
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    petId: "", // Changed from petSpecies to petId
     petSpecies: "",
     services: [],
     date: "",
@@ -16,12 +19,18 @@ const PetRegistrationForm = () => {
     userId: Number(userID),
   })
   const [vetList, setVetList] = useState([])
+  const [serviceOptions, setServiceOptions] = useState([])
+  const [userPets, setUserPets] = useState([]) // New state for user's pets
+  const [selectedPet, setSelectedPet] = useState(null) // New state for selected pet details
+  const [showCreatePetForm, setShowCreatePetForm] = useState(false) // Toggle between select pet or create new
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
   const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
     featchVetList()
+    fetchServices()
+    fetchUserPets() // Add new function call
   }, [])
 
   const featchVetList = async () => {
@@ -33,6 +42,80 @@ const PetRegistrationForm = () => {
       console.error("Error fetching vet list:", error)
       alert("Không thể tải danh sách bác sĩ. Vui lòng thử lại sau!")
     }
+  }
+
+  const fetchUserPets = async () => {
+    try {
+      const token = localStorage.getItem("accessToken")
+      const res = await axios.get(`/api/pet/getPetsByUser/${userID}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      console.log("User pets:", res.data)
+      setUserPets(res.data)
+
+      // If no pets found, redirect to create new pet
+      if (!res.data || res.data.length === 0) {
+        navigate('/pet/add')
+      }
+    } catch (error) {
+      console.error("Error fetching user pets:", error)
+      // If no pets found, redirect to create new pet
+      navigate('/pet/add')
+    }
+  }
+
+  const handleCreateNewPet = () => {
+    navigate('/pet/add')
+  }
+
+  const fetchServices = async () => {
+    try {
+      const res = await axios.get("/api/services/all")
+      console.log("Services:", res.data)
+      const formattedServices = res.data.map(service => ({
+        value: service.name,
+        icon: getServiceIcon(service.name),
+        color: getServiceColor(service.name),
+        price: service.price
+      }))
+      setServiceOptions(formattedServices)
+    } catch (error) {
+      console.error("Error fetching services:", error)
+      // Fallback to hardcoded services if API fails
+      setServiceOptions([
+        { value: "Khám tổng quát", icon: "bi-heart-pulse", color: "#ff6b6b" },
+        { value: "Tiêm phòng", icon: "bi-shield-plus", color: "#4ecdc4" },
+        { value: "Tắm và cắt tỉa lông", icon: "bi-scissors", color: "#45b7d1" },
+      ])
+    }
+  }
+
+  const getServiceIcon = (serviceName) => {
+    const iconMap = {
+      "Khám tổng quát": "bi-heart-pulse",
+      "Tiêm phòng": "bi-shield-plus",
+      "Phẫu thuật": "bi-bandaid",
+      "Nha khoa": "bi-tooth",
+      "Tắm và cắt tỉa lông": "bi-scissors",
+      "Siêu âm": "bi-soundwave",
+      "X-quang": "bi-x-diamond",
+      "Xét nghiệm máu": "bi-droplet"
+    }
+    return iconMap[serviceName] || "bi-gear"
+  }
+
+  const getServiceColor = (serviceName) => {
+    const colorMap = {
+      "Khám tổng quát": "#ff6b6b",
+      "Tiêm phòng": "#4ecdc4",
+      "Phẫu thuật": "#f39c12",
+      "Nha khoa": "#9b59b6",
+      "Tắm và cắt tỉa lông": "#45b7d1",
+      "Siêu âm": "#2ecc71",
+      "X-quang": "#e74c3c",
+      "Xét nghiệm máu": "#34495e"
+    }
+    return colorMap[serviceName] || "#95a5a6"
   }
 
   const validateForm = () => {
@@ -48,8 +131,15 @@ const PetRegistrationForm = () => {
       newErrors.email = "Email không hợp lệ"
     }
 
-    if (!formData.petSpecies) {
-      newErrors.petSpecies = "Vui lòng chọn loại thú cưng"
+    // Validate pet selection based on mode
+    if (!showCreatePetForm) {
+      if (!formData.petId) {
+        newErrors.petId = "Vui lòng chọn thú cưng"
+      }
+    } else {
+      if (!formData.petSpecies) {
+        newErrors.petSpecies = "Vui lòng chọn loại thú cưng"
+      }
     }
 
     if (formData.services.length === 0) {
@@ -91,6 +181,23 @@ const PetRegistrationForm = () => {
     handleInputChange("services", updatedServices)
   }
 
+  const handlePetSelection = (petId) => {
+    const pet = userPets.find(p => p.id === parseInt(petId))
+    if (pet) {
+      setSelectedPet(pet)
+      setFormData(prev => ({
+        ...prev,
+        petId: petId,
+        petSpecies: pet.species || pet.type
+      }))
+    }
+
+    // Clear error when pet is selected
+    if (errors.petId) {
+      setErrors(prev => ({ ...prev, petId: "" }))
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -102,7 +209,38 @@ const PetRegistrationForm = () => {
     const accessToken = localStorage.getItem("accessToken")
 
     try {
-      const res = await axios.post("/api/appointment/createAppointment", formData, {
+      // Prepare appointment data
+      let appointmentData = { ...formData }
+
+      // If user selected existing pet, include pet details
+      if (!showCreatePetForm && selectedPet) {
+        appointmentData.name = formData.name // Use customer name instead
+        // Include pet information
+        appointmentData.petId = selectedPet.id
+        appointmentData.petName = selectedPet.name
+        appointmentData.petType = selectedPet.species || selectedPet.type
+        appointmentData.petBreed = selectedPet.breed || 'Mixed'
+        appointmentData.petAge = selectedPet.age ? selectedPet.age.toString() : 'N/A'
+        appointmentData.petWeight = selectedPet.weight ? selectedPet.weight.toString() : 'N/A'
+        appointmentData.petGender = selectedPet.gender || 'N/A'
+        appointmentData.petImageUrl = selectedPet.image || '/placeholder.svg'
+      } else {
+        // For new pets, use customer name
+        appointmentData.name = formData.name // Use customer name instead
+        appointmentData.petType = formData.petSpecies
+        appointmentData.petName = 'Chưa đặt tên'
+        appointmentData.petBreed = 'Chưa xác định'
+        appointmentData.petAge = 'N/A'
+        appointmentData.petWeight = 'N/A'
+        appointmentData.petGender = 'N/A'
+      }
+
+      // Remove the unnecessary fields  
+      delete appointmentData.petSpecies
+
+      console.log('Sending appointment data:', appointmentData)
+
+      const res = await axios.post("/api/appointment/createAppointment", appointmentData, {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
 
@@ -114,12 +252,14 @@ const PetRegistrationForm = () => {
         setFormData({
           name: "",
           email: "",
+          petId: "",
           petSpecies: "",
           services: [],
           date: "",
           vetId: "",
           userId: Number(userID),
         })
+        setSelectedPet(null)
         setShowSuccess(false)
       }, 3000)
     } catch (error) {
@@ -129,12 +269,6 @@ const PetRegistrationForm = () => {
       setIsSubmitting(false)
     }
   }
-
-  const serviceOptions = [
-    { value: "Khám bệnh", icon: "bi-heart-pulse", color: "#ff6b6b" },
-    { value: "Tiêm phòng", icon: "bi-shield-plus", color: "#4ecdc4" },
-    { value: "Spa", icon: "bi-scissors", color: "#45b7d1" },
-  ]
 
   return (
     <>
@@ -418,6 +552,77 @@ const PetRegistrationForm = () => {
           50% { transform: translateY(-10px); }
         }
         
+        .selected-pet-info {
+          margin-top: 15px;
+        }
+        
+        .pet-info-card {
+          background: linear-gradient(135deg, #f8f9ff 0%, #fff5f5 100%);
+          border: 2px solid #e1e5e9;
+          border-radius: 15px;
+          padding: 20px;
+          transition: all 0.3s ease;
+        }
+        
+        .pet-info-card:hover {
+          border-color: #667eea;
+          box-shadow: 0 5px 20px rgba(102, 126, 234, 0.1);
+        }
+        
+        .pet-avatar {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid #667eea;
+        }
+        
+        .pet-avatar-placeholder {
+          width: 80px;
+          height: 80px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 24px;
+        }
+        
+        .pet-name {
+          color: #333;
+          font-size: 18px;
+          font-weight: 700;
+          margin-bottom: 10px;
+        }
+        
+        .pet-details {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          font-size: 14px;
+        }
+        
+        .detail-item {
+          display: flex;
+          align-items: center;
+          color: #666;
+          background: rgba(255, 255, 255, 0.7);
+          padding: 5px 10px;
+          border-radius: 8px;
+          border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .detail-item i {
+          color: #667eea;
+        }
+        
+        .btn-group-sm .btn {
+          padding: 5px 12px;
+          font-size: 12px;
+          border-radius: 8px;
+        }
+        
         @media (max-width: 768px) {
           .form-card {
             padding: 30px 20px;
@@ -516,54 +721,181 @@ const PetRegistrationForm = () => {
                   </div>
                 </div>
 
-                <div className="row">
-                  <div className="col-md-6">
-                    <div className="form-group">
-                      <label className="form-label">
-                        <i className="bi bi-heart-fill me-2"></i>
-                        Loại thú cưng *
-                      </label>
+                {/* Pet Selection Section */}
+                <div className="form-group">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <label className="form-label mb-0">
+                      <i className="bi bi-heart-fill me-2"></i>
+                      Thông tin thú cưng *
+                    </label>
+                    {userPets.length > 0 && (
+                      <div className="btn-group btn-group-sm">
+                        <button
+                          type="button"
+                          className={`btn ${!showCreatePetForm ? 'btn-primary' : 'btn-outline-primary'}`}
+                          onClick={() => setShowCreatePetForm(false)}
+                        >
+                          <i className="bi bi-list-ul me-1"></i>
+                          Chọn thú cưng có sẵn
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn ${showCreatePetForm ? 'btn-primary' : 'btn-outline-primary'}`}
+                          onClick={handleCreateNewPet}
+                        >
+                          <i className="bi bi-plus-circle me-1"></i>
+                          Thú cưng mới
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {!showCreatePetForm && userPets.length > 0 ? (
+                    <div>
                       <select
-                        className={`form-select ${errors.petSpecies ? "error" : ""}`}
-                        value={formData.petSpecies}
-                        onChange={(e) => handleInputChange("petSpecies", e.target.value)}
+                        className={`form-select ${errors.petId ? "error" : ""}`}
+                        value={formData.petId}
+                        onChange={(e) => handlePetSelection(e.target.value)}
                       >
-                        <option value="">Chọn loại thú cưng</option>
-                        <option value="cho">🐕 Chó</option>
-                        <option value="meo">🐱 Mèo</option>
-
+                        <option value="">Chọn thú cưng của bạn</option>
+                        {userPets.map((pet) => (
+                          <option key={pet.id} value={pet.id}>
+                            {pet.name} - {pet.species || pet.type} ({pet.breed || 'Không rõ giống'})
+                          </option>
+                        ))}
                       </select>
-                      {errors.petSpecies && (
+                      {errors.petId && (
                         <div className="error-message">
                           <i className="bi bi-exclamation-circle"></i>
-                          {errors.petSpecies}
+                          {errors.petId}
                         </div>
                       )}
-                    </div>
-                  </div>
 
-                  <div className="col-md-6">
-                    <div className="form-group">
-                      <label className="form-label">
-                        <i className="bi bi-calendar-fill me-2"></i>
-                        Ngày khám *
-                      </label>
-                      <input
-                        type="date"
-                        className={`form-input ${errors.date ? "error" : ""}`}
-                        value={formData.date}
-                        onChange={(e) => handleInputChange("date", e.target.value)}
-                        min={new Date().toISOString().split("T")[0]}
-                      />
-                      {errors.date && (
-                        <div className="error-message">
-                          <i className="bi bi-exclamation-circle"></i>
-                          {errors.date}
+                      {/* Selected Pet Information Display */}
+                      {selectedPet && (
+                        <div className="selected-pet-info mt-3">
+                          <div className="pet-info-card">
+                            <div className="row align-items-center">
+                              <div className="col-md-3">
+                                {selectedPet.image ? (
+                                  <img
+                                    src={selectedPet.image}
+                                    alt={selectedPet.name}
+                                    className="pet-avatar"
+                                  />
+                                ) : (
+                                  <div className="pet-avatar-placeholder">
+                                    <i className="bi bi-heart-fill"></i>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="col-md-9">
+                                <h6 className="pet-name">
+                                  <i className="bi bi-heart-fill me-2 text-danger"></i>
+                                  {selectedPet.name}
+                                </h6>
+                                <div className="pet-details">
+                                  <span className="detail-item">
+                                    <i className="bi bi-list me-1"></i>
+                                    <strong>Loài:</strong> {selectedPet.species || selectedPet.type}
+                                  </span>
+                                  <span className="detail-item">
+                                    <i className="bi bi-award me-1"></i>
+                                    <strong>Giống:</strong> {selectedPet.breed || 'Không rõ giống'}
+                                  </span>
+                                  <span className="detail-item">
+                                    <i className="bi bi-calendar me-1"></i>
+                                    <strong>Tuổi:</strong> {selectedPet.age || 'Không rõ tuổi'}
+                                  </span>
+                                  {selectedPet.weight && (
+                                    <span className="detail-item">
+                                      <i className="bi bi-speedometer me-1"></i>
+                                      <strong>Cân nặng:</strong> {selectedPet.weight} kg
+                                    </span>
+                                  )}
+                                  {selectedPet.gender && (
+                                    <span className="detail-item">
+                                      <i className="bi bi-gender-ambiguous me-1"></i>
+                                      <strong>Giới tính:</strong> {selectedPet.gender}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
-                  </div>
+                  ) : (
+                    <div className="row">
+                      <div className="col-md-6">
+                        <select
+                          className={`form-select ${errors.petSpecies ? "error" : ""}`}
+                          value={formData.petSpecies}
+                          onChange={(e) => handleInputChange("petSpecies", e.target.value)}
+                        >
+                          <option value="">Chọn loại thú cưng</option>
+                          <option value="Chó">🐕 Chó</option>
+                          <option value="Mèo">🐱 Mèo</option>
+                        </select>
+                        {errors.petSpecies && (
+                          <div className="error-message">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {errors.petSpecies}
+                          </div>
+                        )}
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-group">
+                          <label className="form-label">
+                            <i className="bi bi-calendar-fill me-2"></i>
+                            Ngày khám *
+                          </label>
+                          <input
+                            type="date"
+                            className={`form-input ${errors.date ? "error" : ""}`}
+                            value={formData.date}
+                            onChange={(e) => handleInputChange("date", e.target.value)}
+                            min={new Date().toISOString().split("T")[0]}
+                          />
+                          {errors.date && (
+                            <div className="error-message">
+                              <i className="bi bi-exclamation-circle"></i>
+                              {errors.date}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* Date selection for existing pets */}
+                {!showCreatePetForm && userPets.length > 0 && (
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="form-label">
+                          <i className="bi bi-calendar-fill me-2"></i>
+                          Ngày khám *
+                        </label>
+                        <input
+                          type="date"
+                          className={`form-input ${errors.date ? "error" : ""}`}
+                          value={formData.date}
+                          onChange={(e) => handleInputChange("date", e.target.value)}
+                          min={new Date().toISOString().split("T")[0]}
+                        />
+                        {errors.date && (
+                          <div className="error-message">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {errors.date}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="services-section">
                   <label className="form-label">
