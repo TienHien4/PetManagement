@@ -16,4 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT user FROM User user WHERE user.userName LIKE CONCAT('%', ?1, '%')" +
             " OR user.email LIKE CONCAT('%', ?1, '%')")
     List<User> searchUser(String keyword);
+    List<User> findDistinctByRoles_Name(String roleName);
+
+    @Query("SELECT u FROM User u WHERE u.vet IS NOT NULL")
+    List<User> findAllUsersWithVetProfile();
 }

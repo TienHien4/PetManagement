@@ -142,4 +142,9 @@ public class UserServiceIplm implements UserService {
         return user;
     }
 
+    @Override
+    public List<User> getAllVets() {
+        return userRepo.findDistinctByRoles_Name("VET");
+    }
+
 }

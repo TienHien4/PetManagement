@@ -36,18 +36,18 @@ public class EmailConsumerService {
         System.out.println("From Email: " + fromEmail);
     }
 
-    @KafkaListener(
-            topics = "appointment-email-events",
-            groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "emailKafkaListenerFactory"
-    )
-    public void consumeAppointmentEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
-        System.out.println("MESSAGE RECEIVED FROM KAFKA!");
-        System.out.println("User: " + event.getUserName());
-        System.out.println("Email: " + event.getUserEmail());
-
-        processEmailEvent(event, acknowledgment);
-    }
+//    @KafkaListener(
+//            topics = "appointment-email-events",
+//            groupId = "${spring.kafka.consumer.group-id}",
+//            containerFactory = "emailKafkaListenerFactory"
+//    )
+//    public void consumeAppointmentEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
+//        System.out.println("MESSAGE RECEIVED FROM KAFKA!");
+//        System.out.println("User: " + event.getUserName());
+//        System.out.println("Email: " + event.getUserEmail());
+//
+//        processEmailEvent(event, acknowledgment);
+//    }
 
     private void processEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
         try {

@@ -45,6 +45,7 @@ public class SecurityConfig {
                                                 "/login/**", "/api/pet/**", "/uploads/pets/**", "/refreshToken",
                                                 "/oauth2/**")
                                 .permitAll()
+                                .requestMatchers("/ws/**").permitAll()  // Allow WebSocket connections
                                 .requestMatchers("/api/vet-dashboard/**").hasRole("VET")
                                 .anyRequest().authenticated());
                 httpSecurity.oauth2Login(oauth2 -> oauth2

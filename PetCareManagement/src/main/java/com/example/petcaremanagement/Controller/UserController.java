@@ -3,6 +3,7 @@ package com.example.petcaremanagement.Controller;
 import com.example.petcaremanagement.Dto.UserDTO.UserRequest;
 import com.example.petcaremanagement.Dto.UserDTO.UserResponse;
 import com.example.petcaremanagement.DtoError.ErrorResponse;
+import com.example.petcaremanagement.Entity.User;
 import com.example.petcaremanagement.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -57,6 +58,11 @@ public class UserController {
     public ResponseEntity<UserResponse> ChangePassword(@PathVariable long id, @RequestParam String newPassword){
         var result = userService.ChangePassword(id, newPassword);
         return ResponseEntity.ok().body(result);
+    }
+    @GetMapping("/vets")
+    public ResponseEntity<List<User>> getAllVets() {
+        List<User> vets = userService.getAllVets();
+        return ResponseEntity.ok(vets);
     }
 
 

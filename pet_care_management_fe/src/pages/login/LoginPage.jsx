@@ -22,31 +22,54 @@ const LoginPage = () => {
                 userName,
                 password,
             });
-            const roles = response.data.roles;
-            console.log(response)
-            localStorage.setItem("userId", response.data.id);
-            localStorage.setItem("UserName", response.data.userName);
 
             if (response.data.message !== "Login success!") {
                 setErrorMessage(response.data.message || "Login failed!");
                 return;
             }
-            console.log(response.data.roles)
+
+            const roles = response.data.roles || [];
+            console.log("Login response:", response.data);
+            console.log("User roles:", roles);
+
+            // Save tokens
+            localStorage.setItem("accessToken", response.data.token);
+            localStorage.setItem("refreshToken", response.data.refreshToken);
+
+            // Save user info separately (for backward compatibility)
+            localStorage.setItem("userId", response.data.id);
+            localStorage.setItem("UserName", response.data.userName);
+
+            // IMPORTANT: Save complete user object with roles
+            const userObject = {
+                userId: response.data.id,
+                id: response.data.id,
+                userName: response.data.userName,
+                roles: Array.from(roles), // Convert Set to Array
+                token: response.data.token,
+                refreshToken: response.data.refreshToken
+            };
+            localStorage.setItem("user", JSON.stringify(userObject));
+
+            // Clear error message
+            setErrorMessage("");
+
+            // Navigate based on role
             if (roles.includes("ADMIN")) {
-                localStorage.setItem("accessToken", response.data.token);
-                localStorage.setItem("refreshToken", response.data.refreshToken);
-                setErrorMessage("");
+                console.log("Navigating to /admin");
                 navigate("/admin");
-
-            }
-
-            if (roles.includes("USER")) {
-                localStorage.setItem("accessToken", response.data.token);
-                localStorage.setItem("refreshToken", response.data.refreshToken);
-                setErrorMessage("");
+            } else if (roles.includes("VET")) {
+                console.log("Navigating to /vet/dashboard");
+                navigate("/vet/dashboard");
+            } else if (roles.includes("USER")) {
+                console.log("Navigating to /home");
+                navigate("/home");
+            } else {
+                console.log("No valid role found, navigating to /home");
                 navigate("/home");
             }
         } catch (error) {
+            console.error("Login error:", error);
             const errorMessage =
                 error.response?.data?.message || "An error occurred during login.";
             setErrorMessage(errorMessage);

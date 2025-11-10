@@ -32,6 +32,11 @@ import VetLayout from '../pages/vet/VetLayout';
 import VetDashboard from '../pages/vet/VetDashboard';
 import VetAppointments from '../pages/vet/VetAppointments';
 
+import UserChat from '../pages/Profile/UserChat';
+import VetChat from '../pages/vet/VetChat';
+
+// Floating Chat Button
+import FloatingChatButton from '../components/FloatingChatButton';
 
 // Route Components
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -39,6 +44,9 @@ import RoleBasedRedirect from '../components/RoleBasedRedirect';
 
 
 const AppRouter = () => {
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
     return (
         <Router>
             <Routes>
@@ -136,6 +144,18 @@ const AppRouter = () => {
                         <AddHealthRecord />
                     </ProtectedRoute>
                 } />
+                <Route path="/user/chat" element={
+                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
+                        <UserChat />
+                    </ProtectedRoute>
+                } />
+
+                <Route path="/vet/chat" element={
+                    <ProtectedRoute allowedRoles={['VET']}>
+                        <VetChat />
+                    </ProtectedRoute>
+                } />
+
 
                 {/* VET Routes */}
                 <Route path="/vet" element={
@@ -155,6 +175,9 @@ const AppRouter = () => {
                     </div>
                 } />
             </Routes>
+
+            {/* Show floating chat button only for logged-in users */}
+            {user && user.userId && <FloatingChatButton />}
         </Router>
     );
 };

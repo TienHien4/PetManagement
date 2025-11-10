@@ -3,14 +3,14 @@ import { useEffect } from 'react';
 import axios from 'axios';
 
 const OAuthRedirect = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
         const fetchUserData = async () => {
             try {
                 // Gọi API lấy token & user
                 const response = await axios.get("http://localhost:8080/oauth2/success", {
-                    withCredentials: true, 
+                    withCredentials: true,
                 });
 
                 console.log("API Response:", response.data); // Debug dữ liệu
@@ -40,10 +40,10 @@ const OAuthRedirect = () => {
             }
         };
 
-    fetchUserData();
-  }, [navigate]);
+        fetchUserData();
+    }, [navigate]);
 
-  return <div>Đang xử lý đăng nhập...</div>;
+    return <div>Đang xử lý đăng nhập...</div>;
 };
 
 export default OAuthRedirect;
