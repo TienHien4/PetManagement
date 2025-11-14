@@ -11,7 +11,7 @@ class WebSocketService {
 
     connect(userId, onMessageReceived) {
         if (this.client && this.client.connected) {
-            console.log('✅ WebSocket already connected');
+
             return;
         }
 
@@ -22,19 +22,16 @@ class WebSocketService {
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
-            debug: (str) => {
-                console.log('🔍 STOMP:', str);
-            }
+            debug: (str) => { },
         });
 
         this.client.onConnect = (frame) => {
-            console.log('✅ WebSocket connected for user:', userId);
-            console.log('Connection frame:', frame);
+
 
             // Subscribe to personal message queue
             this.client.subscribe(`/user/${userId}/queue/messages`, (message) => {
                 const receivedMessage = JSON.parse(message.body);
-                console.log('📩 Message received:', receivedMessage);
+
                 onMessageReceived(receivedMessage);
             });
 
@@ -43,16 +40,16 @@ class WebSocketService {
         };
 
         this.client.onStompError = (frame) => {
-            console.error('❌ STOMP error:', frame.headers.message);
+            console.error('STOMP error:', frame.headers.message);
             console.error('Error details:', frame.body);
         };
 
         this.client.onWebSocketError = (event) => {
-            console.error('❌ WebSocket connection error:', event);
+            console.error('WebSocket connection error:', event);
         };
 
         this.client.onDisconnect = () => {
-            console.warn('⚠️ WebSocket disconnected');
+            console.warn('WebSocket disconnected');
         };
 
         this.client.activate();
@@ -60,12 +57,12 @@ class WebSocketService {
 
     sendMessage(message) {
         if (!this.client) {
-            console.error('❌ WebSocket client not initialized');
+            console.error('WebSocket client not initialized');
             return false;
         }
 
         if (!this.client.connected) {
-            console.warn('⚠️ WebSocket not connected yet, queuing message...');
+            console.warn('WebSocket not connected yet, queuing message...');
             this.messageQueue.push(message);
             return false;
         }
@@ -75,17 +72,17 @@ class WebSocketService {
                 destination: '/app/chat.send',
                 body: JSON.stringify(message),
             });
-            console.log('📤 Message sent:', message.content);
+
             return true;
         } catch (error) {
-            console.error('❌ Error sending message:', error);
+            console.error('Error sending message:', error);
             return false;
         }
     }
 
     flushMessageQueue() {
         if (this.messageQueue.length > 0) {
-            console.log(`📨 Sending ${this.messageQueue.length} queued messages...`);
+
             this.messageQueue.forEach(msg => this.sendMessage(msg));
             this.messageQueue = [];
         }
@@ -99,7 +96,7 @@ class WebSocketService {
         if (this.client) {
             this.client.deactivate();
             this.client = null;
-            console.log('🔌 WebSocket disconnected');
+
         }
     }
 }

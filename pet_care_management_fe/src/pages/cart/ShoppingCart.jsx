@@ -11,7 +11,6 @@ const ShoppingCart = () => {
     const [error, setError] = useState(null)
     const [total, setTotal] = useState(0)
     const [shipping, setShipping] = useState(5)
-    const [promo, setPromo] = useState("")
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -297,25 +296,43 @@ const ShoppingCart = () => {
             const res = await axios.post("/api/orders/place", orderRequest, {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
-            // Xử lý OrderResponse trả về
-            const order = res.data;
-            console.log("Order response:", order); // Debug log
 
-            // Hiển thị thông tin đơn hàng vừa đặt (sử dụng orderId thay vì order_id)
-            alert(
-                `Đặt hàng thành công!`
-            )
-            // Sau khi đặt hàng thành công, có thể làm mới giỏ hàng hoặc chuyển hướng
+            const order = res.data;
+
+            // Xóa giỏ hàng ngay
             setItems([]);
             setTotal(0);
-
-            // Trigger cart count update
             window.dispatchEvent(new CustomEvent('cartUpdated'));
 
-            // Chuyển hướng đến trang đơn hàng để user có thể thấy đơn hàng vừa tạo
-            setTimeout(() => {
-                window.location.href = "/user/orders";
-            }, 2000);
+            // Chuyển sang thanh toán VNPay ngay lập tức
+            const paymentResponse = await axios.post('/api/payment/vnpay/create', {
+                orderId: order.orderId || order.id,
+                amount: order.totalAmount || total,
+                orderInfo: `Thanh toán đơn hàng #${order.orderId || order.id}`,
+                orderType: 'billpayment',
+                bankCode: ''
+            }, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            console.log("=== VNPay Payment Data ===");
+            console.log("Response code:", paymentResponse.data.code);
+            console.log("Response message:", paymentResponse.data.message);
+            console.log("Payment URL:", paymentResponse.data.paymentUrl);
+            console.log("Full response:", paymentResponse.data);
+            console.log("========================");
+
+            if (paymentResponse.data.code === '00' && paymentResponse.data.paymentUrl) {
+                // Redirect to VNPay
+                window.location.href = paymentResponse.data.paymentUrl;
+
+            } else {
+                // Nếu không tạo được payment, vẫn cho xem đơn hàng
+                alert(`Đơn hàng đã tạo nhưng không thể chuyển sang thanh toán. Mã đơn: ${order.orderId || order.id}`);
+                setTimeout(() => {
+                    navigate('/user/orders');
+                }, 2000);
+            }
         } catch (err) {
             console.error("Checkout error:", err);
             console.error("Error response:", err.response?.data);
@@ -398,12 +415,11 @@ const ShoppingCart = () => {
                                                                     <div className="d-flex align-items-center gap-5">
                                                                         <img
                                                                             src={image}
-                                                                            alt={item.productName}
                                                                             className="rounded-3 border"
                                                                             style={{ width: '160px', height: '160px', objectFit: 'cover' }}
                                                                             onError={e => {
                                                                                 e.target.onerror = null;
-                                                                                e.target.src = '/placeholder.svg?height=160&width=160'
+
                                                                             }}
                                                                         />
                                                                         <div style={{ width: '350px', minWidth: '350px', maxWidth: '350px' }}>
@@ -566,7 +582,7 @@ const ShoppingCart = () => {
                                                 style={{ letterSpacing: '1px' }}
                                             >
                                                 <i className="bi bi-credit-card me-2"></i>
-                                                Thanh toán
+                                                Đặt hàng & Thanh toán
                                             </button>
 
                                             {items.length === 0 && (
@@ -586,5 +602,4 @@ const ShoppingCart = () => {
         </>
     )
 }
-
-export default ShoppingCart
+export default ShoppingCart;

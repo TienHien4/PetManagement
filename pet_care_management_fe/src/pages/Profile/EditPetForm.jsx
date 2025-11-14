@@ -545,8 +545,8 @@ const EditPetForm = () => {
                                             </label>
                                             <select className="form-select" value={gender} onChange={(e) => setGender(e.target.value)}>
                                                 <option value="">Chọn giới tính</option>
-                                                <option value="Đực">♂️ Đực</option>
-                                                <option value="Cái">♀️ Cái</option>
+                                                <option value="Đực">Đực</option>
+                                                <option value="Cái">Cái</option>
                                             </select>
                                         </div>
                                     </div>

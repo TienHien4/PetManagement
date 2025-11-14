@@ -394,7 +394,7 @@ const PetsManagement = () => {
           <div className="d-flex search-controls" style={{ gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
             <input
               type="text"
-              placeholder="🔍 Tìm kiếm thú cưng theo tên..."
+              placeholder="Tìm kiếm thú cưng theo tên..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="search-input"

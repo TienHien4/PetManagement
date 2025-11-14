@@ -401,7 +401,7 @@ const ChangePassword = () => {
         }
 
         .input-error::before {
-          content: '⚠️';
+          content: '!';
           font-size: 0.75rem;
         }
 

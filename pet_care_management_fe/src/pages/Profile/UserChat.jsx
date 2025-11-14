@@ -36,9 +36,9 @@ const UserChat = () => {
         setTimeout(() => {
             if (WebSocketService.isConnected()) {
                 setIsConnecting(false);
-                console.log('✅ WebSocket ready');
+
             } else {
-                console.warn('⚠️ WebSocket still connecting...');
+                console.warn('WebSocket still connecting...');
                 // Check again after 3 more seconds
                 setTimeout(() => {
                     setIsConnecting(false);
@@ -104,7 +104,7 @@ const UserChat = () => {
         if (!newMessage.trim() || !selectedConversation) return;
 
         if (!WebSocketService.isConnected()) {
-            alert('⚠️ Đang kết nối WebSocket, vui lòng thử lại sau giây lát...');
+            alert('Đang kết nối WebSocket, vui lòng thử lại sau giây lát...');
             return;
         }
 
@@ -137,7 +137,7 @@ const UserChat = () => {
     };
 
     const handleReceivedMessage = (message) => {
-        console.log('📩 Received message:', message);
+
 
         // Always update conversation list when receiving message
         loadConversations();
@@ -147,7 +147,7 @@ const UserChat = () => {
                 // Check if this message already exists (by id)
                 const exists = prev.some(m => m.id && m.id === message.id);
                 if (exists) {
-                    console.log('⚠️ Message already exists, skipping');
+
                     return prev;
                 }
 
@@ -161,13 +161,12 @@ const UserChat = () => {
 
                 if (tempIndex !== -1) {
                     // Replace temp message with real one
-                    console.log('✅ Replaced temp message with server message');
+
                     return prev.map((msg, idx) =>
                         idx === tempIndex ? message : msg
                     );
                 } else {
                     // New message from other user
-                    console.log('✅ Added new message to chat');
                     return [...prev, message];
                 }
             });
@@ -204,7 +203,7 @@ const UserChat = () => {
                     fontSize: '14px',
                     zIndex: 1000
                 }}>
-                    🔄 Đang kết nối WebSocket...
+                    Đang kết nối WebSocket...
                 </div>
             )}
             <div className="chat-sidebar">

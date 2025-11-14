@@ -38,6 +38,9 @@ import VetChat from '../pages/vet/VetChat';
 // Floating Chat Button
 import FloatingChatButton from '../components/FloatingChatButton';
 
+// Payment Components
+import VNPayReturn from '../pages/Payment/VNPayReturn';
+
 // Route Components
 import ProtectedRoute from '../components/ProtectedRoute';
 import RoleBasedRedirect from '../components/RoleBasedRedirect';
@@ -155,6 +158,7 @@ const AppRouter = () => {
                         <VetChat />
                     </ProtectedRoute>
                 } />
+                <Route path="/payment/vnpay-return" element={<VNPayReturn />} />
 
 
                 {/* VET Routes */}

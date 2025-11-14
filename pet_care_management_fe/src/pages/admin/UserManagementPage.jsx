@@ -493,7 +493,7 @@ const UserManagementPage = () => {
         <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
             <div className="logo">
-              <span className="logo-icon">👤</span>
+              <span className="logo-icon">User</span>
               {!collapsed && <span>User Management</span>}
             </div>
           </div>
@@ -572,7 +572,7 @@ const UserManagementPage = () => {
 
           {/* Page Header */}
           <div className="page-header">
-            <h1 className="page-title">👤 Quản lý tài khoản</h1>
+            <h1 className="page-title">Quản lý tài khoản</h1>
             <p className="page-subtitle">Quản lý thông tin người dùng và phân quyền trong hệ thống</p>
           </div>
 

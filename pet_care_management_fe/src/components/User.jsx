@@ -130,7 +130,7 @@ const User = () => {
             case "admin":
                 return "👑 Admin"
             case "user":
-                return "👤 User"
+                return "User"
             case "manager":
                 return "👨‍💼 Manager"
             default:
@@ -418,7 +418,7 @@ const User = () => {
                     <div className="d-flex search-controls" style={{ gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
                         <input
                             type="text"
-                            placeholder="🔍 Tìm kiếm người dùng theo tên, email..."
+                            placeholder="Tìm kiếm người dùng theo tên, email..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="search-input"

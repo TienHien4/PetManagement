@@ -131,7 +131,7 @@ const ProductPage = () => {
 
             // Hiển thị thông báo chi tiết và hướng dẫn
             const confirmCheckout = window.confirm(
-                `✅ Đã thêm "${product.name}" vào giỏ hàng!\n\n`
+                `Đã thêm "${product.name}" vào giỏ hàng!\n\n`
             )
 
 

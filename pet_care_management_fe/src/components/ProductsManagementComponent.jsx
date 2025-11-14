@@ -762,7 +762,7 @@ const ProductsManagement = () => {
                     <div className="d-flex search-controls" style={{ gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
                         <input
                             type="text"
-                            placeholder="🔍 Tìm kiếm sản phẩm theo tên..."
+                            placeholder="Tìm kiếm sản phẩm theo tên..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="search-input"

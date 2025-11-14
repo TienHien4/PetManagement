@@ -106,9 +106,9 @@ const VetAppointments = () => {
     const getStatusBadge = (status) => {
         const statusConfig = {
             'PENDING': { variant: 'warning', text: 'Chờ xử lý', icon: '⏳' },
-            'CONFIRMED': { variant: 'info', text: 'Đã xác nhận', icon: '✅' },
-            'COMPLETED': { variant: 'success', text: 'Hoàn thành', icon: '🎉' },
-            'CANCELLED': { variant: 'danger', text: 'Đã hủy', icon: '❌' }
+            'CONFIRMED': { variant: 'info', text: 'Đã xác nhận', icon: '' },
+            'COMPLETED': { variant: 'success', text: 'Hoàn thành', icon: '' },
+            'CANCELLED': { variant: 'danger', text: 'Đã hủy', icon: '' }
         };
 
         const config = statusConfig[status] || { variant: 'secondary', text: status, icon: '❓' };

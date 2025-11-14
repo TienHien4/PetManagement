@@ -728,7 +728,7 @@ const UserOrders = () => {
             <div className="card-header">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <h2 className="orders-title">🛍️ Lịch sử đơn hàng</h2>
+                  <h2 className="orders-title">Lịch sử đơn hàng</h2>
                   <p className="orders-subtitle">Theo dõi và quản lý các đơn hàng của bạn</p>
                 </div>
                 <div className="d-flex align-items-center gap-3">

@@ -33,9 +33,9 @@ const VetChat = () => {
         setTimeout(() => {
             if (WebSocketService.isConnected()) {
                 setIsConnecting(false);
-                console.log('✅ WebSocket ready');
+
             } else {
-                console.warn('⚠️ WebSocket still connecting...');
+                console.warn('WebSocket still connecting...');
                 setTimeout(() => {
                     setIsConnecting(false);
                 }, 3000);
@@ -77,7 +77,7 @@ const VetChat = () => {
         if (!newMessage.trim() || !selectedConversation) return;
 
         if (!WebSocketService.isConnected()) {
-            alert('⚠️ Đang kết nối WebSocket, vui lòng thử lại sau giây lát...');
+            alert('Đang kết nối WebSocket, vui lòng thử lại sau giây lát...');
             return;
         }
 
@@ -110,7 +110,7 @@ const VetChat = () => {
     };
 
     const handleReceivedMessage = (message) => {
-        console.log('📩 Received message:', message);
+
 
         // Always update conversation list when receiving message
         loadConversations();
@@ -120,7 +120,7 @@ const VetChat = () => {
                 // Check if message already exists
                 const exists = prev.some(m => m.id && m.id === message.id);
                 if (exists) {
-                    console.log('⚠️ Message already exists, skipping');
+
                     return prev;
                 }
 
@@ -133,12 +133,12 @@ const VetChat = () => {
                 );
 
                 if (tempIndex !== -1) {
-                    console.log('✅ Replaced temp message with server message');
+
                     return prev.map((msg, idx) =>
                         idx === tempIndex ? message : msg
                     );
                 } else {
-                    console.log('✅ Added new message to chat');
+
                     return [...prev, message];
                 }
             });
@@ -175,7 +175,7 @@ const VetChat = () => {
                     fontSize: '14px',
                     zIndex: 1000
                 }}>
-                    🔄 Đang kết nối WebSocket...
+                    Đang kết nối WebSocket...
                 </div>
             )}
             <div className="chat-sidebar">

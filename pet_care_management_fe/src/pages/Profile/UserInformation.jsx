@@ -691,7 +691,7 @@ const UserInformation = () => {
         <div className={`sidebar ${sidebarCollapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
             <div className="logo">
-              <span className="logo-icon">👤</span>
+              <span className="logo-icon">User</span>
               {!sidebarCollapsed && <span>User Profile</span>}
             </div>
           </div>

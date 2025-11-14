@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import apiClient from '../services/customizeAxios';
 import './FloatingChatButton.css';
 
 const FloatingChatButton = () => {
@@ -10,8 +11,23 @@ const FloatingChatButton = () => {
 
     // Kiểm tra đăng nhập mỗi khi đổi route
     useEffect(() => {
-        const userData = localStorage.getItem('user');
-        setIsLoggedIn(!!userData && userData !== 'null');
+        const checkLoginStatus = () => {
+            const userData = localStorage.getItem('user');
+            setIsLoggedIn(!!userData && userData !== 'null');
+        };
+
+        checkLoginStatus();
+
+        // Listen to storage changes (when logout happens in another tab or token expires)
+        window.addEventListener('storage', checkLoginStatus);
+
+        // Also check periodically in case of same-tab changes
+        const interval = setInterval(checkLoginStatus, 1000);
+
+        return () => {
+            window.removeEventListener('storage', checkLoginStatus);
+            clearInterval(interval);
+        };
     }, [location.pathname]);
 
     // Tải số tin nhắn chưa đọc
@@ -24,27 +40,20 @@ const FloatingChatButton = () => {
                 const user = JSON.parse(userData);
                 if (!user.userId) return;
 
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch(`http://localhost:8080/api/chat/unread/${user.userId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (response.ok) {
-                    const count = await response.json();
-                    setUnreadCount(count);
-                }
+                const response = await apiClient.get(`/api/chat/unread/${user.userId}`);
+                setUnreadCount(response.data || 0);
             } catch (error) {
                 console.error('Error loading unread count:', error);
+                // If token expired, apiClient will handle redirect to login
             }
         };
 
-        loadUnreadCount();
-        const interval = setInterval(loadUnreadCount, 30000);
-        return () => clearInterval(interval);
-    }, []);
+        if (isLoggedIn) {
+            loadUnreadCount();
+            const interval = setInterval(loadUnreadCount, 30000);
+            return () => clearInterval(interval);
+        }
+    }, [isLoggedIn]);
 
     const handleChatClick = () => {
         const userData = localStorage.getItem('user');
