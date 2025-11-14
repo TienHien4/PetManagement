@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: spring-boot-app
+    env: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: JAVA_OPTS
+        value: "-Xmx512m"

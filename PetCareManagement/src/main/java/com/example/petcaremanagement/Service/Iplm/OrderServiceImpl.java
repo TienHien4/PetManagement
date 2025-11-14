@@ -37,6 +37,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
+        order.setStatus("PENDING"); // Set trạng thái ban đầu
+        order.setPaymentMethod("VNPAY"); // Mặc định là VNPay
+
         // Tính tổng trước
         double totalPrice = 0;
         int totalQuantity = 0;
@@ -81,6 +84,8 @@ public class OrderServiceImpl implements OrderService {
         response.setOrderDate(order.getOrderDate());
         response.setTotalQuantity(totalQuantity);
         response.setTotalPrice(totalPrice);
+        response.setStatus(order.getStatus());
+        response.setPaymentMethod(order.getPaymentMethod());
         List<OrderItemResponse> itemResponses = new ArrayList<>();
         for (OrderItem item : order.getOrderItems()) {
             OrderItemResponse itemResponse = new OrderItemResponse();
@@ -157,6 +162,8 @@ public class OrderServiceImpl implements OrderService {
         orderResponse.setOrderDate(order.getOrderDate());
         orderResponse.setTotalQuantity(order.getTotalQuantity());
         orderResponse.setTotalPrice(order.getTotalPrice());
+        orderResponse.setStatus(order.getStatus());
+        orderResponse.setPaymentMethod(order.getPaymentMethod());
         List<OrderItemResponse> itemResponses = new ArrayList<>();
         for (OrderItem item : order.getOrderItems()) {
             OrderItemResponse itemResponse = new OrderItemResponse();
@@ -194,8 +201,19 @@ public class OrderServiceImpl implements OrderService {
                     }
                     orderResponse.setItems(itemResponses);
                     return orderResponse;
-                }
-        ).toList();
+                }).toList();
         return response;
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderPaymentStatus(Long orderId, String status, String vnpayTxnRef) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus(status);
+        if (vnpayTxnRef != null) {
+            order.setVnpayTxnRef(vnpayTxnRef);
+        }
+        orderRepository.save(order);
     }
 }

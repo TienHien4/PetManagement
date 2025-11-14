@@ -41,13 +41,26 @@ public class EmailConsumerService {
 //            groupId = "${spring.kafka.consumer.group-id}",
 //            containerFactory = "emailKafkaListenerFactory"
 //    )
-//    public void consumeAppointmentEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
-//        System.out.println("MESSAGE RECEIVED FROM KAFKA!");
-//        System.out.println("User: " + event.getUserName());
-//        System.out.println("Email: " + event.getUserEmail());
-//
-//        processEmailEvent(event, acknowledgment);
-//    }
+    public void consumeAppointmentEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
+        System.out.println("MESSAGE RECEIVED FROM KAFKA!");
+        System.out.println("User: " + event.getUserName());
+        System.out.println("Email: " + event.getUserEmail());
+
+        processEmailEvent(event, acknowledgment);
+    }
+
+    // --- PHÉP THỬ STRING ---
+//    @KafkaListener(
+//            topics = "string-test-topic",
+//            groupId = "test-group-string",
+//            // SỬA LẠI: Phải dùng factory STRING tùy chỉnh
+//            containerFactory = "stringKafkaListenerFactory"
+//    )
+    public void listenStringTest(String message) {
+        System.out.println("============================================");
+        System.out.println("Nội dung: " + message);
+        System.out.println("============================================");
+    }
 
     private void processEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
         try {

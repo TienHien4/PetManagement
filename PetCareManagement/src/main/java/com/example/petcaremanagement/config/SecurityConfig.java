@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers("/ws/**").permitAll()  // Allow WebSocket connections
                                 .requestMatchers("/api/vet-dashboard/**").hasRole("VET")
+                                .requestMatchers("/api/payment/**").permitAll()
                                 .anyRequest().authenticated());
                 httpSecurity.oauth2Login(oauth2 -> oauth2
                                 .userInfoEndpoint(

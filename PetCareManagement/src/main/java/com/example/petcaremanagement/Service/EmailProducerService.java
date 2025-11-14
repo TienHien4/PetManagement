@@ -23,7 +23,8 @@ public class EmailProducerService {
     private static final Logger logger = LoggerFactory.getLogger(EmailProducerService.class);
 
     @Autowired
-    private KafkaTemplate<String, EmailEvent> kafkaTemplate;
+    // Tên bean "emailKafkaTemplate" sẽ khớp với bean trong KafkaConfig
+    private KafkaTemplate<String, EmailEvent> emailKafkaTemplate;
 
     /**
      * Gửi email event vào topic tương ứng
@@ -31,12 +32,14 @@ public class EmailProducerService {
     public void sendEmailEvent(EmailEvent event) {
         String topic = getTopicByEventType(event.getEventType());
 
-
-        CompletableFuture<SendResult<String, EmailEvent>> future =
-                kafkaTemplate.send(topic, event.getUserId().toString(), event);
+        // SỬA LẠI BIẾN NÀY ĐỂ DÙNG "emailKafkaTemplate"
+        // VÀ SỬA LẠI KIỂU CỦA "future"
+        CompletableFuture<SendResult<String, EmailEvent>> future = emailKafkaTemplate.send(topic,
+                event.getUserId().toString(), event); // <--- SỬA Ở ĐÂY
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {
+                // ĐẢM BẢO BẠN CÓ ĐỦ 5 ĐỐI SỐ Ở ĐÂY
                 logger.info("Sent {} email event to Kafka topic '{}': user={}, email={}, offset={}",
                         event.getEventType(),
                         topic,
@@ -71,8 +74,7 @@ public class EmailProducerService {
                 user.getEmail(),
                 user.getUserName(),
                 "Xác nhận đặt lịch khám - Pet Care Management",
-                EmailEventType.APPOINTMENT_CONFIRMATION.getTemplatePath()
-        );
+                EmailEventType.APPOINTMENT_CONFIRMATION.getTemplatePath());
 
         // Thêm dữ liệu động cho template
         event.addTemplateData("petName", pet.getName())
@@ -96,11 +98,11 @@ public class EmailProducerService {
      * Gửi email cập nhật trạng thái đặt lịch
      */
     public void sendAppointmentStatusUpdateEmail(User user, Pet pet, Appointment appointment,
-                                                 String oldStatus, String newStatus) {
+            String oldStatus, String newStatus) {
         logger.info("Preparing appointment status update email for user: {}", user.getUserName());
 
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            logger.warn("⚠ User {} has no email. Skipping.", user.getUserName());
+            logger.warn("User {} has no email. Skipping.", user.getUserName());
             return;
         }
 
@@ -110,8 +112,7 @@ public class EmailProducerService {
                 user.getEmail(),
                 user.getUserName(),
                 "Cập nhật trạng thái lịch khám - Pet Care Management",
-                EmailEventType.APPOINTMENT_STATUS_UPDATE.getTemplatePath()
-        );
+                EmailEventType.APPOINTMENT_STATUS_UPDATE.getTemplatePath());
 
         event.addTemplateData("petName", pet.getName())
                 .addTemplateData("appointmentDate", appointment.getDate().toString())
@@ -132,9 +133,9 @@ public class EmailProducerService {
      * Gửi email khuyến mãi
      */
     public void sendPromotionEmail(User user, String title, String description,
-                                   String discount, String validUntil, String promoCode) {
+            String discount, String validUntil, String promoCode) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            logger.warn("⚠User {} has no email. Skipping promotion.", user.getUserName());
+            logger.warn("User {} has no email. Skipping promotion.", user.getUserName());
             return;
         }
 
@@ -143,9 +144,8 @@ public class EmailProducerService {
                 user.getId(),
                 user.getEmail(),
                 user.getUserName(),
-                 title,
-                EmailEventType.PROMOTION.getTemplatePath()
-        );
+                title,
+                EmailEventType.PROMOTION.getTemplatePath());
 
         event.addTemplateData("title", title)
                 .addTemplateData("description", description)
@@ -160,7 +160,7 @@ public class EmailProducerService {
      * Gửi email hàng loạt
      */
     public void sendBulkEmailEvents(List<User> users, String eventType, String subject,
-                                    String templateName, Map<String, Object> templateData) {
+            String templateName, Map<String, Object> templateData) {
         logger.info(" Sending bulk {} emails to {} users", eventType, users.size());
 
         int successCount = 0;
@@ -178,8 +178,7 @@ public class EmailProducerService {
                     user.getEmail(),
                     user.getUserName(),
                     subject,
-                    templateName
-            );
+                    templateName);
 
             event.addAllTemplateData(templateData);
             sendEmailEvent(event);
@@ -195,12 +194,10 @@ public class EmailProducerService {
      */
     private String getTopicByEventType(String eventType) {
         return switch (eventType) {
-            case "appointment-confirmation", "appointment-status-update", "appointment-reminder"
-                    -> "appointment-email-events";
-            case "promotion", "new-year-promotion"
-                    -> "promotion-email-events";
-            case "system-upgrade", "password-reset", "welcome"
-                    -> "system-email-events";
+            case "appointment-confirmation", "appointment-status-update", "appointment-reminder" ->
+                "appointment-email-events";
+            case "promotion", "new-year-promotion" -> "promotion-email-events";
+            case "system-upgrade", "password-reset", "welcome" -> "system-email-events";
             default -> "appointment-email-events";
         };
     }

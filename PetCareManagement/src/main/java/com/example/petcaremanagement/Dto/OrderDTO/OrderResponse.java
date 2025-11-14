@@ -11,6 +11,8 @@ public class OrderResponse {
     private LocalDateTime orderDate;
     private int totalQuantity;
     private double totalPrice;
+    private String status;
+    private String paymentMethod;
     private List<OrderItemResponse> items;
 
     public Long getOrderId() {
@@ -59,5 +61,21 @@ public class OrderResponse {
 
     public void setItems(List<OrderItemResponse> items) {
         this.items = items;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }

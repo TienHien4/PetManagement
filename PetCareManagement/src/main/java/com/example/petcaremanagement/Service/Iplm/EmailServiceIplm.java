@@ -33,7 +33,7 @@ public class EmailServiceIplm implements EmailService {
 
             // Validate
             if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                logger.warn("⚠ User {} has no email address. Email notification skipped.", user.getUserName());
+                logger.warn("User {} has no email address. Email notification skipped.", user.getUserName());
                 return;
             }
             // Gửi vào Kafka (BẤT ĐỒNG BỘ - không chờ)
@@ -50,7 +50,7 @@ public class EmailServiceIplm implements EmailService {
      */
     @Override
     public void sendAppointmentStatusUpdate(Appointment appointment, User user, Pet pet,
-                                            String oldStatus, String newStatus) {
+            String oldStatus, String newStatus) {
         try {
             logger.info("=== 🔔 SENDING STATUS UPDATE VIA KAFKA ===");
             logger.info("User: {} ({})", user.getUserName(), user.getEmail());
@@ -61,23 +61,23 @@ public class EmailServiceIplm implements EmailService {
 
             // Validate
             if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                logger.warn("⚠️ User {} has no email address. Email notification skipped.", user.getUserName());
+                logger.warn("User {} has no email address. Email notification skipped.", user.getUserName());
                 return;
             }
 
             // Gửi vào Kafka
             emailProducerService.sendAppointmentStatusUpdateEmail(user, pet, appointment, oldStatus, newStatus);
 
-            logger.info("✅ Status update email event sent to Kafka successfully");
+            logger.info("Status update email event sent to Kafka successfully");
 
         } catch (Exception e) {
-            logger.error("❌ Failed to send status update event to Kafka", e);
-            logger.warn("⚠️ Status updated successfully but email notification may fail");
+            logger.error("Failed to send status update event to Kafka", e);
+            logger.warn("Status updated successfully but email notification may fail");
         }
     }
 
     @Override
     public void sendAppointmentStatusUpdate(Appointment appointment, String oldStatus, String newStatus) {
-        logger.warn("⚠️ sendAppointmentStatusUpdate called without user/pet info. Email not sent.");
+        logger.warn("sendAppointmentStatusUpdate called without user/pet info. Email not sent.");
     }
 }

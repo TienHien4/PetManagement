@@ -1,6 +1,5 @@
 package com.example.petcaremanagement.Service;
 
-
 import com.example.petcaremanagement.Dto.OrderDTO.OrderRequest;
 import com.example.petcaremanagement.Dto.OrderDTO.OrderResponse;
 import org.springframework.data.domain.Page;
@@ -17,5 +16,8 @@ public interface OrderService {
     Page<OrderResponse> pagination(int pageNo, int pageSize);
 
     OrderResponse searchOrderById(Long orderId);
+
     List<OrderResponse> findOrderByUser(long userId);
+
+    void updateOrderPaymentStatus(Long orderId, String status, String vnpayTxnRef);
 }
