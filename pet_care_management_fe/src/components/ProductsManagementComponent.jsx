@@ -123,9 +123,10 @@ const ProductsManagement = () => {
         setImagePreview(null)
         setFormErrors({})
         setShowModal(true)
+        document.body.style.overflow = 'hidden'
     }
 
-    const openEditModal = (product) => {
+    const openEditModal = async (product) => {
         setModalMode("edit")
         setSelectedProduct(product)
         setFormData({
@@ -135,10 +136,28 @@ const ProductsManagement = () => {
             quantity: product.quantity,
             description: product.description || "",
         })
-        setImageFile(null)
-        setImagePreview(product.image || null)
+
+        // Convert existing image URL to File object
+        if (product.image) {
+            try {
+                const response = await fetch(product.image)
+                const blob = await response.blob()
+                const file = new File([blob], "product-image.jpg", { type: blob.type })
+                setImageFile(file)
+                setImagePreview(product.image)
+            } catch (error) {
+                console.error("Error loading image:", error)
+                setImageFile(null)
+                setImagePreview(product.image)
+            }
+        } else {
+            setImageFile(null)
+            setImagePreview(null)
+        }
+
         setFormErrors({})
         setShowModal(true)
+        document.body.style.overflow = 'hidden'
     }
 
     const closeModal = () => {
@@ -154,6 +173,7 @@ const ProductsManagement = () => {
         setImageFile(null)
         setImagePreview(null)
         setFormErrors({})
+        document.body.style.overflow = 'auto'
     }
 
     const handleInputChange = (e) => {
@@ -220,7 +240,7 @@ const ProductsManagement = () => {
             errors.quantity = "Số lượng không được âm"
         }
 
-        if (modalMode === "create" && !imageFile) {
+        if (!imageFile) {
             errors.image = "Vui lòng chọn ảnh sản phẩm"
         }
 
@@ -246,12 +266,15 @@ const ProductsManagement = () => {
                 description: formData.description,
             }
 
+            console.log('Product Request:', productRequest)
+            console.log('Has Image File:', !!imageFile)
+            console.log('Modal Mode:', modalMode)
+
             const formDataToSend = new FormData()
             formDataToSend.append("productRequest", JSON.stringify(productRequest))
+            formDataToSend.append("imageFile", imageFile)
 
-            if (imageFile) {
-                formDataToSend.append("imageFile", imageFile)
-            }
+            console.log('Image file:', imageFile.name, imageFile.type)
 
             if (modalMode === "create") {
                 await createProduct(formDataToSend)
@@ -270,7 +293,8 @@ const ProductsManagement = () => {
             }
         } catch (error) {
             console.error("Error saving product:", error)
-            alert(`Có lỗi xảy ra khi ${modalMode === "create" ? "tạo" : "cập nhật"} sản phẩm!`)
+            console.error("Error response:", error.response?.data)
+            alert(`Có lỗi xảy ra khi ${modalMode === "create" ? "tạo" : "cập nhật"} sản phẩm: ${error.response?.data?.message || error.message}`)
         } finally {
             setLoading(false)
         }
@@ -537,11 +561,11 @@ const ProductsManagement = () => {
           right: 0;
           bottom: 0;
           background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 1050;
+          z-index: 1055;
+          overflow-y: scroll;
+          overflow-x: hidden;
           animation: fadeIn 0.3s ease;
+          -webkit-overflow-scrolling: touch;
         }
 
         @keyframes fadeIn {
@@ -559,10 +583,10 @@ const ProductsManagement = () => {
           padding: 32px;
           max-width: 600px;
           width: 90%;
-          max-height: 90vh;
-          overflow-y: auto;
+          margin: 60px auto 60px auto;
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
           animation: slideUp 0.3s ease;
+          position: relative;
         }
 
         @keyframes slideUp {
@@ -859,8 +883,10 @@ const ProductsManagement = () => {
 
                 {/* Modal for Create/Edit */}
                 {showModal && (
-                    <div className="modal-overlay" onClick={closeModal}>
-                        <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-overlay" onClick={(e) => {
+                        if (e.target === e.currentTarget) closeModal()
+                    }}>
+                        <div className="modal-content-custom">
                             <div className="modal-header-custom">
                                 <h3 className="modal-title">{modalMode === "create" ? "Thêm Sản Phẩm Mới" : "Chỉnh Sửa Sản Phẩm"}</h3>
                                 <button className="btn-close-custom" onClick={closeModal}>

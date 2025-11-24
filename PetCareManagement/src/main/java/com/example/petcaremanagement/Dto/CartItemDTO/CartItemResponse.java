@@ -1,8 +1,12 @@
 package com.example.petcaremanagement.Dto.CartItemDTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CartItemResponse {
     private Long productId;
     private String productName;
+    @JsonProperty("productImage")
+    private String productImage;
     private int quantity;
     private double totalPrice;
 
@@ -36,5 +40,13 @@ public class CartItemResponse {
 
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public String getProductImage() {
+        return productImage;
+    }
+
+    public void setProductImage(String productImage) {
+        this.productImage = productImage;
     }
 }

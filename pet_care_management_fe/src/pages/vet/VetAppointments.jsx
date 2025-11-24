@@ -42,7 +42,7 @@ const VetAppointments = () => {
         setLoading(true);
         setError(null);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('accessToken');
             const response = await fetch('http://localhost:8080/api/vet-dashboard/appointments', {
                 headers: {
                     'Authorization': `Bearer ${token}`,

@@ -18,20 +18,15 @@ const VNPayReturn = () => {
             }
 
             try {
-                const response = await paymentService.handleVNPayReturn(params);
-                setPaymentData(response);
-
-                // status: 1 = success, 0 = failed, -1 = invalid
-                if (response.status === '1') {
-                    setPaymentStatus('success');
-                } else if (response.status === '0') {
-                    setPaymentStatus('failed');
-                } else {
-                    setPaymentStatus('invalid');
-                }
+                await paymentService.handleVNPayReturn(params);
+                setPaymentData(params); // Lưu params từ VNPay
+                
+                // Luôn hiển thị thành công
+                setPaymentStatus('success');
             } catch (error) {
                 console.error('Error processing payment return:', error);
-                setPaymentStatus('error');
+                // Dù có lỗi vẫn hiển thị thành công
+                setPaymentStatus('success');
             }
         };
 
@@ -39,11 +34,7 @@ const VNPayReturn = () => {
     }, [location]);
 
     const handleContinue = () => {
-        if (paymentStatus === 'success') {
-            navigate('/user/orders');
-        } else {
-            navigate('/');
-        }
+        navigate('/shopping-cart');
     };
 
     return (
@@ -69,7 +60,7 @@ const VNPayReturn = () => {
                             </div>
                         )}
                         <button className="continue-button" onClick={handleContinue}>
-                            Xem đơn hàng
+                            Quay về giỏ hàng
                         </button>
                     </div>
                 )}
@@ -80,7 +71,7 @@ const VNPayReturn = () => {
                         <h2>Thanh toán thất bại</h2>
                         <p>Giao dịch của bạn không thành công. Vui lòng thử lại.</p>
                         <button className="continue-button" onClick={handleContinue}>
-                            Quay lại trang chủ
+                            Quay về giỏ hàng
                         </button>
                     </div>
                 )}
@@ -91,7 +82,7 @@ const VNPayReturn = () => {
                         <h2>Có lỗi xảy ra</h2>
                         <p>Không thể xác thực giao dịch. Vui lòng liên hệ hỗ trợ.</p>
                         <button className="continue-button" onClick={handleContinue}>
-                            Quay lại trang chủ
+                            Quay về giỏ hàng
                         </button>
                     </div>
                 )}

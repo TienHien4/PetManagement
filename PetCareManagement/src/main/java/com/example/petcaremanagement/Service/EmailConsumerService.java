@@ -30,11 +30,6 @@ public class EmailConsumerService {
         System.out.println("EmailConsumerService CONSTRUCTOR called");
     }
 
-    @PostConstruct
-    public void init() {
-        System.out.println("EmailConsumerService INITIALIZED");
-        System.out.println("From Email: " + fromEmail);
-    }
 
 //    @KafkaListener(
 //            topics = "appointment-email-events",
@@ -48,8 +43,7 @@ public class EmailConsumerService {
 
         processEmailEvent(event, acknowledgment);
     }
-
-    // --- PHÉP THỬ STRING ---
+    
 //    @KafkaListener(
 //            topics = "string-test-topic",
 //            groupId = "test-group-string",

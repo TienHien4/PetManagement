@@ -27,4 +27,7 @@ public interface EmailService {
      * @param newStatus   The new status
      */
     void sendAppointmentStatusUpdate(Appointment appointment, String oldStatus, String newStatus);
+    void sendAppointmentConfirmationDirect(Appointment appointment, User user, Pet pet);
+    void sendAppointmentStatusUpdateDirect(Appointment appointment, User user, Pet pet,
+                                      String oldStatus, String newStatus);
 }

@@ -11,6 +11,7 @@ const ShoppingCart = () => {
     const [error, setError] = useState(null)
     const [total, setTotal] = useState(0)
     const [shipping, setShipping] = useState(5)
+    const [cartImageErrors, setCartImageErrors] = useState(new Map())
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -54,14 +55,25 @@ const ShoppingCart = () => {
             console.log("Cart data length:", res.data?.length || 0)
 
             // Debug: Xem cấu trúc chi tiết từng item trong giỏ hàng
+            console.log("=== CART API RESPONSE ===")
+            console.log("Full response data:", res.data)
+            console.log("Response type:", typeof res.data)
+            console.log("Is array:", Array.isArray(res.data))
+            console.log("Length:", res.data?.length)
+
             if (res.data && res.data.length > 0) {
-                console.log("Cart items structure:")
+                console.log("=== CART ITEMS DETAILED STRUCTURE ===")
                 res.data.forEach((item, index) => {
-                    console.log(`Cart Item ${index}:`, item)
-                    console.log(`  - productId: ${item.productId}`)
-                    console.log(`  - product.id: ${item.product?.id}`)
-                    console.log(`  - quantity: ${item.quantity}`)
-                    console.log(`  - totalPrice: ${item.totalPrice}`)
+                    console.log(`\n--- Cart Item ${index} ---`)
+                    console.log("Full item object:", JSON.stringify(item, null, 2))
+                    console.log(`productId: ${item.productId}`)
+                    console.log(`productName: ${item.productName}`)
+                    console.log(`productImage: ${item.productImage}`)
+                    console.log(`imageUrl: ${item.imageUrl}`)
+                    console.log(`image: ${item.image}`)
+                    console.log(`product: ${JSON.stringify(item.product)}`)
+                    console.log(`quantity: ${item.quantity}`)
+                    console.log(`totalPrice: ${item.totalPrice}`)
                 })
             } else {
                 console.log("Cart is empty or no data returned")
@@ -69,6 +81,7 @@ const ShoppingCart = () => {
 
             setItems(res.data)
             setTotal(res.data.reduce((sum, item) => sum + item.totalPrice, 0))
+            setCartImageErrors(new Map())
             setError(null)
         } catch (err) {
             console.error("Cart fetch error:", err)
@@ -305,26 +318,20 @@ const ShoppingCart = () => {
             window.dispatchEvent(new CustomEvent('cartUpdated'));
 
             // Chuyển sang thanh toán VNPay ngay lập tức
-            const paymentResponse = await axios.post('/api/payment/vnpay/create', {
-                orderId: order.orderId || order.id,
-                amount: order.totalAmount || total,
-                orderInfo: `Thanh toán đơn hàng #${order.orderId || order.id}`,
-                orderType: 'billpayment',
-                bankCode: ''
-            }, {
+            const paymentResponse = await axios.get('/api/payment/pay', {
+                params: {
+                    orderId: order.orderId || order.id
+                },
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
 
             console.log("=== VNPay Payment Data ===");
-            console.log("Response code:", paymentResponse.data.code);
-            console.log("Response message:", paymentResponse.data.message);
-            console.log("Payment URL:", paymentResponse.data.paymentUrl);
-            console.log("Full response:", paymentResponse.data);
+            console.log("Payment URL:", paymentResponse.data);
             console.log("========================");
 
-            if (paymentResponse.data.code === '00' && paymentResponse.data.paymentUrl) {
+            if (paymentResponse.data) {
                 // Redirect to VNPay
-                window.location.href = paymentResponse.data.paymentUrl;
+                window.location.href = paymentResponse.data;
 
             } else {
                 // Nếu không tạo được payment, vẫn cho xem đơn hàng
@@ -404,9 +411,34 @@ const ShoppingCart = () => {
                                                 </div>
                                             ) : (
                                                 items.map((item, index) => {
-                                                    const image = item.imageUrl || "/placeholder.svg?height=60&width=60";
                                                     const productId = item.productId || item.product?.id;
-                                                    console.log("Cart item productId:", productId, "item:", item);
+                                                    // Lấy image từ productImage field mới của CartItemResponse
+                                                    const productImage = item.productImage || item.product?.image || item.image || item.imageUrl;
+                                                    const displayImage = cartImageErrors.has(productId) ? '/placeholder.svg?height=160&width=160' : productImage;
+
+                                                    console.log(`\n=== RENDERING CART ITEM ${index} ===`);
+                                                    console.log("productId:", productId);
+                                                    console.log("item.productImage:", item.productImage);
+                                                    console.log("item.product?.image:", item.product?.image);
+                                                    console.log("item.image:", item.image);
+                                                    console.log("item.imageUrl:", item.imageUrl);
+                                                    console.log("Calculated productImage:", productImage);
+                                                    console.log("Final displayImage:", displayImage);
+                                                    console.log("Has error:", cartImageErrors.has(productId));
+
+                                                    const handleImageError = () => {
+                                                        console.log(`Image error for productId: ${productId}`);
+                                                        setCartImageErrors(prev => {
+                                                            if (!prev.has(productId)) {
+                                                                const newMap = new Map(prev);
+                                                                newMap.set(productId, true);
+                                                                console.log("Added to error map:", productId);
+                                                                return newMap;
+                                                            }
+                                                            return prev;
+                                                        });
+                                                    };
+
                                                     return (
                                                         <div key={productId} className={`p-6 ${index !== items.length - 1 ? 'border-bottom' : ''}`} style={{ minHeight: '180px' }}>
                                                             <div className="row align-items-center g-5">
@@ -414,13 +446,11 @@ const ShoppingCart = () => {
                                                                 <div className="col-md-6">
                                                                     <div className="d-flex align-items-center gap-5">
                                                                         <img
-                                                                            src={image}
+                                                                            src={displayImage}
+                                                                            alt={item.productName}
                                                                             className="rounded-3 border"
-                                                                            style={{ width: '160px', height: '160px', objectFit: 'cover' }}
-                                                                            onError={e => {
-                                                                                e.target.onerror = null;
-
-                                                                            }}
+                                                                            style={{ width: '160px', height: '160px', objectFit: 'cover', background: '#f8f9fa' }}
+                                                                            onError={handleImageError}
                                                                         />
                                                                         <div style={{ width: '350px', minWidth: '350px', maxWidth: '350px' }}>
                                                                             <h2 className="fw-bold mb-3 display-6"

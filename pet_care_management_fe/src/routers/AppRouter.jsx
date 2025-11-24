@@ -181,7 +181,7 @@ const AppRouter = () => {
             </Routes>
 
             {/* Show floating chat button only for logged-in users */}
-            {user && user.userId && <FloatingChatButton />}
+            {user && (user.userId || user.id) && <FloatingChatButton />}
         </Router>
     );
 };

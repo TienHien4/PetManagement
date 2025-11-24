@@ -90,7 +90,8 @@ public class SecurityConfig {
 
         private final List<String> ALLOWED_ORIGINS = List.of(
                         "http://localhost:3000",
-                        "http://localhost:3001");
+                        "http://localhost:3001",
+                "https://dbmh3ml6-3000.asse.devtunnels.ms");
         private final List<String> ALLOWED_HTTP_METHODS = List.of(
                         GET.toString(),
                         POST.toString(),

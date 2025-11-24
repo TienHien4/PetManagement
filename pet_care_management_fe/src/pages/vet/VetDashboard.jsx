@@ -42,7 +42,7 @@ const VetDashboard = () => {
     const fetchCompletedAppointments = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('accessToken');
             console.log('Token:', token ? 'Available' : 'Missing');
 
             // Lấy tất cả appointments
@@ -81,7 +81,7 @@ const VetDashboard = () => {
 
     const fetchAllAppointments = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('accessToken');
             console.log('Fetching all appointments...');
 
             const response = await fetch('http://localhost:8080/api/vet-dashboard/appointments', {

@@ -73,8 +73,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         CartItemResponse res = new CartItemResponse();
         res.setProductId(itemToReturn.getProduct().getId());
         res.setProductName(itemToReturn.getProduct().getName());
+        res.setProductImage(itemToReturn.getProduct().getImage());
         res.setQuantity(itemToReturn.getQuantity());
         res.setTotalPrice(itemToReturn.getTotalPrice());
+        
+        System.out.println("=== ADD ITEM RESPONSE ===");
+        System.out.println("Product ID: " + res.getProductId());
+        System.out.println("Product Name: " + res.getProductName());
+        System.out.println("Product Image: " + res.getProductImage());
+        System.out.println("Quantity: " + res.getQuantity());
+        System.out.println("Total Price: " + res.getTotalPrice());
+        
         return res;
     }
 
@@ -104,6 +113,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             CartItemResponse res = new CartItemResponse();
             res.setProductId(item.getProduct().getId());
             res.setProductName(item.getProduct().getName());
+            res.setProductImage(item.getProduct().getImage());
             res.setQuantity(item.getQuantity());
             res.setTotalPrice(item.getTotalPrice());
             response.add(res);
@@ -131,6 +141,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         CartItemResponse res = new CartItemResponse();
         res.setProductId(item.getProduct().getId());
         res.setProductName(item.getProduct().getName());
+        res.setProductImage(item.getProduct().getImage());
         res.setQuantity(item.getQuantity());
         res.setTotalPrice(item.getTotalPrice());
         return res;

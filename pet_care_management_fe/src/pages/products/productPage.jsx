@@ -33,11 +33,16 @@ const ProductPage = () => {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
             // Backend đã trả về field 'image' trực tiếp, không cần chuyển đổi
+            console.log('=== ALL PRODUCTS FROM API ===');
+            console.log('Total products:', res.data.length);
+            console.log('Products:', res.data);
+            console.log('Product types:', res.data.map(p => ({ id: p.id, name: p.name, type: p.type })));
             setProducts(res.data);
             setLoading(false);
             // Reset product image errors when products change
             setProductImageErrors(new Map());
         } catch (err) {
+            console.error('Error loading products:', err);
             setError('Không thể tải sản phẩm.');
             setLoading(false);
         }
@@ -176,10 +181,18 @@ const ProductPage = () => {
                                     <div className="row g-4 justify-content-center align-items-stretch" style={{ minHeight: 500 }}>
                                         {(() => {
                                             const filtered = products.filter(product => {
-                                                if (activeTab === 'tab-2') return product.type && product.type.trim() === 'Food';
-                                                if (activeTab === 'tab-3') return product.type && product.type.trim() === 'Phụ kiện cho chó';
+                                                if (!product.type) return activeTab === 'tab-1';
+                                                const normalizedType = product.type.trim().toLowerCase();
+                                                if (activeTab === 'tab-2') return normalizedType === 'thức ăn';
+                                                if (activeTab === 'tab-3') return normalizedType === 'phụ kiện';
                                                 return true;
                                             });
+
+                                            console.log('=== FILTER RESULT ===');
+                                            console.log('Active Tab:', activeTab);
+                                            console.log('Total products:', products.length);
+                                            console.log('Filtered products:', filtered.length);
+                                            console.log('Filtered items:', filtered.map(p => ({ id: p.id, name: p.name, type: p.type })));
                                             // Đảm bảo luôn render đủ 4 cột (dù thiếu sản phẩm)
                                             const colCount = 4;
                                             const rows = [];

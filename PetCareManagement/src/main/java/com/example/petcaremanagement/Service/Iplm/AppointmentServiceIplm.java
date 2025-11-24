@@ -95,7 +95,7 @@ public class AppointmentServiceIplm implements AppointmentService {
             appointment = appointmentRepository.save(appointment);
 
             // Send notification
-            emailService.sendAppointmentConfirmation(appointment, user, pet);
+            emailService.sendAppointmentConfirmationDirect(appointment, user, pet);
 
             // Create response
             AppointmentResponse response = appointmentMapper.toAppointmentResponse(appointment);
@@ -227,9 +227,9 @@ public class AppointmentServiceIplm implements AppointmentService {
         Pet pet = petRepository.findById(appointment.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet not found"));
 
-        // GỬI EMAIL THÔNG BÁO THAY ĐỔI TRẠNG THÁI
+        // GỬI EMAIL THÔNG BÁO THAY ĐỔI TRẠNG THÁI (TRỰC TIẾP QUA SMTP)
         try {
-            emailService.sendAppointmentStatusUpdate(
+            emailService.sendAppointmentStatusUpdateDirect(
                     updatedAppointment,
                     appointment.getUser(),
                     pet,

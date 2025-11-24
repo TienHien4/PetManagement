@@ -7,73 +7,73 @@ import "bootstrap-icons/font/bootstrap-icons.css"
 import ProductsManagement from "../../components/ProductsManagementComponent"
 
 const ProductManagementPage = () => {
-    const [collapsed, setCollapsed] = useState(false)
-    const [currentTime, setCurrentTime] = useState(new Date())
+  const [collapsed, setCollapsed] = useState(false)
+  const [currentTime, setCurrentTime] = useState(new Date())
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(new Date())
-        }, 1000)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
 
-        return () => clearInterval(timer)
-    }, [])
+    return () => clearInterval(timer)
+  }, [])
 
-    const handleLogout = async () => {
-        try {
-            const token = localStorage.getItem("accessToken")
-            if (!token) {
-                console.error("Error: accessToken is null or undefined before logout.")
-                return
-            }
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("accessToken")
+      if (!token) {
+        console.error("Error: accessToken is null or undefined before logout.")
+        return
+      }
 
-            console.log("Logging out with accessToken:", token)
+      console.log("Logging out with accessToken:", token)
 
-            const response = await axios.post(
-                "http://localhost:8080/api/logout",
-                { token: token },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                },
-            )
+      const response = await axios.post(
+        "http://localhost:8080/api/logout",
+        { token: token },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      )
 
-            console.log("Logout response:", response.data)
+      console.log("Logout response:", response.data)
 
-            localStorage.removeItem("accessToken")
-            localStorage.removeItem("refreshToken")
-            localStorage.removeItem("UserName")
-            window.location.href = "/login"
-        } catch (error) {
-            console.error("Logout error:", error.response?.data || error.message)
-        }
+      localStorage.removeItem("accessToken")
+      localStorage.removeItem("refreshToken")
+      localStorage.removeItem("UserName")
+      window.location.href = "/login"
+    } catch (error) {
+      console.error("Logout error:", error.response?.data || error.message)
     }
+  }
 
-    const handleNavigation = (path) => {
-        window.location.href = path
-    }
+  const handleNavigation = (path) => {
+    window.location.href = path
+  }
 
-    const formatTime = (date) => {
-        return date.toLocaleTimeString("vi-VN", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-        })
-    }
+  const formatTime = (date) => {
+    return date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    })
+  }
 
-    const formatDate = (date) => {
-        return date.toLocaleDateString("vi-VN", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        })
-    }
+  const formatDate = (date) => {
+    return date.toLocaleDateString("vi-VN", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  }
 
-    return (
-        <>
-            <style jsx>{`
+  return (
+    <>
+      <style jsx>{`
         .dashboard-container {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           min-height: 100vh;
@@ -486,116 +486,116 @@ const ProductManagementPage = () => {
         }
       `}</style>
 
-            <div className="dashboard-container">
-                <div className="floating-elements">
-                    <div className="floating-element"></div>
-                    <div className="floating-element"></div>
-                    <div className="floating-element"></div>
-                </div>
+      <div className="dashboard-container">
+        <div className="floating-elements">
+          <div className="floating-element"></div>
+          <div className="floating-element"></div>
+          <div className="floating-element"></div>
+        </div>
 
-                {/* Sidebar */}
-                <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
-                    <div className="sidebar-header">
-                        <div className="logo">
-                            <span className="logo-icon">📦</span>
-                            {!collapsed && <span>Product Management</span>}
-                        </div>
-                    </div>
-                    <ul className="sidebar-menu">
-                        <li>
-                            <button
-                                className={`menu-item ${window.location.pathname === "/admin" ? "active" : ""}`}
-                                onClick={() => handleNavigation("/admin")}
-                            >
-                                <i className="bi bi-bar-chart menu-icon"></i>
-                                <span className="menu-text">Thống kê</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
-                                onClick={() => handleNavigation("/admin/petmanagement")}
-                            >
-                                <span className="menu-icon">🐾</span>
-                                <span className="menu-text">Thú cưng</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button className="menu-item active">
-                                <i className="bi bi-box-seam menu-icon"></i>
-                                <span className="menu-text">Sản phẩm</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`menu-item ${window.location.pathname === "/admin/usermanagement" ? "active" : ""}`}
-                                onClick={() => handleNavigation("/admin/usermanagement")}
-                            >
-                                <i className="bi bi-person menu-icon"></i>
-                                <span className="menu-text">Tài khoản</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                className={`menu-item ${window.location.pathname === "/admin/orders" ? "active" : ""}`}
-                                onClick={() => handleNavigation("/admin/orders")}
-                            >
-                                <i className="bi bi-bag menu-icon"></i>
-                                <span className="menu-text">Đơn hàng</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
-                {/* Main Layout */}
-                <div className={`main-layout ${collapsed ? "sidebar-collapsed" : "sidebar-expanded"}`}>
-                    {/* Header */}
-                    <div className="header">
-                        <div className="header-content">
-                            <div className="header-left">
-                                <button className="toggle-btn" onClick={() => setCollapsed(!collapsed)}>
-                                    <i className={`bi ${collapsed ? "bi-list" : "bi-x-lg"}`}></i>
-                                </button>
-                                <div className="header-info">
-                                    <h2 className="current-time">{formatTime(currentTime)}</h2>
-                                    <p className="current-date">{formatDate(currentTime)}</p>
-                                </div>
-                            </div>
-                            <button className="user-info" onClick={handleLogout}>
-                                <div className="user-avatar">
-                                    <i className="bi bi-person"></i>
-                                </div>
-                                <div>
-                                    <h6 className="user-name">
-                                        {localStorage.getItem("UserName") ? localStorage.getItem("UserName").toUpperCase() : "GUEST"}
-                                    </h6>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Page Header */}
-                    <div className="page-header">
-                        <h1 className="page-title">
-                            <span>📦</span>
-                            <span>Quản lý sản phẩm</span>
-                        </h1>
-                        <p className="page-subtitle">Quản lý thông tin và kho sản phẩm trong hệ thống</p>
-                    </div>
-
-                    {/* Content */}
-                    <div className="content-wrapper">
-                        <div className="products-content">
-                            <ProductsManagement />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile Overlay */}
-                <div className={`overlay ${!collapsed ? "show" : ""} d-md-none`} onClick={() => setCollapsed(true)}></div>
+        {/* Sidebar */}
+        <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
+          <div className="sidebar-header">
+            <div className="logo">
+              <span className="logo-icon">📦</span>
+              {!collapsed && <span>Product Management</span>}
             </div>
-        </>
-    )
+          </div>
+          <ul className="sidebar-menu">
+            <li>
+              <button
+                className={`menu-item ${window.location.pathname === "/admin" ? "active" : ""}`}
+                onClick={() => handleNavigation("/admin")}
+              >
+                <i className="bi bi-bar-chart menu-icon"></i>
+                <span className="menu-text">Thống kê</span>
+              </button>
+            </li>
+            <li>
+              <button
+                className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
+                onClick={() => handleNavigation("/admin/petmanagement")}
+              >
+                <span className="menu-icon">🐾</span>
+                <span className="menu-text">Thú cưng</span>
+              </button>
+            </li>
+            <li>
+              <button className="menu-item active">
+                <i className="bi bi-box-seam menu-icon"></i>
+                <span className="menu-text">Sản phẩm</span>
+              </button>
+            </li>
+            <li>
+              <button
+                className={`menu-item ${window.location.pathname === "/admin/usermanagement" ? "active" : ""}`}
+                onClick={() => handleNavigation("/admin/usermanagement")}
+              >
+                <i className="bi bi-person menu-icon"></i>
+                <span className="menu-text">Tài khoản</span>
+              </button>
+            </li>
+            <li>
+              <button
+                className={`menu-item ${window.location.pathname === "/admin/orders" ? "active" : ""}`}
+                onClick={() => handleNavigation("/admin/orders")}
+              >
+                <i className="bi bi-bag menu-icon"></i>
+                <span className="menu-text">Đơn hàng</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Main Layout */}
+        <div className={`main-layout ${collapsed ? "sidebar-collapsed" : "sidebar-expanded"}`}>
+          {/* Header */}
+          <div className="header">
+            <div className="header-content">
+              <div className="header-left">
+                <button className="toggle-btn" onClick={() => setCollapsed(!collapsed)}>
+                  <i className={`bi ${collapsed ? "bi-list" : "bi-x-lg"}`}></i>
+                </button>
+                <div className="header-info">
+                  <h2 className="current-time">{formatTime(currentTime)}</h2>
+                  <p className="current-date">{formatDate(currentTime)}</p>
+                </div>
+              </div>
+              <button className="user-info" onClick={handleLogout}>
+                <div className="user-avatar">
+                  <i className="bi bi-person"></i>
+                </div>
+                <div>
+                  <h6 className="user-name">
+                    {localStorage.getItem("UserName") ? localStorage.getItem("UserName").toUpperCase() : "GUEST"}
+                  </h6>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Page Header */}
+          <div className="page-header">
+            <h1 className="page-title">
+              <span>📦</span>
+              <span>Quản lý sản phẩm</span>
+            </h1>
+            <p className="page-subtitle">Quản lý thông tin và kho sản phẩm trong hệ thống</p>
+          </div>
+
+          {/* Content */}
+          <div className="content-wrapper">
+            <div className="products-content">
+              <ProductsManagement />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Overlay */}
+        <div className={`overlay ${!collapsed ? "show" : ""} d-md-none`} onClick={() => setCollapsed(true)}></div>
+      </div>
+    </>
+  )
 }
 
 export default ProductManagementPage

@@ -15,6 +15,22 @@ const PetsManagement = () => {
   const [pageSize] = useState(5)
   const [loading, setLoading] = useState(false)
 
+  // Edit Modal States
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingPet, setEditingPet] = useState(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    species: '',
+    breed: '',
+    dob: '',
+    gender: '',
+    weight: '',
+    age: '',
+    userId: ''
+  })
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken")
     if (!accessToken) {
@@ -103,8 +119,127 @@ const PetsManagement = () => {
     window.location.href = "/admin/addPet"
   }
 
-  const handleEditPet = (petId) => {
-    window.location.href = `/admin/editPet/${petId}`
+  const handleEditPet = (pet) => {
+    setEditingPet(pet)
+    setFormData({
+      name: pet.name || '',
+      species: pet.species || '',
+      breed: pet.breed || '',
+      dob: pet.dob || '',
+      gender: pet.gender || '',
+      weight: pet.weight || '',
+      age: pet.age || '',
+      userId: pet.userId || ''
+    })
+    setImagePreview(pet.image || null)
+    setShowEditModal(true)
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Kích thước ảnh không được vượt quá 5MB!')
+        return
+      }
+
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+      if (!validTypes.includes(file.type)) {
+        alert('Chỉ chấp nhận file ảnh định dạng JPG, PNG hoặc GIF!')
+        return
+      }
+
+      setImageFile(file)
+
+      // Preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleUpdate = async () => {
+    if (!formData.name.trim()) {
+      alert('Vui lòng nhập tên thú cưng!')
+      return
+    }
+
+    if (!formData.species) {
+      alert('Vui lòng chọn loại thú cưng!')
+      return
+    }
+
+    try {
+      const accessToken = localStorage.getItem('accessToken')
+
+      const petRequest = {
+        name: formData.name.trim(),
+        userId: formData.userId ? parseInt(formData.userId) : null,
+        species: formData.species,
+        breed: formData.breed.trim() || null,
+        dob: formData.dob || null,
+        gender: formData.gender || null,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
+        age: formData.age ? parseInt(formData.age) : 0,
+      }
+
+      const formDataToSend = new FormData()
+      formDataToSend.append('petRequest', JSON.stringify(petRequest))
+
+      if (imageFile) {
+        formDataToSend.append('imageFile', imageFile)
+      }
+
+      const response = await axios.post(
+        `http://localhost:8080/api/pet/update/${editingPet.id}`,
+        formDataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+
+      console.log('Update response:', response.data)
+      alert('Cập nhật thú cưng thành công!')
+
+      // Refresh list
+      getPets(accessToken, currentPage, pageSize)
+      handleCloseModal()
+    } catch (error) {
+      console.error('Error updating pet:', error)
+      alert('Có lỗi xảy ra khi cập nhật thú cưng!')
+    }
+  }
+
+  const handleCloseModal = () => {
+    setShowEditModal(false)
+    setEditingPet(null)
+    setFormData({
+      name: '',
+      species: '',
+      breed: '',
+      dob: '',
+      gender: '',
+      weight: '',
+      age: '',
+      userId: ''
+    })
+    setImageFile(null)
+    setImagePreview(null)
   }
 
   const renderPagination = () => {
@@ -363,6 +498,71 @@ const PetsManagement = () => {
           margin-top: 24px;
         }
 
+        .modal-content {
+          border-radius: 24px;
+          border: none;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 24px 24px 0 0;
+          padding: 24px;
+        }
+
+        .modal-title {
+          font-weight: 700;
+          font-size: 1.5rem;
+        }
+
+        .btn-close {
+          filter: brightness(0) invert(1);
+        }
+
+        .form-label {
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+          border-radius: 12px;
+          border: 2px solid #e0e0e0;
+          padding: 12px 16px;
+          transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+          border-color: #667eea;
+          box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .image-preview-container {
+          position: relative;
+          width: 200px;
+          height: 200px;
+          margin: 16px auto;
+          border-radius: 16px;
+          overflow: hidden;
+          border: 3px dashed #667eea;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #f8f9fa;
+        }
+
+        .image-preview {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .no-image-placeholder {
+          color: #999;
+          text-align: center;
+        }
+
         @media (max-width: 768px) {
           .search-section {
             padding: 16px;
@@ -460,7 +660,7 @@ const PetsManagement = () => {
                     </td>
                     <td>ID: {pet.userId}</td>
                     <td>
-                      <button className="action-btn btn-edit" onClick={() => handleEditPet(pet.id)} title="Chỉnh sửa">
+                      <button className="action-btn btn-edit" onClick={() => handleEditPet(pet)} title="Chỉnh sửa">
                         <Edit size={16} />
                       </button>
                       <button className="action-btn btn-delete" onClick={() => handleDelete(pet.id)} title="Xóa">
@@ -483,6 +683,183 @@ const PetsManagement = () => {
         {/* Pagination */}
         {Array.isArray(pets) && pets.length > 0 && (!Array.isArray(petSearch) || petSearch.length === 0) && (
           <div className="pagination-container">{renderPagination()}</div>
+        )}
+
+        {/* Edit Modal */}
+        {showEditModal && (
+          <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1050, overflowY: 'auto', padding: '20px 0' }}>
+            <div className="modal-dialog modal-lg" style={{ margin: '0 auto', maxWidth: '800px' }}>
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    <i className="bi bi-pencil-square me-2"></i>
+                    Chỉnh sửa thông tin thú cưng
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={handleCloseModal}
+                  ></button>
+                </div>
+
+                <div className="modal-body">
+                  <div className="row g-3">
+                    {/* Image Preview */}
+                    <div className="col-12">
+                      <div className="image-preview-container">
+                        {imagePreview ? (
+                          <img src={imagePreview} alt="Preview" className="image-preview" />
+                        ) : (
+                          <div className="no-image-placeholder">
+                            <i className="bi bi-image" style={{ fontSize: '48px' }}></i>
+                            <p>Chưa có ảnh</p>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </div>
+
+                    {/* Name */}
+                    <div className="col-md-6">
+                      <label className="form-label">
+                        Tên thú cưng <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+
+                    {/* Species */}
+                    <div className="col-md-6">
+                      <label className="form-label">
+                        Loại <span className="text-danger">*</span>
+                      </label>
+                      <select
+                        className="form-select"
+                        name="species"
+                        value={formData.species}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Chọn loại</option>
+                        <option value="Dog">Chó</option>
+                        <option value="Cat">Mèo</option>
+                        <option value="Bird">Chim</option>
+                        <option value="Other">Khác</option>
+                      </select>
+                    </div>
+
+                    {/* Breed */}
+                    <div className="col-md-6">
+                      <label className="form-label">Giống</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="breed"
+                        value={formData.breed}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+
+                    {/* Gender */}
+                    <div className="col-md-6">
+                      <label className="form-label">Giới tính</label>
+                      <select
+                        className="form-select"
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleInputChange}
+                      >
+                        <option value="">Chọn giới tính</option>
+                        <option value="Male">Đực</option>
+                        <option value="Female">Cái</option>
+                      </select>
+                    </div>
+
+                    {/* DOB */}
+                    <div className="col-md-4">
+                      <label className="form-label">Ngày sinh</label>
+                      <input
+                        type="date"
+                        className="form-control"
+                        name="dob"
+                        value={formData.dob}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+
+                    {/* Age */}
+                    <div className="col-md-4">
+                      <label className="form-label">Tuổi</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        name="age"
+                        value={formData.age}
+                        onChange={handleInputChange}
+                        min="0"
+                      />
+                    </div>
+
+                    {/* Weight */}
+                    <div className="col-md-4">
+                      <label className="form-label">Cân nặng (kg)</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        name="weight"
+                        value={formData.weight}
+                        onChange={handleInputChange}
+                        step="0.1"
+                        min="0"
+                      />
+                    </div>
+
+                    {/* User ID */}
+                    <div className="col-12">
+                      <label className="form-label">ID Chủ nuôi</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        name="userId"
+                        value={formData.userId}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleCloseModal}
+                  >
+                    <i className="bi bi-x-circle me-2"></i>
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleUpdate}
+                  >
+                    <i className="bi bi-check-circle me-2"></i>
+                    Cập nhật
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>
