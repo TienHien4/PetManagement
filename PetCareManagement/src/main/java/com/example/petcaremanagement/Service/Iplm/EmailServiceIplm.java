@@ -85,6 +85,7 @@ public class EmailServiceIplm implements EmailService {
             emailProducerService.sendAppointmentStatusUpdateEmail(user, pet, appointment, oldStatus, newStatus);
 
             logger.info("Status update email event sent to Kafka successfully");
+            logger.info("test");
 
         } catch (Exception e) {
             logger.error("Failed to send status update event to Kafka", e);

@@ -37,6 +37,7 @@ public class VetServiceIplm implements VetService {
                     return appointment;
                 }).toList();
         vet.setAppointments(appointments);
+
         return vetMapper.toVetResponse(vet);
     }
 
