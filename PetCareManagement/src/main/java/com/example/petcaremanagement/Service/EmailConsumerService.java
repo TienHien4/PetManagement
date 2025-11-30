@@ -47,7 +47,6 @@ public class EmailConsumerService {
 //    @KafkaListener(
 //            topics = "string-test-topic",
 //            groupId = "test-group-string",
-//            // SỬA LẠI: Phải dùng factory STRING tùy chỉnh
 //            containerFactory = "stringKafkaListenerFactory"
 //    )
     public void listenStringTest(String message) {
