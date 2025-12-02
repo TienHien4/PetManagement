@@ -151,7 +151,7 @@ const OrderManagement = () => {
       await getOrders()
       setShowEditModal(false)
       setEditingOrder(null)
-      
+
       // Show success message
       alert("Cập nhật trạng thái đơn hàng thành công!")
     } catch (error) {
@@ -175,12 +175,12 @@ const OrderManagement = () => {
       await getOrders()
       setShowDeleteModal(false)
       setDeletingOrder(null)
-      
+
       // Clear selected order if it was deleted
       if (selectedOrder?.orderId === deletingOrder.orderId) {
         setSelectedOrder(null)
       }
-      
+
       alert("Xóa đơn hàng thành công!")
     } catch (error) {
       console.error("Error deleting order:", error)
