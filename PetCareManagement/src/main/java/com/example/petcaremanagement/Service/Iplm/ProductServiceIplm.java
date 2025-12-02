@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Service
-@Slf4j  // Thêm annotation này
+@Slf4j // Thêm annotation này
 public class ProductServiceIplm implements ProductService {
     @Autowired
     private ProductRepository productRepository;
@@ -39,7 +39,7 @@ public class ProductServiceIplm implements ProductService {
         return listProducts.stream().map(s -> productMapper.toProductResponse(s)).toList();
     }
 
-    @Cacheable(value = "products", key = "'page-' + #pageNo + '-' + #pageSize")
+    // Removed @Cacheable to avoid LinkedHashMap casting issue with Page object
     @Override
     public Page<ProductResponse> GetAllProductPagination(int pageNo, int pageSize) {
         log.info("========== FETCHING FROM DATABASE: Pagination page={}, size={} ==========", pageNo, pageSize);

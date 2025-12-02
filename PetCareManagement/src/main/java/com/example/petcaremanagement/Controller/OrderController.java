@@ -36,9 +36,24 @@ public class OrderController {
         orderService.deleteOrder(id);
     }
 
+    @PutMapping("/{id}/status")
+    public ResponseEntity<OrderResponse> updateOrderStatus(
+            @PathVariable Long id, 
+            @RequestBody UpdateStatusRequest request) {
+        OrderResponse order = orderService.searchOrderById(id);
+        orderService.updateOrderPaymentStatus(id, request.getStatus(), null);
+        return ResponseEntity.ok(orderService.searchOrderById(id));
+    }
+
     @GetMapping("/page")
     public Page<OrderResponse> getOrdersPage(@RequestParam int pageNo, @RequestParam int pageSize) {
         return orderService.pagination(pageNo, pageSize);
+    }
+    
+    // Inner class for update status request
+    @lombok.Data
+    public static class UpdateStatusRequest {
+        private String status;
     }
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderResponse>> getOrdersByUser(@PathVariable long userId) {

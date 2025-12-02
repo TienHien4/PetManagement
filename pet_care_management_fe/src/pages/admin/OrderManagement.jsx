@@ -46,6 +46,11 @@ const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [collapsed, setCollapsed] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [editingOrder, setEditingOrder] = useState(null)
+  const [deletingOrder, setDeletingOrder] = useState(null)
+  const [editStatus, setEditStatus] = useState("")
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -113,6 +118,74 @@ const OrderManagement = () => {
 
   const handleSelectOrder = (order) => {
     setSelectedOrder(order)
+  }
+
+  const handleEditOrder = (order) => {
+    setEditingOrder(order)
+    setEditStatus(order.status || "PENDING")
+    setShowEditModal(true)
+  }
+
+  const handleDeleteOrder = (order) => {
+    setDeletingOrder(order)
+    setShowDeleteModal(true)
+  }
+
+  const confirmEditOrder = async () => {
+    if (!editingOrder) return
+
+    try {
+      const token = localStorage.getItem("accessToken")
+      await axios.put(
+        `http://localhost:8080/api/orders/${editingOrder.orderId}/status`,
+        { status: editStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+
+      // Refresh orders list
+      await getOrders()
+      setShowEditModal(false)
+      setEditingOrder(null)
+      
+      // Show success message
+      alert("Cập nhật trạng thái đơn hàng thành công!")
+    } catch (error) {
+      console.error("Error updating order:", error)
+      alert("Không thể cập nhật đơn hàng. Vui lòng thử lại!")
+    }
+  }
+
+  const confirmDeleteOrder = async () => {
+    if (!deletingOrder) return
+
+    try {
+      const token = localStorage.getItem("accessToken")
+      await axios.delete(`http://localhost:8080/api/orders/${deletingOrder.orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      // Refresh orders list
+      await getOrders()
+      setShowDeleteModal(false)
+      setDeletingOrder(null)
+      
+      // Clear selected order if it was deleted
+      if (selectedOrder?.orderId === deletingOrder.orderId) {
+        setSelectedOrder(null)
+      }
+      
+      alert("Xóa đơn hàng thành công!")
+    } catch (error) {
+      console.error("Error deleting order:", error)
+      alert("Không thể xóa đơn hàng. Vui lòng thử lại!")
+    }
   }
 
   const getStatusBadge = (status) => {
@@ -828,7 +901,28 @@ const OrderManagement = () => {
                                 <i className="bi bi-cart3 text-muted me-2"></i>
                                 <span className="fw-bold text-dark">#{order.orderId}</span>
                               </div>
-
+                              <div className="d-flex gap-2">
+                                <button
+                                  className="btn btn-sm btn-outline-warning"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEditOrder(order)
+                                  }}
+                                  title="Sửa đơn hàng"
+                                >
+                                  <i className="bi bi-pencil"></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDeleteOrder(order)
+                                  }}
+                                  title="Xóa đơn hàng"
+                                >
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              </div>
                             </div>
                             <div className="row g-2 small">
                               <div className="col-12">
@@ -960,6 +1054,127 @@ const OrderManagement = () => {
 
         {/* Mobile Overlay */}
         <div className={`overlay ${!collapsed ? "show" : ""} d-md-none`} onClick={() => setCollapsed(true)}></div>
+
+        {/* Edit Order Modal */}
+        {showEditModal && (
+          <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    <i className="bi bi-pencil-square me-2"></i>
+                    Sửa đơn hàng #{editingOrder?.orderId}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowEditModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="form-label fw-bold">Trạng thái đơn hàng</label>
+                    <select
+                      className="form-select"
+                      value={editStatus}
+                      onChange={(e) => setEditStatus(e.target.value)}
+                    >
+                      <option value="PENDING">Chờ xử lý</option>
+                      <option value="PAID">Đã thanh toán</option>
+                      <option value="PROCESSING">Đang xử lý</option>
+                      <option value="COMPLETED">Hoàn thành</option>
+                      <option value="CANCELLED">Đã hủy</option>
+                    </select>
+                  </div>
+                  <div className="alert alert-info">
+                    <i className="bi bi-info-circle me-2"></i>
+                    Bạn có thể cập nhật trạng thái đơn hàng để phản ánh quá trình xử lý.
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowEditModal(false)}
+                  >
+                    <i className="bi bi-x-circle me-2"></i>
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={confirmEditOrder}
+                  >
+                    <i className="bi bi-check-circle me-2"></i>
+                    Lưu thay đổi
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Order Modal */}
+        {showDeleteModal && (
+          <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header bg-danger text-white">
+                  <h5 className="modal-title">
+                    <i className="bi bi-trash me-2"></i>
+                    Xác nhận xóa đơn hàng
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    onClick={() => setShowDeleteModal(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <div className="alert alert-warning">
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác!
+                  </div>
+                  <p className="mb-2">Bạn có chắc chắn muốn xóa đơn hàng sau không?</p>
+                  <div className="card bg-light">
+                    <div className="card-body">
+                      <p className="mb-1">
+                        <strong>Mã đơn hàng:</strong> #{deletingOrder?.orderId}
+                      </p>
+                      <p className="mb-1">
+                        <strong>Khách hàng:</strong> {deletingOrder?.userId || "N/A"}
+                      </p>
+                      <p className="mb-0">
+                        <strong>Tổng tiền:</strong>{" "}
+                        <span className="text-danger fw-bold">
+                          {deletingOrder?.totalPrice?.toLocaleString("vi-VN")} đ
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowDeleteModal(false)}
+                  >
+                    <i className="bi bi-x-circle me-2"></i>
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={confirmDeleteOrder}
+                  >
+                    <i className="bi bi-trash me-2"></i>
+                    Xóa đơn hàng
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )

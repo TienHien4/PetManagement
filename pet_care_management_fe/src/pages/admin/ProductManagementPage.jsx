@@ -79,6 +79,7 @@ const ProductManagementPage = () => {
           min-height: 100vh;
           position: relative;
           overflow-x: hidden;
+          overflow-y: auto;
         }
 
         .dashboard-container::before {
@@ -365,7 +366,7 @@ const ProductManagementPage = () => {
           padding: 40px;
           border: 1px solid rgba(255, 255, 255, 0.2);
           position: relative;
-          overflow: hidden;
+          overflow: visible;
         }
 
         .products-content::before {
