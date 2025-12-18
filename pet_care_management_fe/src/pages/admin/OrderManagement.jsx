@@ -2,63 +2,29 @@
 
 import { useEffect, useState } from "react"
 import axios from "axios"
+import { Edit, Trash2, Eye, X } from "lucide-react"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 
-// Mock data for demonstration
-const mockOrders = [
-  {
-    orderId: "ORD001",
-    user: { name: "Nguyễn Văn A", username: "nguyenvana" },
-    orderDate: "2024-01-15T10:30:00Z",
-    totalPrice: 1250000,
-    status: "completed",
-    orderItems: [
-      { orderItemId: 1, product: { name: "iPhone 15 Pro" }, quantity: 1, price: 1000000 },
-      { orderItemId: 2, product: { name: "Ốp lưng iPhone" }, quantity: 1, price: 250000 },
-    ],
-  },
-  {
-    orderId: "ORD002",
-    user: { name: "Trần Thị B", username: "tranthib" },
-    orderDate: "2024-01-14T14:20:00Z",
-    totalPrice: 850000,
-    status: "pending",
-    orderItems: [{ orderItemId: 3, product: { name: "Samsung Galaxy S24" }, quantity: 1, price: 850000 }],
-  },
-  {
-    orderId: "ORD003",
-    user: { name: "Lê Văn C", username: "levanc" },
-    orderDate: "2024-01-13T09:15:00Z",
-    totalPrice: 2100000,
-    status: "processing",
-    orderItems: [
-      { orderItemId: 4, product: { name: "MacBook Air M2" }, quantity: 1, price: 2000000 },
-      { orderItemId: 5, product: { name: "Chuột Magic Mouse" }, quantity: 1, price: 100000 },
-    ],
-  },
-]
-
 const OrderManagement = () => {
   const [orders, setOrders] = useState([])
+  const [filteredOrders, setFilteredOrders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [search, setSearch] = useState("")
   const [collapsed, setCollapsed] = useState(false)
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [pageSize] = useState(10)
+
+  // Modal states
+  const [showDetailModal, setShowDetailModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [editingOrder, setEditingOrder] = useState(null)
-  const [deletingOrder, setDeletingOrder] = useState(null)
+  const [selectedOrder, setSelectedOrder] = useState(null)
   const [editStatus, setEditStatus] = useState("")
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
+  const handleNavigation = (path) => {
+    window.location.href = path
+  }
 
   const handleLogout = async () => {
     try {
@@ -68,7 +34,7 @@ const OrderManagement = () => {
         return
       }
 
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8080/api/logout",
         { token: token },
         {
@@ -88,56 +54,158 @@ const OrderManagement = () => {
     }
   }
 
-  const handleNavigation = (path) => {
-    window.location.href = path
-  }
-
-
   // Fetch orders from API
   const getOrders = async () => {
     setLoading(true)
-    setError(null)
     try {
       const token = localStorage.getItem("accessToken")
+      if (!token) {
+        window.location.href = "/login"
+        return
+      }
       const response = await axios.get("http://localhost:8080/api/orders", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-      console.log(response.data)
       setOrders(response.data)
+      setFilteredOrders(response.data)
     } catch (err) {
-      setError("Không thể tải danh sách đơn hàng.")
+      console.error("Error fetching orders:", err)
+      alert("Không thể tải danh sách đơn hàng!")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
     getOrders()
   }, [])
 
-  const handleSelectOrder = (order) => {
-    setSelectedOrder(order)
+  // Filter orders based on search
+  useEffect(() => {
+    let result = orders
+
+    // Filter by search
+    if (search) {
+      result = result.filter(order =>
+        order.orderId?.toLowerCase().includes(search.toLowerCase()) ||
+        order.userId?.toString().includes(search)
+      )
+    }
+
+    setFilteredOrders(result)
+    // Calculate total pages based on filtered results
+    setTotalPages(Math.ceil(result.length / pageSize))
+  }, [search, orders, pageSize])
+
+  const handleSearch = () => {
+    // Trigger search filter
+    const filtered = orders.filter(order =>
+      order.orderId?.toLowerCase().includes(search.toLowerCase()) ||
+      order.userId?.toString().includes(search)
+    )
+    setFilteredOrders(filtered)
+    setTotalPages(Math.ceil(filtered.length / pageSize))
+    setCurrentPage(1)
   }
 
-  const handleEditOrder = (order) => {
-    setEditingOrder(order)
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  // Get paginated orders for current page
+  const getPaginatedOrders = () => {
+    const startIndex = (currentPage - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    return filteredOrders.slice(startIndex, endIndex)
+  }
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null
+
+    const pages = []
+    const maxVisiblePages = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+
+    // Previous button
+    pages.push(
+      <button
+        key="prev"
+        className="btn btn-outline-primary me-1"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        <i className="bi bi-chevron-left"></i>
+      </button>,
+    )
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          className={`btn me-1 ${i === currentPage ? "btn-primary" : "btn-outline-primary"}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>,
+      )
+    }
+
+    // Next button
+    pages.push(
+      <button
+        key="next"
+        className="btn btn-outline-primary"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        <i className="bi bi-chevron-right"></i>
+      </button>,
+    )
+
+    return <div className="d-flex justify-content-center align-items-center">{pages}</div>
+  }
+
+  const openDetailModal = (order) => {
+    setSelectedOrder(order)
+    setShowDetailModal(true)
+    document.body.style.overflow = 'hidden'
+  }
+
+  const closeDetailModal = () => {
+    setShowDetailModal(false)
+    setSelectedOrder(null)
+    document.body.style.overflow = 'auto'
+  }
+
+  const openEditModal = (order) => {
+    setSelectedOrder(order)
     setEditStatus(order.status || "PENDING")
     setShowEditModal(true)
+    document.body.style.overflow = 'hidden'
   }
 
-  const handleDeleteOrder = (order) => {
-    setDeletingOrder(order)
-    setShowDeleteModal(true)
+  const closeEditModal = () => {
+    setShowEditModal(false)
+    setSelectedOrder(null)
+    document.body.style.overflow = 'auto'
   }
 
-  const confirmEditOrder = async () => {
-    if (!editingOrder) return
+  const handleUpdateStatus = async (e) => {
+    e.preventDefault()
+    if (!selectedOrder) return
 
     try {
       const token = localStorage.getItem("accessToken")
       await axios.put(
-        `http://localhost:8080/api/orders/${editingOrder.orderId}/status`,
+        `http://localhost:8080/api/orders/${selectedOrder.orderId}/status`,
         { status: editStatus },
         {
           headers: {
@@ -147,41 +215,30 @@ const OrderManagement = () => {
         }
       )
 
-      // Refresh orders list
-      await getOrders()
-      setShowEditModal(false)
-      setEditingOrder(null)
-
-      // Show success message
       alert("Cập nhật trạng thái đơn hàng thành công!")
+      closeEditModal()
+      getOrders()
     } catch (error) {
       console.error("Error updating order:", error)
       alert("Không thể cập nhật đơn hàng. Vui lòng thử lại!")
     }
   }
 
-  const confirmDeleteOrder = async () => {
-    if (!deletingOrder) return
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) {
+      return
+    }
 
     try {
       const token = localStorage.getItem("accessToken")
-      await axios.delete(`http://localhost:8080/api/orders/${deletingOrder.orderId}`, {
+      await axios.delete(`http://localhost:8080/api/orders/${orderId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
 
-      // Refresh orders list
-      await getOrders()
-      setShowDeleteModal(false)
-      setDeletingOrder(null)
-
-      // Clear selected order if it was deleted
-      if (selectedOrder?.orderId === deletingOrder.orderId) {
-        setSelectedOrder(null)
-      }
-
       alert("Xóa đơn hàng thành công!")
+      getOrders()
     } catch (error) {
       console.error("Error deleting order:", error)
       alert("Không thể xóa đơn hàng. Vui lòng thử lại!")
@@ -190,92 +247,22 @@ const OrderManagement = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      completed: {
-        label: "Hoàn thành",
-        className: "badge bg-success",
-      },
-      pending: {
-        label: "Chờ xử lý",
-        className: "badge bg-warning text-dark",
-      },
-      processing: {
-        label: "Đang xử lý",
-        className: "badge bg-info",
-      },
-      cancelled: {
-        label: "Đã hủy",
-        className: "badge bg-danger",
-      },
+      COMPLETED: { label: "Hoàn thành", className: "bg-success" },
+      PENDING: { label: "Chờ xử lý", className: "bg-warning text-dark" },
+      PROCESSING: { label: "Đang xử lý", className: "bg-info" },
+      PAID: { label: "Đã thanh toán", className: "bg-primary" },
+      CANCELLED: { label: "Đã hủy", className: "bg-danger" },
     }
-    const config = statusConfig[status] || statusConfig.pending
-    return <span className={config.className}>{config.label}</span>
-  }
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    })
-  }
-
-  const formatDate = (date) => {
-    return date.toLocaleDateString("vi-VN", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
-
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
-        <div className="text-center">
-          <div className="spinner-border text-primary mb-3" role="status" style={{ width: "3rem", height: "3rem" }}>
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="text-muted fs-5">Đang tải danh sách đơn hàng...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
-        <div className="card border-danger" style={{ maxWidth: "400px" }}>
-          <div className="card-body text-center">
-            <i className="bi bi-exclamation-triangle text-danger fs-1 mb-3"></i>
-            <p className="text-danger fs-5">{error}</p>
-            <button className="btn btn-outline-primary" onClick={() => window.location.reload()}>
-              Thử lại
-            </button>
-          </div>
-        </div>
-      </div>
-    )
+    const config = statusConfig[status] || statusConfig.PENDING
+    return <span className={`badge ${config.className}`}>{config.label}</span>
   }
 
   return (
     <>
       <style jsx>{`
         .dashboard-container {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           min-height: 100vh;
-          position: relative;
-          overflow-x: hidden;
-        }
-
-        .dashboard-container::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-          pointer-events: none;
+          background: #f5f7fa;
         }
 
         .sidebar {
@@ -397,8 +384,6 @@ const OrderManagement = () => {
         .main-layout {
           transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           min-height: 100vh;
-          position: relative;
-          z-index: 1;
         }
 
         .main-layout.sidebar-collapsed {
@@ -410,27 +395,20 @@ const OrderManagement = () => {
         }
 
         .header {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+          background: white;
+          border-bottom: 1px solid #e9ecef;
           position: sticky;
           top: 0;
           z-index: 999;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .header-content {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          height: 80px;
+          height: 70px;
           padding: 0 32px;
-        }
-
-        .header-left {
-          display: flex;
-          align-items: center;
-          gap: 24px;
         }
 
         .toggle-btn {
@@ -450,31 +428,11 @@ const OrderManagement = () => {
           box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
         }
 
-        .header-info {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        .current-time {
-          font-size: 24px;
-          font-weight: 700;
-          color: #333;
-          margin: 0;
-        }
-
-        .current-date {
-          font-size: 14px;
-          color: #666;
-          margin: 0;
-          text-transform: capitalize;
-        }
-
         .user-info {
           display: flex;
           align-items: center;
           cursor: pointer;
-          padding: 12px 20px;
+          padding: 8px 16px;
           border-radius: 50px;
           transition: all 0.3s ease;
           border: none;
@@ -489,16 +447,16 @@ const OrderManagement = () => {
         }
 
         .user-avatar {
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background: rgba(255, 255, 255, 0.2);
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          margin-right: 12px;
-          font-size: 18px;
+          margin-right: 10px;
+          font-size: 16px;
         }
 
         .user-name {
@@ -508,277 +466,430 @@ const OrderManagement = () => {
           font-size: 14px;
         }
 
-        .page-header {
+        .content-wrapper {
           padding: 32px;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-          backdrop-filter: blur(20px);
-          margin: 24px 32px 0 32px;
+        }
+
+        .orders-management {
+          padding: 0;
+        }
+
+        .page-header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           border-radius: 20px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          padding: 32px;
+          margin-bottom: 24px;
+          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .page-title {
-          font-size: 2.5rem;
-          font-weight: 800;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin: 0;
+          font-size: 2rem;
+          font-weight: 700;
+          color: white;
+          margin: 0 0 8px 0;
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
         }
 
         .page-subtitle {
-          font-size: 1.1rem;
-          color: #666;
-          margin: 8px 0 0 0;
-          font-weight: 400;
+          font-size: 1rem;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
         }
 
-        .content-wrapper {
-          padding: 32px;
-          position: relative;
+        .header-section {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
         }
 
-        .orders-content {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(20px);
-          border-radius: 24px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-          padding: 40px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .orders-content::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #4facfe 0%, #00f2fe 50%, #667eea 100%);
-        }
-
-        .floating-elements {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          pointer-events: none;
-          overflow: hidden;
-        }
-
-        .floating-element {
-          position: absolute;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 50%;
-          animation: float 6s ease-in-out infinite;
-        }
-
-        .floating-element:nth-child(1) {
-          width: 80px;
-          height: 80px;
-          top: 10%;
-          left: 10%;
-          animation-delay: 0s;
-        }
-
-        .floating-element:nth-child(2) {
-          width: 120px;
-          height: 120px;
-          top: 60%;
-          right: 10%;
-          animation-delay: 2s;
-        }
-
-        .floating-element:nth-child(3) {
-          width: 60px;
-          height: 60px;
-          bottom: 20%;
-          left: 20%;
-          animation-delay: 4s;
-        }
-
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px) rotate(0deg);
-            opacity: 0.5;
-          }
-          50% {
-            transform: translateY(-20px) rotate(180deg);
-            opacity: 0.8;
-          }
-        }
-
-        .order-card {
+        .btn-add {
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+          border: none;
+          border-radius: 12px;
+          padding: 12px 24px;
+          color: white;
+          font-weight: 600;
           transition: all 0.3s ease;
-          border-left: 4px solid transparent;
-          border-radius: 12px;
-          margin-bottom: 8px;
+          box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
 
-        .order-card:hover {
-          background-color: #f8f9fa;
+        .btn-add:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-          border-left-color: #4facfe;
-        }
-
-        .order-card.selected {
-          background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-          border-left-color: #2196f3;
-          box-shadow: 0 8px 25px rgba(33, 150, 243, 0.2);
-        }
-
-        .gradient-header {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
           color: white;
-          border-radius: 12px 12px 0 0;
         }
 
-        .gradient-header-green {
-          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-          color: white;
-          border-radius: 12px 12px 0 0;
+        .search-section {
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          border-radius: 16px;
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
-        .price-highlight {
-          color: #28a745;
-          font-weight: bold;
-          font-size: 1.1rem;
-        }
-
-        .order-item {
-          border: 1px solid #e9ecef;
+        .search-input {
+          border: 2px solid #e9ecef;
           border-radius: 12px;
-          transition: all 0.2s ease;
-          background: #f8f9fa;
-        }
-
-        .order-item:hover {
-          border-color: #007bff;
-          box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+          padding: 12px 16px;
+          font-size: 1rem;
+          transition: all 0.3s ease;
           background: white;
         }
 
-        .scroll-area {
-          max-height: 600px;
-          overflow-y: auto;
+        .search-input:focus {
+          border-color: #4facfe;
+          box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+          outline: none;
+        }
+
+        .btn-search {
+          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+          border: none;
+          border-radius: 12px;
+          padding: 12px 24px;
+          color: white;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-search:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+          color: white;
+        }
+
+        .orders-table-container {
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+          margin-bottom: 24px;
+        }
+
+        .orders-table {
+          margin: 0;
+          font-size: 0.95rem;
+        }
+
+        .orders-table thead th {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          font-weight: 600;
+          padding: 16px 12px;
+          border: none;
+          text-align: center;
+          vertical-align: middle;
+        }
+
+        .orders-table tbody td {
+          padding: 16px 12px;
+          vertical-align: middle;
+          text-align: center;
+          border-bottom: 1px solid #f1f3f4;
+        }
+
+        .orders-table tbody tr:hover {
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-btn {
+          border: none;
+          border-radius: 8px;
+          padding: 8px 12px;
+          margin: 0 4px;
+          transition: all 0.3s ease;
+          font-size: 0.9rem;
+        }
+
+        .btn-view {
+          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+          color: white;
+          box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-view:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+          color: white;
+        }
+
+        .btn-edit {
+          background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+          color: white;
+          box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-edit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+          color: white;
+        }
+
+        .btn-delete {
+          background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+          color: white;
+          box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-delete:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+          color: white;
+        }
+
+        .loading-spinner {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 40px;
+        }
+
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #4facfe;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
 
         .empty-state {
-          min-height: 400px;
+          text-align: center;
+          padding: 60px 20px;
+          color: #6c757d;
         }
 
-        .cursor-pointer {
-          cursor: pointer;
+        .empty-icon {
+          font-size: 4rem;
+          margin-bottom: 16px;
+          opacity: 0.5;
         }
 
-        .scroll-area::-webkit-scrollbar {
-          width: 8px;
-        }
-
-        .scroll-area::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-
-        .scroll-area::-webkit-scrollbar-thumb {
-          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-          border-radius: 10px;
-        }
-
-        .scroll-area::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .card {
-          animation: fadeIn 0.5s ease-out;
-          border: none;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          border-radius: 16px;
-        }
-
-        .overlay {
+        /* Modal Styles */
+        .modal-overlay {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
           background: rgba(0, 0, 0, 0.5);
-          z-index: 999;
-          display: none;
-          backdrop-filter: blur(4px);
+          z-index: 1055;
+          overflow-y: scroll;
+          overflow-x: hidden;
+          animation: fadeIn 0.3s ease;
         }
 
-        .overlay.show {
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .modal-content-custom {
+          background: white;
+          border-radius: 16px;
+          padding: 32px;
+          max-width: 700px;
+          width: 90%;
+          margin: 60px auto 60px auto;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+          animation: slideUp 0.3s ease;
+          position: relative;
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(50px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .modal-header-custom {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+          padding-bottom: 16px;
+          border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #333;
+          margin: 0;
+        }
+
+        .btn-close-custom {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #6c757d;
+          padding: 0;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+          background: #f1f3f4;
+          color: #dc3545;
+        }
+
+        .order-detail-section {
+          margin-bottom: 24px;
+        }
+
+        .section-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #495057;
+          margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .detail-card {
+          background: #f8f9fa;
+          border-radius: 8px;
+          padding: 16px;
+        }
+
+        .order-item-card {
+          border: 1px solid #e9ecef;
+          border-radius: 8px;
+          padding: 12px;
+          margin-bottom: 12px;
+          background: white;
+          transition: all 0.2s ease;
+        }
+
+        .order-item-card:hover {
+          border-color: #4facfe;
+          box-shadow: 0 2px 8px rgba(79, 172, 254, 0.15);
+        }
+
+        .form-group {
+          margin-bottom: 20px;
+        }
+
+        .form-label {
+          font-weight: 600;
+          color: #495057;
+          margin-bottom: 8px;
           display: block;
         }
 
+        .form-control-custom {
+          width: 100%;
+          padding: 12px 16px;
+          border: 2px solid #e9ecef;
+          border-radius: 8px;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+        }
+
+        .form-control-custom:focus {
+          border-color: #4facfe;
+          outline: none;
+          box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+        }
+
+        .modal-footer-custom {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          margin-top: 24px;
+          padding-top: 16px;
+          border-top: 2px solid #e9ecef;
+        }
+
+        .btn-cancel {
+          background: #6c757d;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          padding: 12px 24px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+          background: #5a6268;
+          transform: translateY(-2px);
+        }
+
+        .btn-submit {
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          padding: 12px 24px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-submit:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+        }
+
+        .pagination-container {
+          display: flex;
+          justify-content: center;
+          margin-top: 24px;
+        }
+
         @media (max-width: 768px) {
-          .sidebar {
-            transform: translateX(-100%);
+          .orders-table-container {
+            overflow-x: auto;
           }
 
-          .sidebar.mobile-open {
-            transform: translateX(0);
+          .orders-table {
+            min-width: 900px;
           }
 
-          .main-layout {
-            margin-left: 0 !important;
+          .search-controls {
+            flex-direction: column;
+            gap: 12px;
           }
 
-          .header-content {
-            padding: 0 16px;
+          .search-controls > * {
+            width: 100% !important;
           }
 
-          .content-wrapper {
-            padding: 16px;
-          }
-
-          .page-header {
-            margin: 16px;
-            padding: 24px;
-          }
-
-          .page-title {
-            font-size: 2rem;
-          }
-
-          .orders-content {
-            padding: 24px;
-          }
-
-          .header-info {
-            display: none;
+          .modal-content-custom {
+            padding: 20px;
+            width: 95%;
           }
         }
       `}</style>
 
       <div className="dashboard-container">
-        <div className="floating-elements">
-          <div className="floating-element"></div>
-          <div className="floating-element"></div>
-          <div className="floating-element"></div>
-        </div>
-
         {/* Sidebar */}
         <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
@@ -841,340 +952,253 @@ const OrderManagement = () => {
           {/* Header */}
           <div className="header">
             <div className="header-content">
-              <div className="header-left">
-                <button className="toggle-btn" onClick={() => setCollapsed(!collapsed)}>
-                  <i className={`bi ${collapsed ? "bi-list" : "bi-x-lg"}`}></i>
-                </button>
-                <div className="header-info">
-                  <h2 className="current-time">{formatTime(currentTime)}</h2>
-                  <p className="current-date">{formatDate(currentTime)}</p>
-                </div>
-              </div>
+              <button className="toggle-btn" onClick={() => setCollapsed(!collapsed)}>
+                <i className={`bi ${collapsed ? "bi-list" : "bi-x-lg"}`}></i>
+              </button>
               <button className="user-info" onClick={handleLogout}>
                 <div className="user-avatar">
                   <i className="bi bi-person"></i>
                 </div>
                 <div>
                   <h6 className="user-name">
-                    {localStorage.getItem("UserName") ? localStorage.getItem("UserName").toUpperCase() : "GUEST"}
+                    {localStorage.getItem("UserName") ? localStorage.getItem("UserName").toUpperCase() : "ADMIN"}
                   </h6>
                 </div>
               </button>
             </div>
           </div>
 
-          {/* Page Header */}
-          <div className="page-header">
-            <h1 className="page-title">
-              <i className="bi bi-box-seam"></i>
-              Quản lý đơn hàng
-            </h1>
-            <p className="page-subtitle">Theo dõi và quản lý tất cả đơn hàng của khách hàng</p>
-          </div>
-
           {/* Content */}
           <div className="content-wrapper">
-            <div className="orders-content">
-              <div className="row g-4">
-                {/* Orders List */}
-                <div className="col-lg-6">
-                  <div className="card shadow-lg h-100">
-                    <div className="card-header gradient-header">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <h5 className="card-title mb-0 d-flex align-items-center">
-                          <i className="bi bi-file-text me-2"></i>
-                          Danh sách đơn hàng
-                        </h5>
-                        <span className="badge bg-light text-dark">{orders.length} đơn hàng</span>
-                      </div>
-                    </div>
-                    <div className="card-body p-0">
-                      <div className="scroll-area">
-                        {orders.map((order) => (
-                          <div
-                            key={order.orderId}
-                            className={`order-card p-3 cursor-pointer ${selectedOrder?.orderId === order.orderId ? "selected" : ""}`}
-                            onClick={() => handleSelectOrder(order)}
-                          >
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                              <div className="d-flex align-items-center">
-                                <i className="bi bi-cart3 text-muted me-2"></i>
-                                <span className="fw-bold text-dark">#{order.orderId}</span>
-                              </div>
-                              <div className="d-flex gap-2">
-                                <button
-                                  className="btn btn-sm btn-outline-warning"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleEditOrder(order)
-                                  }}
-                                  title="Sửa đơn hàng"
-                                >
-                                  <i className="bi bi-pencil"></i>
-                                </button>
-                                <button
-                                  className="btn btn-sm btn-outline-danger"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleDeleteOrder(order)
-                                  }}
-                                  title="Xóa đơn hàng"
-                                >
-                                  <i className="bi bi-trash"></i>
-                                </button>
-                              </div>
-                            </div>
-                            <div className="row g-2 small">
-                              <div className="col-12">
-                                <div className="d-flex align-items-center text-muted">
-                                  <i className="bi bi-person me-2"></i>
-                                  <span>{order.userId || order.userId || "N/A"}</span>
-                                </div>
-                              </div>
-                              <div className="col-12">
-                                <div className="d-flex align-items-center text-muted">
-                                  <i className="bi bi-calendar3 me-2"></i>
-                                  <span>
-                                    {order.orderDate ? new Date(order.orderDate).toLocaleDateString("vi-VN") : "N/A"}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="col-12">
-                                <div className="d-flex justify-content-between align-items-center">
-                                  <div className="d-flex align-items-center">
-                                    <i className="bi bi-currency-dollar me-2 text-muted"></i>
-                                    <span className="price-highlight">
-                                      {order.totalPrice?.toLocaleString("vi-VN")} đ
-                                    </span>
-                                  </div>
-                                  <button
-                                    className="btn btn-sm btn-outline-primary"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleSelectOrder(order)
-                                    }}
-                                  >
-                                    <i className="bi bi-eye me-1"></i>
-                                    Xem chi tiết
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="orders-management">
+              {/* Page Header */}
+              <div className="page-header">
+                <h1 className="page-title">
+                  <i className="bi bi-box-seam"></i>
+                  Quản lý đơn hàng
+                </h1>
+                <p className="page-subtitle">Quản lý thông tin và kho sản phẩm trong hệ thống</p>
+              </div>
 
-                {/* Order Details */}
-                <div className="col-lg-6">
-                  <div className="card shadow-lg h-100">
-                    <div className="card-header gradient-header-green">
-                      <h5 className="card-title mb-0 d-flex align-items-center">
-                        <i className="bi bi-box me-2"></i>
-                        Chi tiết đơn hàng
-                      </h5>
-                    </div>
-                    <div className="card-body">
-                      {selectedOrder ? (
-                        <div>
-                          {/* Order Header */}
-                          <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4 className="fw-bold text-dark">Đơn hàng #{selectedOrder.orderId}</h4>
 
-                          </div>
-                          <hr />
-                          {/* Customer Info */}
-                          <div className="mb-4">
-                            <h6 className="fw-semibold text-dark d-flex align-items-center mb-3">
-                              <i className="bi bi-person me-2"></i>
-                              Thông tin khách hàng
-                            </h6>
-                            <div className="bg-light p-3 rounded">
-                              <p className="mb-2">
-                                <strong>Tên:</strong>{" "}
-                                {selectedOrder.user?.name || selectedOrder.user?.username || "N/A"}
-                              </p>
-                              <p className="mb-0">
-                                <strong>Ngày đặt:</strong>{" "}
-                                {selectedOrder.orderDate
-                                  ? new Date(selectedOrder.orderDate).toLocaleString("vi-VN")
-                                  : "N/A"}
-                              </p>
-                            </div>
-                          </div>
-                          {/* Order Items */}
-                          <div className="mb-4">
-                            <h6 className="fw-semibold text-dark d-flex align-items-center mb-3">
-                              <i className="bi bi-cart3 me-2"></i>
-                              Sản phẩm đã đặt
-                            </h6>
-                            <div className="d-flex flex-column gap-3">
-                              {selectedOrder.orderItems?.map((item) => (
-                                <div key={item.orderItemId} className="order-item p-3">
-                                  <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                      <p className="fw-medium text-dark mb-1">{item.product?.name}</p>
-                                      <small className="text-muted">Số lượng: {item.quantity}</small>
-                                    </div>
-                                    <div className="text-end">
-                                      <p className="price-highlight mb-0">{item.price?.toLocaleString("vi-VN")} đ</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          <hr />
-                          {/* Total */}
-                          <div className="bg-success bg-opacity-10 p-4 rounded">
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span className="fs-5 fw-semibold text-dark">Tổng cộng:</span>
-                              <span className="fs-4 fw-bold text-success">
-                                {selectedOrder.totalPrice?.toLocaleString("vi-VN")} đ
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="d-flex flex-column justify-content-center align-items-center empty-state text-muted">
-                          <i className="bi bi-box display-1 mb-4 text-black-50"></i>
-                          <h5 className="fw-medium">Chọn đơn hàng để xem chi tiết</h5>
-                          <p className="text-center">Nhấp vào một đơn hàng bên trái để xem thông tin chi tiết</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+
+              {/* Search Section */}
+              <div className="search-section">
+                <div className="d-flex search-controls" style={{ gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm theo mã đơn hàng hoặc ID khách hàng..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                    style={{ flex: 1, minWidth: "250px" }}
+                  />
+                  <button className="btn-search" onClick={handleSearch} disabled={loading}>
+                    <i className="bi bi-search me-2"></i>
+                    Tìm kiếm
+                  </button>
                 </div>
               </div>
+
+              {/* Table Section */}
+              <div className="orders-table-container">
+                {loading ? (
+                  <div className="loading-spinner">
+                    <div className="spinner"></div>
+                  </div>
+                ) : filteredOrders.length > 0 ? (
+                  <table className="table orders-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: "15%" }}>Mã đơn hàng</th>
+                        <th style={{ width: "15%" }}>Khách hàng</th>
+                        <th style={{ width: "15%" }}>Ngày đặt</th>
+                        <th style={{ width: "20%" }}>Tổng tiền</th>
+                        <th style={{ width: "15%" }}>Trạng thái</th>
+                        <th style={{ width: "20%" }}>Hành động</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {getPaginatedOrders().map((order) => (
+                        <tr key={order.orderId}>
+                          <td>
+                            <strong>#{order.orderId}</strong>
+                          </td>
+                          <td>{order.userId || "N/A"}</td>
+                          <td>
+                            {order.orderDate
+                              ? new Date(order.orderDate).toLocaleDateString("vi-VN")
+                              : "N/A"}
+                          </td>
+                          <td>
+                            <strong className="text-success">
+                              {order.totalPrice?.toLocaleString("vi-VN")} ₫
+                            </strong>
+                          </td>
+                          <td>{getStatusBadge(order.status)}</td>
+                          <td>
+                            <button
+                              className="action-btn btn-view"
+                              onClick={() => openDetailModal(order)}
+                              title="Xem chi tiết"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button
+                              className="action-btn btn-edit"
+                              onClick={() => openEditModal(order)}
+                              title="Chỉnh sửa"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              className="action-btn btn-delete"
+                              onClick={() => handleDeleteOrder(order.orderId)}
+                              title="Xóa"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="empty-state">
+                    <div className="empty-icon">📦</div>
+                    <h5>Không tìm thấy đơn hàng nào</h5>
+                    <p>Hãy thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Pagination */}
+              {filteredOrders.length > 0 && (
+                <div className="pagination-container">{renderPagination()}</div>
+              )}
+
+              {/* Detail Modal */}
+              {showDetailModal && selectedOrder && (
+                <div className="modal-overlay" onClick={(e) => {
+                  if (e.target === e.currentTarget) closeDetailModal()
+                }}>
+                  <div className="modal-content-custom">
+                    <div className="modal-header-custom">
+                      <h3 className="modal-title">Chi tiết đơn hàng #{selectedOrder.orderId}</h3>
+                      <button className="btn-close-custom" onClick={closeDetailModal}>
+                        <X size={24} />
+                      </button>
+                    </div>
+
+                    {/* Customer Info */}
+                    <div className="order-detail-section">
+                      <div className="section-title">
+                        <i className="bi bi-person-circle"></i>
+                        Thông tin khách hàng
+                      </div>
+                      <div className="detail-card">
+                        <p className="mb-2">
+                          <strong>ID khách hàng:</strong> {selectedOrder.userId || "N/A"}
+                        </p>
+                        <p className="mb-2">
+                          <strong>Ngày đặt:</strong>{" "}
+                          {selectedOrder.orderDate
+                            ? new Date(selectedOrder.orderDate).toLocaleString("vi-VN")
+                            : "N/A"}
+                        </p>
+                        <p className="mb-0">
+                          <strong>Trạng thái:</strong> {getStatusBadge(selectedOrder.status)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Order Items */}
+                    <div className="order-detail-section">
+                      <div className="section-title">
+                        <i className="bi bi-cart3"></i>
+                        Sản phẩm đã đặt
+                      </div>
+                      {selectedOrder.orderItems && selectedOrder.orderItems.length > 0 ? (
+                        selectedOrder.orderItems.map((item) => (
+                          <div key={item.orderItemId} className="order-item-card">
+                            <div className="d-flex justify-content-between align-items-center">
+                              <div>
+                                <p className="fw-medium text-dark mb-1">
+                                  {item.product?.name || "N/A"}
+                                </p>
+                                <small className="text-muted">Số lượng: {item.quantity}</small>
+                              </div>
+                              <div className="text-end">
+                                <p className="text-success fw-bold mb-0">
+                                  {item.price?.toLocaleString("vi-VN")} ₫
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-muted">Không có sản phẩm</p>
+                      )}
+                    </div>
+
+                    {/* Total */}
+                    <div className="detail-card">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="fs-5 fw-semibold">Tổng cộng:</span>
+                        <span className="fs-4 fw-bold text-success">
+                          {selectedOrder.totalPrice?.toLocaleString("vi-VN")} ₫
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Edit Modal */}
+              {showEditModal && selectedOrder && (
+                <div className="modal-overlay" onClick={(e) => {
+                  if (e.target === e.currentTarget) closeEditModal()
+                }}>
+                  <div className="modal-content-custom">
+                    <div className="modal-header-custom">
+                      <h3 className="modal-title">Chỉnh sửa đơn hàng #{selectedOrder.orderId}</h3>
+                      <button className="btn-close-custom" onClick={closeEditModal}>
+                        <X size={24} />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleUpdateStatus}>
+                      <div className="form-group">
+                        <label className="form-label">Trạng thái đơn hàng</label>
+                        <select
+                          value={editStatus}
+                          onChange={(e) => setEditStatus(e.target.value)}
+                          className="form-control-custom"
+                          required
+                        >
+                          <option value="PENDING">Chờ xử lý</option>
+                          <option value="PAID">Đã thanh toán</option>
+                          <option value="PROCESSING">Đang xử lý</option>
+                          <option value="COMPLETED">Hoàn thành</option>
+                          <option value="CANCELLED">Đã hủy</option>
+                        </select>
+                      </div>
+
+                      <div className="modal-footer-custom">
+                        <button type="button" className="btn-cancel" onClick={closeEditModal}>
+                          Hủy
+                        </button>
+                        <button type="submit" className="btn-submit">
+                          Cập nhật
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
-
-        {/* Mobile Overlay */}
-        <div className={`overlay ${!collapsed ? "show" : ""} d-md-none`} onClick={() => setCollapsed(true)}></div>
-
-        {/* Edit Order Modal */}
-        {showEditModal && (
-          <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">
-                    <i className="bi bi-pencil-square me-2"></i>
-                    Sửa đơn hàng #{editingOrder?.orderId}
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setShowEditModal(false)}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <div className="mb-3">
-                    <label className="form-label fw-bold">Trạng thái đơn hàng</label>
-                    <select
-                      className="form-select"
-                      value={editStatus}
-                      onChange={(e) => setEditStatus(e.target.value)}
-                    >
-                      <option value="PENDING">Chờ xử lý</option>
-                      <option value="PAID">Đã thanh toán</option>
-                      <option value="PROCESSING">Đang xử lý</option>
-                      <option value="COMPLETED">Hoàn thành</option>
-                      <option value="CANCELLED">Đã hủy</option>
-                    </select>
-                  </div>
-                  <div className="alert alert-info">
-                    <i className="bi bi-info-circle me-2"></i>
-                    Bạn có thể cập nhật trạng thái đơn hàng để phản ánh quá trình xử lý.
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowEditModal(false)}
-                  >
-                    <i className="bi bi-x-circle me-2"></i>
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={confirmEditOrder}
-                  >
-                    <i className="bi bi-check-circle me-2"></i>
-                    Lưu thay đổi
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Delete Order Modal */}
-        {showDeleteModal && (
-          <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header bg-danger text-white">
-                  <h5 className="modal-title">
-                    <i className="bi bi-trash me-2"></i>
-                    Xác nhận xóa đơn hàng
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close btn-close-white"
-                    onClick={() => setShowDeleteModal(false)}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <div className="alert alert-warning">
-                    <i className="bi bi-exclamation-triangle me-2"></i>
-                    <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác!
-                  </div>
-                  <p className="mb-2">Bạn có chắc chắn muốn xóa đơn hàng sau không?</p>
-                  <div className="card bg-light">
-                    <div className="card-body">
-                      <p className="mb-1">
-                        <strong>Mã đơn hàng:</strong> #{deletingOrder?.orderId}
-                      </p>
-                      <p className="mb-1">
-                        <strong>Khách hàng:</strong> {deletingOrder?.userId || "N/A"}
-                      </p>
-                      <p className="mb-0">
-                        <strong>Tổng tiền:</strong>{" "}
-                        <span className="text-danger fw-bold">
-                          {deletingOrder?.totalPrice?.toLocaleString("vi-VN")} đ
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setShowDeleteModal(false)}
-                  >
-                    <i className="bi bi-x-circle me-2"></i>
-                    Hủy
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={confirmDeleteOrder}
-                  >
-                    <i className="bi bi-trash me-2"></i>
-                    Xóa đơn hàng
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   )

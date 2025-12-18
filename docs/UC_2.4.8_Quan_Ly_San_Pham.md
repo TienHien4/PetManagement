@@ -43,3 +43,64 @@
 | 5c | Hệ thống | Nếu xóa sản phẩm có trong đơn hàng thì hiển thị "Không thể xóa sản phẩm đang có trong đơn hàng" |
 
 **Hậu điều kiện**: Sản phẩm được cập nhật trong hệ thống và hiển thị cho người mua
+
+## Biểu đồ Sequence - Quản lý sản phẩm
+
+```mermaid
+sequenceDiagram
+    actor Admin as Admin
+    participant UI as Giao diện
+    participant Controller as ProductController
+    participant Product as Product
+    participant DB as Database
+
+    %% Luồng thêm sản phẩm
+    Admin->>UI: 1. Click "Thêm sản phẩm mới"
+    UI->>Admin: 2. Hiển thị form nhập thông tin
+    Admin->>UI: 3. Nhập thông tin và nhấn "Lưu"
+    UI->>Controller: 4. POST /api/products
+    Controller->>Product: 5. Tạo Product mới
+    Product->>DB: 6. Lưu sản phẩm vào database
+    DB-->>Controller: 7. Trả về kết quả
+    Controller-->>UI: 8. Thông báo thành công
+    UI-->>Admin: 9. Hiển thị sản phẩm trong danh sách
+
+    %% Luồng sửa sản phẩm
+    Admin->>UI: 10. Click "Chỉnh sửa" sản phẩm
+    UI->>Controller: 11. GET /api/products/{id}
+    Controller->>DB: 12. Lấy thông tin Product
+    DB-->>UI: 13. Hiển thị form với thông tin hiện tại
+    Admin->>UI: 14. Cập nhật thông tin và nhấn "Cập nhật"
+    UI->>Controller: 15. PUT /api/products/{id}
+    Controller->>Product: 16. Cập nhật Product
+    Product->>DB: 17. Lưu thay đổi
+    DB-->>Controller: 18. Xác nhận cập nhật
+    Controller-->>UI: 19. Thông báo cập nhật thành công
+    UI-->>Admin: 20. Hiển thị thông tin đã cập nhật
+
+    %% Luồng xóa sản phẩm
+    Admin->>UI: 21. Click "Xóa" sản phẩm
+    UI->>Admin: 22. Hiển thị hộp thoại xác nhận
+    Admin->>UI: 23. Xác nhận xóa
+    UI->>Controller: 24. DELETE /api/products/{id}
+    Controller->>DB: 25. Xóa Product
+    DB-->>Controller: 26. Xác nhận xóa
+    Controller-->>UI: 27. Thông báo xóa thành công
+    UI-->>Admin: 28. Cập nhật danh sách
+
+    %% Luồng thay thế
+    alt Thông tin bắt buộc chưa nhập
+        Controller-->>UI: Trả về lỗi 400
+        UI-->>Admin: "Vui lòng nhập đầy đủ thông tin"
+    end
+
+    alt Giá hoặc số lượng không hợp lệ
+        Controller-->>UI: Trả về lỗi 400
+        UI-->>Admin: "Giá và số lượng phải là số dương"
+    end
+
+    alt Sản phẩm đang trong đơn hàng
+        Controller-->>UI: Trả về lỗi 409
+        UI-->>Admin: "Không thể xóa sản phẩm đang có trong đơn hàng"
+    end
+```

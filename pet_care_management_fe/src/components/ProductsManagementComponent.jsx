@@ -883,7 +883,7 @@ const ProductsManagement = () => {
 
                 {/* Modal for Create/Edit */}
                 {showModal && (
-                    <div className="modal-overlay" onClick={(e) => {
+                    <div className="modal-overlay" style={{ height: 600 }} onClick={(e) => {
                         if (e.target === e.currentTarget) closeModal()
                     }}>
                         <div className="modal-content-custom">
