@@ -36,6 +36,11 @@ public class PetController {
         return ResponseEntity.ok().body(petService.GetAllPet());
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<PetResponse>> GetAll() {
+        return ResponseEntity.ok().body(petService.GetAllPet());
+    }
+
     @GetMapping("/getPets/{keyword}")
     public ResponseEntity<List<PetResponse>> GetPetsByKeyword(@PathVariable String keyword) {
         var result = petService.GetPetByKeyword(keyword);

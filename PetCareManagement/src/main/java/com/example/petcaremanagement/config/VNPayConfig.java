@@ -24,11 +24,13 @@ public class VNPayConfig {
     private String vnpReturnUrl;
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static String vnp_ReturnUrl = "http://localhost:3000/payment/vnpay-return";
-    public static String vnp_TmnCode = "FMKNYP35";
-    public static String secretKey = "AEH2QS0QY1FLPKHLEHL5SLO32IIK5RSO";
+    public static String vnp_TmnCode = "ZVPB2B2U";
+    public static String secretKey = "04KYONFMB1A8DGOC3SM9XYSW242OVO2D";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
+
     public static String md5(String message) {
+
         String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

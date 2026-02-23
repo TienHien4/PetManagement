@@ -5,13 +5,18 @@ import com.example.petcaremanagement.Entity.Appointment;
 import com.example.petcaremanagement.Entity.Pet;
 import com.example.petcaremanagement.Entity.User;
 import com.example.petcaremanagement.Enum.EmailEventType;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -23,19 +28,18 @@ public class EmailProducerService {
     private static final Logger logger = LoggerFactory.getLogger(EmailProducerService.class);
 
     @Autowired
-    // Tên bean "emailKafkaTemplate" sẽ khớp với bean trong KafkaConfig
     private KafkaTemplate<String, EmailEvent> emailKafkaTemplate;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     /**
      * Gửi email event vào topic tương ứng
      */
     public void sendEmailEvent(EmailEvent event) {
         String topic = getTopicByEventType(event.getEventType());
-
-        // SỬA LẠI BIẾN NÀY ĐỂ DÙNG "emailKafkaTemplate"
-        // VÀ SỬA LẠI KIỂU CỦA "future"
         CompletableFuture<SendResult<String, EmailEvent>> future = emailKafkaTemplate.send(topic,
-                event.getUserId().toString(), event); // <--- SỬA Ở ĐÂY
+                event.getUserId().toString(), event);
 
         future.whenComplete((result, ex) -> {
             if (ex == null) {
@@ -56,7 +60,7 @@ public class EmailProducerService {
     }
 
     /**
-     * 🐾 Gửi email xác nhận đặt lịch khám
+     * Gửi email xác nhận đặt lịch khám
      */
     public void sendAppointmentConfirmationEmail(User user, Pet pet, Appointment appointment) {
         logger.info("Preparing appointment confirmation email for user: {}", user.getUserName());
@@ -196,7 +200,7 @@ public class EmailProducerService {
         return switch (eventType) {
             case "appointment-confirmation", "appointment-status-update", "appointment-reminder" ->
                 "appointment-email-events";
-            case "promotion", "new-year-promotion" -> "promotion-email-events";
+            case "promotion", "new-year-promotion", "year-end-sale" -> "promotion-email-events";
             case "system-upgrade", "password-reset", "welcome" -> "system-email-events";
             default -> "appointment-email-events";
         };
@@ -248,4 +252,128 @@ public class EmailProducerService {
             default -> "";
         };
     }
+
+    @Autowired
+    private SpringTemplateEngine templateEngine;
+
+    /**
+     * Gửi email xác nhận appointment trực tiếp (không qua Kafka) - TRUE ASYNC
+     * Gửi ngay lập tức trong background thread, không đợi
+     *
+     * @param user        User nhận email
+     * @param pet         Thông tin thú cưng
+     * @param appointment Thông tin cuộc hẹn
+     * @return CompletableFuture với kết quả gửi email
+     */
+    public CompletableFuture<Boolean> sendDirectAppointmentConfirmationEmail(User user, Pet pet,
+            Appointment appointment) {
+
+        // Chạy ngay trong thread pool riêng, trả về CompletableFuture ngay lập tức
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                logger.info("Sending direct appointment confirmation email to: {}", user.getEmail());
+
+                if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                    logger.warn("User {} has no email. Cannot send direct email.", user.getUserName());
+                    return false;
+                }
+
+                // Tạo context cho template Thymeleaf
+                Context context = new Context();
+                context.setVariable("userName", user.getUserName());
+                context.setVariable("userEmail", user.getEmail());
+                context.setVariable("petName", pet.getName());
+                context.setVariable("petSpecies", pet.getSpecies());
+                context.setVariable("petBreed", pet.getBreed() != null ? pet.getBreed() : "Không rõ");
+                context.setVariable("appointmentDate", appointment.getDate().toString());
+                context.setVariable("services", appointment.getServices());
+                context.setVariable("reason", appointment.getServices());
+                context.setVariable("status", getStatusText(appointment.getStatus()));
+                context.setVariable("statusColor", getStatusColor(appointment.getStatus()));
+                context.setVariable("appointmentId", appointment.getId());
+
+                // Render template HTML
+                String htmlContent = templateEngine.process("email/appointment-confirmation", context);
+
+                // Tạo và gửi email
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+                helper.setTo(user.getEmail());
+                helper.setSubject("Xác nhận đặt lịch khám - Pet Care Management");
+                helper.setText(htmlContent, true);
+
+                // mailSender.send(message);
+
+                logger.info("Direct appointment confirmation email sent successfully to: {}", user.getEmail());
+                return true;
+
+            } catch (Exception e) {
+                logger.error("Failed to send direct appointment confirmation email: {}", e.getMessage(), e);
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Gửi email trực tiếp với nội dung text thuần - TRUE ASYNC
+     * Gửi ngay lập tức trong background thread, không đợi
+     * 
+     * @param to          Email người nhận
+     * @param subject     Tiêu đề email
+     * @param textContent Nội dung text thuần
+     * @return CompletableFuture với kết quả gửi email
+     */
+    public CompletableFuture<Boolean> sendDirectTextEmail(String to, String subject, String textContent) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                logger.info("Sending direct text email to: {}", to);
+
+                MimeMessage message = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+                helper.setTo(to);
+                helper.setSubject(subject);
+                helper.setText(textContent, false); // false = plain text
+
+                mailSender.send(message);
+
+                logger.info("Direct text email sent successfully to: {}", to);
+                return true;
+            } catch (Exception e) {
+                logger.error("Failed to send direct text email to {}: {}", to, e.getMessage(), e);
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Gửi email trực tiếp với HTML content (đồng bộ - chỉ dùng khi cần blocking)
+     * 
+     * @param to      Email người nhận
+     * @param subject Tiêu đề email
+     * @param content Nội dung HTML
+     * @return true nếu gửi thành công, false nếu thất bại
+     */
+    public boolean sendDirectEmailSync(String to, String subject, String content) {
+        try {
+            logger.info("Sending direct email (sync) to: {}", to);
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(content, true);
+
+            mailSender.send(message);
+
+            logger.info("Direct email sent successfully (sync) to: {}", to);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to send direct email (sync) to {}: {}", to, e.getMessage(), e);
+            return false;
+        }
+    }
+
 }

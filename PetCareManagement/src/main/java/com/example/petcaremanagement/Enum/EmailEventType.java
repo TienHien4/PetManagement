@@ -6,6 +6,7 @@ public enum EmailEventType {
     APPOINTMENT_REMINDER("appointment-reminder", "email/appointment-reminder"),
     PROMOTION("promotion", "email/promotion"),
     NEW_YEAR_PROMOTION("new-year-promotion", "email/new-year-promotion"),
+    YEAR_END_SALE("year-end-sale", "email/year-end-sale"),
     SYSTEM_UPGRADE("system-upgrade", "email/system-upgrade"),
     WELCOME_EMAIL("welcome", "email/welcome"),
     PASSWORD_RESET("password-reset", "email/password-reset");

@@ -23,18 +23,29 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public MedicalRecordResponse createMedicalRecord(MedicalRecordRequest request) {
+        // Validate required fields
+        if (request.getPetId() == null) {
+            throw new IllegalArgumentException("Pet ID is required");
+        }
+        if (request.getDiagnosis() == null || request.getDiagnosis().trim().isEmpty()) {
+            throw new IllegalArgumentException("Diagnosis is required");
+        }
+        if (request.getRecordDate() == null) {
+            throw new IllegalArgumentException("Record date is required");
+        }
+
         Pet pet = petRepository.findById(request.getPetId())
-                .orElseThrow(() -> new RuntimeException("Pet not found"));
+                .orElseThrow(() -> new RuntimeException("Pet not found with ID: " + request.getPetId()));
 
         MedicalRecord medicalRecord = MedicalRecord.builder()
                 .pet(pet)
                 .visitDate(request.getRecordDate())
-                .diagnosis(request.getDiagnosis())
-                .treatment(request.getTreatment())
-                .veterinarian(request.getVeterinarian())
-                .clinic(request.getClinic())
-                .symptoms(request.getSymptoms())
-                .notes(request.getNotes())
+                .diagnosis(request.getDiagnosis().trim())
+                .treatment(request.getTreatment() != null ? request.getTreatment().trim() : null)
+                .veterinarian(request.getVeterinarian() != null ? request.getVeterinarian().trim() : null)
+                .clinic(request.getClinic() != null ? request.getClinic().trim() : null)
+                .symptoms(request.getSymptoms() != null ? request.getSymptoms().trim() : null)
+                .notes(request.getNotes() != null ? request.getNotes().trim() : null)
                 .createdAt(new Date())
                 .build();
 
@@ -44,16 +55,24 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public MedicalRecordResponse updateMedicalRecord(Long id, MedicalRecordRequest request) {
+        // Validate required fields
+        if (request.getDiagnosis() == null || request.getDiagnosis().trim().isEmpty()) {
+            throw new IllegalArgumentException("Diagnosis is required");
+        }
+        if (request.getRecordDate() == null) {
+            throw new IllegalArgumentException("Record date is required");
+        }
+
         MedicalRecord medicalRecord = medicalRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Medical record not found"));
+                .orElseThrow(() -> new RuntimeException("Medical record not found with ID: " + id));
 
         medicalRecord.setVisitDate(request.getRecordDate());
-        medicalRecord.setDiagnosis(request.getDiagnosis());
-        medicalRecord.setTreatment(request.getTreatment());
-        medicalRecord.setVeterinarian(request.getVeterinarian());
-        medicalRecord.setClinic(request.getClinic());
-        medicalRecord.setSymptoms(request.getSymptoms());
-        medicalRecord.setNotes(request.getNotes());
+        medicalRecord.setDiagnosis(request.getDiagnosis().trim());
+        medicalRecord.setTreatment(request.getTreatment() != null ? request.getTreatment().trim() : null);
+        medicalRecord.setVeterinarian(request.getVeterinarian() != null ? request.getVeterinarian().trim() : null);
+        medicalRecord.setClinic(request.getClinic() != null ? request.getClinic().trim() : null);
+        medicalRecord.setSymptoms(request.getSymptoms() != null ? request.getSymptoms().trim() : null);
+        medicalRecord.setNotes(request.getNotes() != null ? request.getNotes().trim() : null);
 
         MedicalRecord updated = medicalRecordRepository.save(medicalRecord);
         return convertToResponse(updated);
@@ -85,7 +104,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public void deleteMedicalRecord(Long id) {
         if (!medicalRecordRepository.existsById(id)) {
-            throw new RuntimeException("Medical record not found");
+            throw new RuntimeException("Medical record not found with ID: " + id);
         }
         medicalRecordRepository.deleteById(id);
     }

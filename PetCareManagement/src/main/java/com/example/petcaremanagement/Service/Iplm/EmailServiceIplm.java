@@ -36,38 +36,39 @@ public class EmailServiceIplm implements EmailService {
     @Value("classpath:templates/email/appointment-status-update.html")
     private Resource appointmentStatusUpdateTemplate;
 
-
     /**
      * Gửi email xác nhận đặt lịch khám (qua Kafka - BẤT ĐỒNG BỘ)
      */
     @Override
     public void sendAppointmentConfirmation(Appointment appointment, User user, Pet pet) {
         try {
-            logger.info("=== SENDING APPOINTMENT CONFIRMATION VIA KAFKA ===");
-            logger.info("User: {} (ID: {}, Email: {})", user.getUserName(), user.getId(), user.getEmail());
-            logger.info("Pet: {} ({})", pet.getName(), pet.getSpecies());
-            logger.info("Appointment ID: {}, Date: {}", appointment.getId(), appointment.getDate());
-            logger.info("Status: {}", appointment.getStatus());
-            logger.info("=========================================================");
 
             // Validate
             if (user.getEmail() == null || user.getEmail().isEmpty()) {
                 logger.warn("User {} has no email address. Email notification skipped.", user.getUserName());
                 return;
             }
-            // Gửi vào Kafka (BẤT ĐỒNG BỘ - không chờ)
-            emailProducerService.sendAppointmentConfirmationEmail(user, pet, appointment);
-            logger.info("Appointment confirmation email event sent to Kafka successfully");
+
+            // Gửi email bất đồng bộ - trả về ngay lập tức
+            emailProducerService.sendDirectAppointmentConfirmationEmail(user, pet, appointment)
+                    .thenAccept(success -> {
+                        if (success) {
+                            logger.info("Email queued successfully for: {}", user.getEmail());
+                        } else {
+                            logger.warn("Email failed for: {}", user.getEmail());
+                        }
+                    });
+
+            logger.info("Email sending initiated (non-blocking)");
 
         } catch (Exception e) {
-            logger.error("Failed to send appointment confirmation event to Kafka", e);
+            logger.error("Failed to initiate email sending", e);
         }
     }
 
-
     @Override
     public void sendAppointmentStatusUpdate(Appointment appointment, User user, Pet pet,
-                                            String oldStatus, String newStatus) {
+            String oldStatus, String newStatus) {
         try {
             logger.info("User: {} ({})", user.getUserName(), user.getEmail());
             logger.info("Pet: {}", pet.getName());
@@ -127,7 +128,7 @@ public class EmailServiceIplm implements EmailService {
 
             helper.setText(emailContent, true);
 
-            mailSender.send(message);
+//            mailSender.send(message);
             logger.info("Appointment confirmation email sent successfully via SMTP");
 
         } catch (MessagingException | IOException e) {
@@ -141,7 +142,7 @@ public class EmailServiceIplm implements EmailService {
      */
     @Override
     public void sendAppointmentStatusUpdateDirect(Appointment appointment, User user, Pet pet,
-                                                  String oldStatus, String newStatus) {
+            String oldStatus, String newStatus) {
         try {
             logger.info("=== SENDING STATUS UPDATE VIA SMTP ===");
             logger.info("User: {} ({})", user.getUserName(), user.getEmail());
@@ -184,7 +185,8 @@ public class EmailServiceIplm implements EmailService {
     /**
      * Thay thế các placeholder trong template xác nhận lịch hẹn
      */
-    private String populateAppointmentConfirmationTemplate(String template, Appointment appointment, User user, Pet pet) {
+    private String populateAppointmentConfirmationTemplate(String template, Appointment appointment, User user,
+            Pet pet) {
         return template
                 .replace("{{userName}}", user.getUserName())
                 .replace("{{petName}}", pet.getName())
@@ -198,7 +200,7 @@ public class EmailServiceIplm implements EmailService {
      * Thay thế các placeholder trong template cập nhật trạng thái
      */
     private String populateStatusUpdateTemplate(String template, Appointment appointment, User user, Pet pet,
-                                                String oldStatus, String newStatus) {
+            String oldStatus, String newStatus) {
         return template
                 .replace("{{userName}}", user.getUserName())
                 .replace("{{petName}}", pet.getName())

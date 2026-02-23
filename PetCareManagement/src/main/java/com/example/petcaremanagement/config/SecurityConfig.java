@@ -45,9 +45,11 @@ public class SecurityConfig {
                                                 "/login/**", "/api/pet/**", "/uploads/pets/**", "/refreshToken",
                                                 "/oauth2/**")
                                 .permitAll()
-                                .requestMatchers("/ws/**").permitAll()  // Allow WebSocket connections
+                                .requestMatchers("/ws/**").permitAll() // Allow WebSocket connections
                                 .requestMatchers("/api/vet-dashboard/**").hasRole("VET")
+                                .requestMatchers(HttpMethod.GET, "/api/vet/**").permitAll()
                                 .requestMatchers("/api/payment/**").permitAll()
+                                .requestMatchers("/api/chatbot/**").permitAll()
                                 .anyRequest().authenticated());
                 httpSecurity.oauth2Login(oauth2 -> oauth2
                                 .userInfoEndpoint(
@@ -91,7 +93,7 @@ public class SecurityConfig {
         private final List<String> ALLOWED_ORIGINS = List.of(
                         "http://localhost:3000",
                         "http://localhost:3001",
-                "https://dbmh3ml6-3000.asse.devtunnels.ms");
+                        "https://dbmh3ml6-3000.asse.devtunnels.ms");
         private final List<String> ALLOWED_HTTP_METHODS = List.of(
                         GET.toString(),
                         POST.toString(),

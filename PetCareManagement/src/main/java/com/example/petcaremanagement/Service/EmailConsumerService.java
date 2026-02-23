@@ -30,12 +30,7 @@ public class EmailConsumerService {
         System.out.println("EmailConsumerService CONSTRUCTOR called");
     }
 
-
-//    @KafkaListener(
-//            topics = "appointment-email-events",
-//            groupId = "${spring.kafka.consumer.group-id}",
-//            containerFactory = "emailKafkaListenerFactory"
-//    )
+    @KafkaListener(topics = "appointment-email-events", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "emailKafkaListenerFactory")
     public void consumeAppointmentEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
         System.out.println("MESSAGE RECEIVED FROM KAFKA!");
         System.out.println("User: " + event.getUserName());
@@ -43,12 +38,22 @@ public class EmailConsumerService {
 
         processEmailEvent(event, acknowledgment);
     }
-    
-//    @KafkaListener(
-//            topics = "string-test-topic",
-//            groupId = "test-group-string",
-//            containerFactory = "stringKafkaListenerFactory"
-//    )
+
+    @KafkaListener(topics = "promotion-email-events", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "emailKafkaListenerFactory")
+    public void consumePromotionEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
+        System.out.println("PROMOTION EMAIL RECEIVED FROM KAFKA!");
+        System.out.println("User: " + event.getUserName());
+        System.out.println("Email: " + event.getUserEmail());
+        System.out.println("Event Type: " + event.getEventType());
+
+        processEmailEvent(event, acknowledgment);
+    }
+
+    // @KafkaListener(
+    // topics = "string-test-topic",
+    // groupId = "test-group-string",
+    // containerFactory = "stringKafkaListenerFactory"
+    // )
     public void listenStringTest(String message) {
         System.out.println("============================================");
         System.out.println("Nội dung: " + message);
@@ -58,7 +63,8 @@ public class EmailConsumerService {
     private void processEmailEvent(EmailEvent event, Acknowledgment acknowledgment) {
         try {
             if (event.getUserEmail() == null || event.getUserEmail().isEmpty()) {
-                if (acknowledgment != null) acknowledgment.acknowledge();
+                if (acknowledgment != null)
+                    acknowledgment.acknowledge();
                 return;
             }
 
