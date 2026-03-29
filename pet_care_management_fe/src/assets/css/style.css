@@ -1,4 +1,4 @@
-.flex-center-start {
+﻿.flex-center-start {
   display: -webkit-box;
   display: -ms-flexbox;
 
@@ -107,7 +107,7 @@ p {
 label {
   color: #7e7e7e;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
 }
 
@@ -131,25 +131,25 @@ label {
 
 *::-webkit-input-placeholder {
   color: #cccccc;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
 }
 
 *:-ms-input-placeholder {
   color: #cccccc;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
 }
 
 *::-ms-input-placeholder {
   color: #cccccc;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
 }
 
 *::placeholder {
   color: #cccccc;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
 }
 
@@ -295,7 +295,7 @@ h3 {
   display: inline-block;
   padding: 18px 44px;
   font-family: "Poppins", sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   border: 0;
   border: 1px solid #ff3500;
@@ -373,7 +373,7 @@ h3 {
   display: inline-block;
   padding: 18px 24px;
   font-family: "Poppins", sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   border: 0;
   border: 1px solid #fff;
@@ -420,7 +420,7 @@ h3 {
 
 .book_now {
   display: inline-block;
-  font-size: 14px;
+  font-size: 16px;
   color: #009DFF;
   border: 1px solid #009DFF;
   text-transform: capitalize;
@@ -887,7 +887,7 @@ h3 {
 .header-area .main-header-area .Appointment .book_btn a {
   background: #009DFF;
   padding: 12px 26px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   border: 1px solid transparent;
   color: #fff;
@@ -1158,7 +1158,7 @@ h3 {
   .header-area .header-top_area .short_contact_list ul li a {
     margin-left: 0;
     margin-right: 5px;
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 10px;
     display: inline-block;
   }
@@ -1611,7 +1611,7 @@ h3 {
 }
 
 .team_area .single_team .member_name .mamber_inner p {
-  font-size: 14px;
+  font-size: 16px;
   color: #7a7b7c;
   font-weight: 400;
   margin-bottom: 0;
@@ -1717,7 +1717,7 @@ h3 {
 
 .footer .footer_top .footer_widget p {
   color: #AAB1B7;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 26px;
   color: #AAB1B7;
@@ -1813,7 +1813,7 @@ h3 {
   right: 0;
   height: 40px;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   color: #fff;
   background: #eb592d;
   padding: 10px;
@@ -1822,13 +1822,13 @@ h3 {
   border-radius: 30px;
   top: 5px;
   right: 5px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   font-family: "Open Sans", sans-serif;
 }
 
 .footer .footer_top .footer_widget .newsletter_text {
-  font-size: 14px;
+  font-size: 16px;
   color: #AAB1B7;
   line-height: 26px;
   font-family: "Open Sans", sans-serif;
@@ -2107,7 +2107,7 @@ h3 {
 }
 
 .form-contact label {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .form-contact .form-group {
@@ -2119,7 +2119,7 @@ h3 {
   border-radius: 0px;
   height: 48px;
   padding-left: 18px;
-  font-size: 13px;
+  font-size: 15px;
   background: transparent;
 }
 
@@ -2242,7 +2242,7 @@ h5 {
 }
 
 h6 {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 h1,
@@ -2318,3 +2318,4 @@ a {
 .account-dropdown:hover .dropdown-content {
   display: block;
 }
+

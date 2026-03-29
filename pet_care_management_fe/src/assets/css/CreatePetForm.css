@@ -1,4 +1,4 @@
-.pet-form-container {
+﻿.pet-form-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
@@ -41,7 +41,7 @@
 .input-field label {
   display: block;
   margin-bottom: 5px;
-  font-size: 14px;
+  font-size: 16px;
   color: #666;
 }
 
@@ -72,11 +72,12 @@
 
 .submit-button:hover {
   background-color: #45a049;
-}/* Cập nhật phần label trong file CSS */
+}/* Cáº­p nháº­t pháº§n label trong file CSS */
 .input-field label {
   display: block;
-  margin-bottom: 8px;  /* Tăng khoảng cách dưới */
-  font-size: 16px;    /* Tăng cỡ chữ từ 14px lên 16px */
-  color: #333;        /* Màu tối hơn */
-  font-weight: 600;   /* Độ đậm hơn (600 thay vì normal 400) */
+  margin-bottom: 8px;  /* TÄƒng khoáº£ng cÃ¡ch dÆ°á»›i */
+  font-size: 16px;    /* TÄƒng cá»¡ chá»¯ tá»« 14px lÃªn 16px */
+  color: #333;        /* MÃ u tá»‘i hÆ¡n */
+  font-weight: 600;   /* Äá»™ Ä‘áº­m hÆ¡n (600 thay vÃ¬ normal 400) */
 }
+

@@ -1,4 +1,4 @@
-.profile body {
+﻿.profile body {
     font-family: Arial, sans-serif;
     margin: 0;
     background-color: #f5f5f5;
@@ -94,7 +94,7 @@
     margin-bottom: 5px;
     font-weight: normal;
     color: #333;
-    font-size: 14px;
+    font-size: 16px;
     font-family: Arial, sans-serif;
 }
 
@@ -102,15 +102,15 @@
 .profile .form-group select,
 .profile .form-group textarea {
     width: 400px;
-    /* Đặt chiều rộng cố định để căn chỉnh thẳng hàng */
+    /* Äáº·t chiá»u rá»™ng cá»‘ Ä‘á»‹nh Ä‘á»ƒ cÄƒn chá»‰nh tháº³ng hÃ ng */
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 16px;
     background-color: #fff;
     font-family: Arial, sans-serif;
     box-sizing: border-box;
-    /* Đảm bảo padding và border không làm thay đổi kích thước */
+    /* Äáº£m báº£o padding vÃ  border khÃ´ng lÃ m thay Ä‘á»•i kÃ­ch thÆ°á»›c */
 }
 
 .profile .form-group input[readonly] {
@@ -125,12 +125,12 @@
 .profile .email-wrapper {
     position: relative;
     display: inline-block;
-    /* Đổi từ flex sang inline-block để không ảnh hưởng đến chiều rộng */
+    /* Äá»•i tá»« flex sang inline-block Ä‘á»ƒ khÃ´ng áº£nh hÆ°á»Ÿng Ä‘áº¿n chiá»u rá»™ng */
 }
 
 .profile .email-wrapper input {
     width: 400px;
-    /* Đảm bảo input có chiều rộng cố định */
+    /* Äáº£m báº£o input cÃ³ chiá»u rá»™ng cá»‘ Ä‘á»‹nh */
 }
 
 .profile .add-email-icon {
@@ -146,12 +146,12 @@
 .profile .date-wrapper {
     position: relative;
     display: inline-block;
-    /* Đổi từ flex sang inline-block để không ảnh hưởng đến chiều rộng */
+    /* Äá»•i tá»« flex sang inline-block Ä‘á»ƒ khÃ´ng áº£nh hÆ°á»Ÿng Ä‘áº¿n chiá»u rá»™ng */
 }
 
 .profile .date-wrapper input {
     width: 400px;
-    /* Đảm bảo input có chiều rộng cố định */
+    /* Äáº£m báº£o input cÃ³ chiá»u rá»™ng cá»‘ Ä‘á»‹nh */
 }
 
 .profile .calendar-icon {
@@ -178,7 +178,7 @@
     align-items: center;
     gap: 5px;
     font-weight: normal;
-    font-size: 14px;
+    font-size: 16px;
     color: #333;
     font-family: Arial, sans-serif;
 }
@@ -194,7 +194,7 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     font-family: Arial, sans-serif;
 }
 
@@ -287,3 +287,4 @@
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+

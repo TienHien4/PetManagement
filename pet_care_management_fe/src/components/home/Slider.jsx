@@ -258,7 +258,7 @@ const Slider = () => {
               <div className="hero-brand-icon">
                 <i className="bi bi-heart-pulse-fill"></i>
               </div>
-              <h2 className="hero-brand-title">PetCare Management</h2>
+              <h2 className="hero-brand-title">Veterinary Clinic</h2>
               <p className="hero-brand-sub">Hệ thống quản lý thú cưng chuyên nghiệp</p>
               <div className="hero-brand-line"></div>
             </div>

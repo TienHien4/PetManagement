@@ -777,8 +777,8 @@ const Header = () => {
             <div className="row align-items-center">
               <div className="col-lg-2 col-md-4 col-6">
                 <div className="logo-container">
-                  <img src={logo} alt="Pet Care Logo" className="logo-img" />
-                  <span className="brand-text">PetCare</span>
+                  <img src={logo} alt="Veterinary Clinic Logo" className="logo-img" />
+                  <span className="brand-text">Veterinary Clinic</span>
                 </div>
               </div>
 
@@ -817,8 +817,8 @@ const Header = () => {
         <div className={`mobile-menu ${isMobileMenuOpen ? "open" : ""}`}>
           <div className="mobile-menu-header">
             <div className="logo-container">
-              <img src="/placeholder.svg?height=45&width=45" alt="Pet Care Logo" className="logo-img" />
-              <span className="brand-text">PetCare</span>
+              <img src="/placeholder.svg?height=45&width=45" alt="Veterinary Clinic Logo" className="logo-img" />
+              <span className="brand-text">Veterinary Clinic</span>
             </div>
             <button className="mobile-close-btn" onClick={() => setIsMobileMenuOpen(false)}>
               <i className="bi bi-x-lg"></i>

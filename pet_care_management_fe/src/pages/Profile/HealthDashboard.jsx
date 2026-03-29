@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
@@ -30,7 +30,7 @@ const HealthDashboard = () => {
       setPets(petsRes.data)
     } catch (error) {
       console.error("Error fetching pets:", error)
-      alert("Không thể tải danh sách thú cưng!")
+      alert("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch thÃº cÆ°ng!")
     } finally {
       setLoading(false)
     }
@@ -42,11 +42,11 @@ const HealthDashboard = () => {
     const daysSinceCheckup = Math.floor((new Date() - new Date(lastCheckup)) / (1000 * 60 * 60 * 24))
 
     if (daysSinceCheckup > 365) {
-      return { status: 'critical', text: 'Cần khám ngay', color: 'danger', days: daysSinceCheckup }
+      return { status: 'critical', text: 'Cáº§n khÃ¡m ngay', color: 'danger', days: daysSinceCheckup }
     } else if (daysSinceCheckup > 180) {
-      return { status: 'warning', text: 'Cần khám sớm', color: 'warning', days: daysSinceCheckup }
+      return { status: 'warning', text: 'Cáº§n khÃ¡m sá»›m', color: 'warning', days: daysSinceCheckup }
     } else {
-      return { status: 'good', text: 'Tốt', color: 'success', days: daysSinceCheckup }
+      return { status: 'good', text: 'Tá»‘t', color: 'success', days: daysSinceCheckup }
     }
   }
 
@@ -56,9 +56,9 @@ const HealthDashboard = () => {
     const dueVaccines = vaccines.filter(v => v.status === 'due').length
 
     if (dueVaccines > 0) {
-      return { status: 'due', text: `${dueVaccines} mũi đến hạn`, color: 'warning' }
+      return { status: 'due', text: `${dueVaccines} mÅ©i Ä‘áº¿n háº¡n`, color: 'warning' }
     }
-    return { status: 'current', text: 'Đã cập nhật', color: 'success' }
+    return { status: 'current', text: 'ÄÃ£ cáº­p nháº­t', color: 'success' }
   }
 
   const filteredPets = pets.filter(pet => {
@@ -92,7 +92,7 @@ const HealthDashboard = () => {
           <div className="spinner-border text-primary mb-3" role="status" style={{ width: "3rem", height: "3rem" }}>
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="text-muted fs-5">Đang tải thông tin...</p>
+          <p className="text-muted fs-5">Äang táº£i thÃ´ng tin...</p>
         </div>
       </div>
     )
@@ -177,7 +177,7 @@ const HealthDashboard = () => {
         }
 
         .stat-label {
-          font-size: 14px;
+          font-size: 16px;
           opacity: 0.8;
           margin: 0;
         }
@@ -245,7 +245,7 @@ const HealthDashboard = () => {
 
         .pet-details {
           color: #666;
-          font-size: 14px;
+          font-size: 16px;
           margin: 0;
         }
 
@@ -264,14 +264,14 @@ const HealthDashboard = () => {
         }
 
         .indicator-label {
-          font-size: 12px;
+          font-size: 14px;
           color: #666;
           margin-bottom: 4px;
         }
 
         .indicator-value {
           font-weight: 600;
-          font-size: 14px;
+          font-size: 16px;
         }
 
         .pet-actions {
@@ -284,7 +284,7 @@ const HealthDashboard = () => {
           padding: 8px 12px;
           border: none;
           border-radius: 8px;
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -424,8 +424,8 @@ const HealthDashboard = () => {
       <div className="dashboard-container">
         <div className="dashboard-content">
           <div className="header-section">
-            <h1 className="dashboard-title">TỔNG QUAN SỨC KHỎE</h1>
-            <p className="dashboard-subtitle">Theo dõi tình trạng sức khỏe của tất cả thú cưng</p>
+            <h1 className="dashboard-title">Tá»”NG QUAN Sá»¨C KHá»ŽE</h1>
+            <p className="dashboard-subtitle">Theo dÃµi tÃ¬nh tráº¡ng sá»©c khá»e cá»§a táº¥t cáº£ thÃº cÆ°ng</p>
           </div>
 
           <div className="stats-section">
@@ -435,7 +435,7 @@ const HealthDashboard = () => {
             >
               <i className="bi bi-heart-pulse stat-icon text-primary"></i>
               <div className="stat-number">{filterCounts.all}</div>
-              <p className="stat-label">Tổng số thú cưng</p>
+              <p className="stat-label">Tá»•ng sá»‘ thÃº cÆ°ng</p>
             </div>
 
             <div
@@ -444,7 +444,7 @@ const HealthDashboard = () => {
             >
               <i className="bi bi-check-circle stat-icon text-success"></i>
               <div className="stat-number">{filterCounts.good}</div>
-              <p className="stat-label">Sức khỏe tốt</p>
+              <p className="stat-label">Sá»©c khá»e tá»‘t</p>
             </div>
 
             <div
@@ -453,7 +453,7 @@ const HealthDashboard = () => {
             >
               <i className="bi bi-exclamation-triangle stat-icon text-warning"></i>
               <div className="stat-number">{filterCounts.warning}</div>
-              <p className="stat-label">Cần chú ý</p>
+              <p className="stat-label">Cáº§n chÃº Ã½</p>
             </div>
 
             <div
@@ -462,17 +462,17 @@ const HealthDashboard = () => {
             >
               <i className="bi bi-x-circle stat-icon text-danger"></i>
               <div className="stat-number">{filterCounts.critical}</div>
-              <p className="stat-label">Cần khám ngay</p>
+              <p className="stat-label">Cáº§n khÃ¡m ngay</p>
             </div>
           </div>
 
           <div className="pets-section">
             <div className="section-header">
               <h2 className="section-title">
-                {selectedFilter === 'all' ? 'Tất cả thú cưng' :
-                  selectedFilter === 'good' ? 'Thú cưng có sức khỏe tốt' :
-                    selectedFilter === 'warning' ? 'Thú cưng cần chú ý' :
-                      'Thú cưng cần khám ngay'} ({filteredPets.length})
+                {selectedFilter === 'all' ? 'Táº¥t cáº£ thÃº cÆ°ng' :
+                  selectedFilter === 'good' ? 'ThÃº cÆ°ng cÃ³ sá»©c khá»e tá»‘t' :
+                    selectedFilter === 'warning' ? 'ThÃº cÆ°ng cáº§n chÃº Ã½' :
+                      'ThÃº cÆ°ng cáº§n khÃ¡m ngay'} ({filteredPets.length})
               </h2>
             </div>
 
@@ -493,35 +493,35 @@ const HealthDashboard = () => {
                         <div className="pet-info">
                           <h5>{pet.name}</h5>
                           <p className="pet-details">
-                            {pet.species === "Dog" ? "🐕 Chó" : pet.species === "Cat" ? "🐱 Mèo" : pet.species} •
-                            {pet.breed} • {pet.age} tuổi
+                            {pet.species === "Dog" ? "ðŸ• ChÃ³" : pet.species === "Cat" ? "ðŸ± MÃ¨o" : pet.species} â€¢
+                            {pet.breed} â€¢ {pet.age} tuá»•i
                           </p>
                         </div>
                       </div>
 
                       <div className="health-indicators">
                         <div className="health-indicator">
-                          <div className="indicator-label">Tình trạng sức khỏe</div>
+                          <div className="indicator-label">TÃ¬nh tráº¡ng sá»©c khá»e</div>
                           <div className={`indicator-value text-${healthStatus.color}`}>
                             {healthStatus.text}
                           </div>
                         </div>
                         <div className="health-indicator">
-                          <div className="indicator-label">Tiêm chủng</div>
+                          <div className="indicator-label">TiÃªm chá»§ng</div>
                           <div className={`indicator-value text-${vaccinationStatus.color}`}>
                             {vaccinationStatus.text}
                           </div>
                         </div>
                         <div className="health-indicator">
-                          <div className="indicator-label">Khám lần cuối</div>
+                          <div className="indicator-label">KhÃ¡m láº§n cuá»‘i</div>
                           <div className="indicator-value">
-                            {healthStatus.days} ngày trước
+                            {healthStatus.days} ngÃ y trÆ°á»›c
                           </div>
                         </div>
                         <div className="health-indicator">
-                          <div className="indicator-label">Cân nặng</div>
+                          <div className="indicator-label">CÃ¢n náº·ng</div>
                           <div className="indicator-value">
-                            {pet.weight || 'Chưa cập nhật'} kg
+                            {pet.weight || 'ChÆ°a cáº­p nháº­t'} kg
                           </div>
                         </div>
                       </div>
@@ -532,14 +532,14 @@ const HealthDashboard = () => {
                           className="action-btn btn-primary-custom"
                         >
                           <i className="bi bi-eye"></i>
-                          Xem chi tiết
+                          Xem chi tiáº¿t
                         </Link>
                         <Link
                           to={`/pet/health/${pet.id}/add`}
                           className="action-btn btn-outline-custom"
                         >
                           <i className="bi bi-plus-circle"></i>
-                          Thêm hồ sơ
+                          ThÃªm há»“ sÆ¡
                         </Link>
                       </div>
                     </div>
@@ -549,11 +549,11 @@ const HealthDashboard = () => {
             ) : (
               <div className="empty-state">
                 <i className="bi bi-search empty-icon"></i>
-                <h3 className="empty-title">Không tìm thấy thú cưng</h3>
+                <h3 className="empty-title">KhÃ´ng tÃ¬m tháº¥y thÃº cÆ°ng</h3>
                 <p className="empty-text">
                   {selectedFilter === 'all'
-                    ? 'Bạn chưa có thú cưng nào được đăng ký.'
-                    : 'Không có thú cưng nào phù hợp với bộ lọc đã chọn.'
+                    ? 'Báº¡n chÆ°a cÃ³ thÃº cÆ°ng nÃ o Ä‘Æ°á»£c Ä‘Äƒng kÃ½.'
+                    : 'KhÃ´ng cÃ³ thÃº cÆ°ng nÃ o phÃ¹ há»£p vá»›i bá»™ lá»c Ä‘Ã£ chá»n.'
                   }
                 </p>
               </div>
@@ -563,14 +563,14 @@ const HealthDashboard = () => {
           <div className="emergency-section">
             <h3 className="emergency-title">
               <i className="bi bi-exclamation-triangle-fill me-2"></i>
-              Trường hợp khẩn cấp?
+              TrÆ°á»ng há»£p kháº©n cáº¥p?
             </h3>
             <p className="emergency-text">
-              Nếu thú cưng của bạn có triệu chứng bất thường hoặc cần cấp cứu ngay lập tức
+              Náº¿u thÃº cÆ°ng cá»§a báº¡n cÃ³ triá»‡u chá»©ng báº¥t thÆ°á»ng hoáº·c cáº§n cáº¥p cá»©u ngay láº­p tá»©c
             </p>
             <a href="tel:1900-1234" className="emergency-btn">
               <i className="bi bi-telephone-fill"></i>
-              Gọi hotline: 1900-1234
+              Gá»i hotline: 1900-1234
             </a>
           </div>
         </div>
@@ -580,3 +580,4 @@ const HealthDashboard = () => {
 }
 
 export default HealthDashboard
+

@@ -70,6 +70,7 @@ const PetRegistrationForm = () => {
       console.log("Services:", res.data)
       const formattedServices = res.data.map(service => ({
         value: service.name,
+        displayName: getServiceDisplayName(service.name),
         icon: getServiceIcon(service.name),
         color: getServiceColor(service.name),
         price: service.price
@@ -79,39 +80,151 @@ const PetRegistrationForm = () => {
       console.error("Error fetching services:", error)
       // Fallback to hardcoded services if API fails
       setServiceOptions([
-        { value: "Khám tổng quát", icon: "bi-heart-pulse", color: "#ff6b6b" },
-        { value: "Tiêm phòng", icon: "bi-shield-plus", color: "#4ecdc4" },
-        { value: "Tắm và cắt tỉa lông", icon: "bi-scissors", color: "#45b7d1" },
+        { value: "Khám tổng quát", displayName: "Khám tổng quát", icon: "bi-heart-pulse", color: "#ff6b6b" },
+        { value: "Tiêm phòng", displayName: "Tiêm phòng", icon: "bi-shield-plus", color: "#4ecdc4" },
+        { value: "Tắm và cắt tỉa lông", displayName: "Tắm và cắt tỉa lông", icon: "bi-scissors", color: "#45b7d1" },
       ])
     }
   }
 
-  const getServiceIcon = (serviceName) => {
-    const iconMap = {
-      "Khám tổng quát": "bi-heart-pulse",
-      "Tiêm phòng": "bi-shield-plus",
-      "Phẫu thuật": "bi-bandaid",
-      "Nha khoa": "bi-tooth",
-      "Tắm và cắt tỉa lông": "bi-scissors",
-      "Siêu âm": "bi-soundwave",
-      "X-quang": "bi-x-diamond",
-      "Xét nghiệm máu": "bi-droplet"
+  const fixMojibake = (text) => {
+    if (typeof text !== "string") return ""
+    const looksBroken = /[ÃÂÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßáºá»â€]/.test(text)
+    if (!looksBroken) return text
+
+    const decodeUtf8FromLatin1 = (value) => {
+      try {
+        const bytes = Uint8Array.from([...value].map((ch) => ch.charCodeAt(0) & 0xff))
+        return new TextDecoder("utf-8", { fatal: false }).decode(bytes)
+      } catch {
+        return value
+      }
     }
-    return iconMap[serviceName] || "bi-gear"
+
+    let fixed = text
+    for (let i = 0; i < 2; i++) {
+      const next = decodeUtf8FromLatin1(fixed)
+      if (!next || next === fixed) break
+      fixed = next
+      if (!/[ÃÂÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßáºá»â€]/.test(fixed)) break
+    }
+
+    try {
+      return decodeURIComponent(escape(fixed))
+    } catch {
+      return fixed
+    }
+  }
+
+  const normalizeServiceLabel = (serviceName) => {
+    return fixMojibake(serviceName || "").replace(/\s+/g, " ").trim()
+  }
+
+  const simplifyText = (value) => {
+    return (value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+  }
+
+  const detectServiceType = (serviceName) => {
+    const repaired = simplifyText(normalizeServiceLabel(serviceName))
+    const raw = (serviceName || "").toLowerCase()
+    const compact = repaired.replace(/[^a-z0-9]/g, "")
+
+    const maybeUltrasound =
+      compact.includes("sieuam") ||
+      compact.includes("sieum") ||
+      compact.includes("siuam") ||
+      compact.includes("sium") ||
+      /s[iy]e?u.*a?m/.test(compact)
+
+    const maybeBloodTest =
+      compact.includes("xetnghiemmau") ||
+      compact.includes("xetnghiem") ||
+      compact.includes("xtnghimmu") ||
+      compact.includes("xtnghiem") ||
+      /x[e]?t.*ngh[ie]?m.*m[a]?u/.test(compact)
+
+    if (
+      (repaired.includes("kham") && repaired.includes("tong")) ||
+      raw.includes("khÃ¡m") ||
+      raw.includes("tá»•ng")
+    ) return "general"
+
+    if (repaired.includes("tiem") || repaired.includes("vaccine") || raw.includes("tiÃªm")) return "vaccine"
+
+    if (repaired.includes("phau") || repaired.includes("surgery") || raw.includes("pháº«u")) return "surgery"
+
+    if (repaired.includes("nha khoa") || repaired.includes("rang") || repaired.includes("dental")) return "dental"
+
+    if (
+      repaired.includes("tam") ||
+      repaired.includes("tia long") ||
+      repaired.includes("groom") ||
+      raw.includes("táº¯m") ||
+      raw.includes("lá»")
+    ) return "grooming"
+
+    if (repaired.includes("sieu am") || repaired.includes("ultra") || raw.includes("siÃªu") || maybeUltrasound) return "ultrasound"
+
+    if (repaired.includes("x quang") || repaired.includes("x-quang") || repaired.includes("xray") || raw.includes("x-quang")) return "xray"
+
+    if (repaired.includes("xet nghiem") || repaired.includes("mau") || repaired.includes("blood") || raw.includes("xÃ©t") || maybeBloodTest) return "blood"
+
+    return "other"
+  }
+
+  const getServiceDisplayName = (serviceName) => {
+    const type = detectServiceType(serviceName)
+    const displayNameMap = {
+      general: "Khám tổng quát",
+      vaccine: "Tiêm phòng",
+      surgery: "Phẫu thuật",
+      dental: "Nha khoa",
+      grooming: "Tắm và cắt tỉa lông",
+      ultrasound: "Siêu âm",
+      xray: "X-quang",
+      blood: "Xét nghiệm máu",
+      other: normalizeServiceLabel(serviceName)
+    }
+
+    return displayNameMap[type]
+  }
+
+  const getServiceIcon = (serviceName) => {
+    const type = detectServiceType(serviceName)
+    const iconMap = {
+      general: "bi-heart-pulse",
+      vaccine: "bi-shield-plus",
+      surgery: "bi-tools",
+      dental: "bi-emoji-smile",
+      grooming: "bi-scissors",
+      ultrasound: "bi-soundwave",
+      xray: "bi-x-diamond",
+      blood: "bi-droplet",
+      other: "bi-gear-fill"
+    }
+
+    return iconMap[type]
   }
 
   const getServiceColor = (serviceName) => {
+    const type = detectServiceType(serviceName)
     const colorMap = {
-      "Khám tổng quát": "#ff6b6b",
-      "Tiêm phòng": "#4ecdc4",
-      "Phẫu thuật": "#f39c12",
-      "Nha khoa": "#9b59b6",
-      "Tắm và cắt tỉa lông": "#45b7d1",
-      "Siêu âm": "#2ecc71",
-      "X-quang": "#e74c3c",
-      "Xét nghiệm máu": "#34495e"
+      general: "#ff6b6b",
+      vaccine: "#4ecdc4",
+      surgery: "#f39c12",
+      dental: "#9b59b6",
+      grooming: "#45b7d1",
+      ultrasound: "#2ecc71",
+      xray: "#e74c3c",
+      blood: "#34495e",
+      other: "#95a5a6"
     }
-    return colorMap[serviceName] || "#95a5a6"
+
+    return colorMap[type]
   }
 
   const validateForm = () => {
@@ -894,7 +1007,7 @@ const PetRegistrationForm = () => {
                           <div className="service-icon" style={{ backgroundColor: service.color }}>
                             <i className={`bi ${service.icon}`}></i>
                           </div>
-                          <span className="service-text">{service.value}</span>
+                          <span className="service-text">{service.displayName || service.value}</span>
                         </label>
                       </div>
                     ))}

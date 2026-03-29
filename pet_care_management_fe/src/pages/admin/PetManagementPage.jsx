@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import axios from "axios"
@@ -498,7 +498,7 @@ const PetManagementPage = () => {
           <div className="sidebar-header">
             <div className="logo">
               <span className="logo-icon">🐾</span>
-              {!collapsed && <span>Pet Management</span>}
+              {!collapsed && <span>Veterinary Clinic</span>}
             </div>
           </div>
           <ul className="sidebar-menu">

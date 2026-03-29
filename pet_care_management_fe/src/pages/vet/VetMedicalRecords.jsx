@@ -93,7 +93,7 @@ const VetMedicalRecords = () => {
             ...recordForm,
             petId: pet.id,
             veterinarian: localStorage.getItem('userName') || '',
-            clinic: 'PetCare Clinic'
+            clinic: 'Veterinary Clinic'
         });
         setShowRecordModal(true);
     };
@@ -104,7 +104,7 @@ const VetMedicalRecords = () => {
             ...vaccinationForm,
             petId: pet.id,
             veterinarian: localStorage.getItem('userName') || '',
-            clinic: 'PetCare Clinic'
+            clinic: 'Veterinary Clinic'
         });
         setShowVaccinationModal(true);
     };

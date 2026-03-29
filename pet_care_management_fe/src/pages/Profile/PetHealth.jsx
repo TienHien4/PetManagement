@@ -1,4 +1,4 @@
-
+﻿
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
@@ -58,14 +58,14 @@ const PetHealth = () => {
 
         } catch (error) {
             console.error("Error fetching pet health data:", error)
-            alert("Không thể tải dữ liệu sức khỏe thú cưng!")
+            alert("KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u sá»©c khá»e thÃº cÆ°ng!")
         } finally {
             setLoading(false)
         }
     }
 
     const handleDeleteRecord = async (recordId) => {
-        if (!window.confirm('Đồng ý xóa hồ sơ bệnh án này?')) {
+        if (!window.confirm('Äá»“ng Ã½ xÃ³a há»“ sÆ¡ bá»‡nh Ã¡n nÃ y?')) {
             return
         }
 
@@ -74,12 +74,12 @@ const PetHealth = () => {
             await axios.delete(`http://localhost:8080/api/medical-records/${recordId}`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
-            alert('Xóa hồ sơ bệnh án thành công!')
+            alert('XÃ³a há»“ sÆ¡ bá»‡nh Ã¡n thÃ nh cÃ´ng!')
             // Refresh data
             fetchPetHealthData(accessToken)
         } catch (error) {
             console.error("Error deleting record:", error)
-            alert('Không thể xóa hồ sơ bệnh án!')
+            alert('KhÃ´ng thá»ƒ xÃ³a há»“ sÆ¡ bá»‡nh Ã¡n!')
         }
     }
 
@@ -90,10 +90,10 @@ const PetHealth = () => {
 
     const getStatusBadge = (status) => {
         const statusConfig = {
-            completed: { label: "Hoàn thành", className: "badge bg-success" },
-            due_soon: { label: "Sắp đến hạn", className: "badge bg-warning text-dark" },
-            overdue: { label: "Quá hạn", className: "badge bg-danger" },
-            active: { label: "Đang dùng", className: "badge bg-primary" }
+            completed: { label: "HoÃ n thÃ nh", className: "badge bg-success" },
+            due_soon: { label: "Sáº¯p Ä‘áº¿n háº¡n", className: "badge bg-warning text-dark" },
+            overdue: { label: "QuÃ¡ háº¡n", className: "badge bg-danger" },
+            active: { label: "Äang dÃ¹ng", className: "badge bg-primary" }
         }
         const config = statusConfig[status] || statusConfig.completed
         return <span className={config.className}>{config.label}</span>
@@ -105,7 +105,7 @@ const PetHealth = () => {
                 return (
                     <div className="health-records">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4>Hồ sơ khám bệnh</h4>
+                            <h4>Há»“ sÆ¡ khÃ¡m bá»‡nh</h4>
                             <button
                                 className="btn btn-primary"
                                 onClick={() => window.location.href = `/pet/health/${petId}/add`}
@@ -119,7 +119,7 @@ const PetHealth = () => {
                                 }}
                             >
                                 <i className="bi bi-plus-circle me-2"></i>
-                                Thêm hồ sơ
+                                ThÃªm há»“ sÆ¡
                             </button>
                         </div>
 
@@ -139,19 +139,19 @@ const PetHealth = () => {
                                                 borderRadius: '20px',
                                                 fontWeight: '600'
                                             }}>
-                                                Khám bệnh
+                                                KhÃ¡m bá»‡nh
                                             </span>
                                             <button
                                                 className="btn btn-sm btn-outline-primary"
                                                 onClick={() => handleViewDetail(record)}
-                                                title="Xem chi tiết"
+                                                title="Xem chi tiáº¿t"
                                             >
                                                 <i className="bi bi-eye"></i>
                                             </button>
                                             <button
                                                 className="btn btn-sm btn-outline-danger"
                                                 onClick={() => handleDeleteRecord(record.id)}
-                                                title="Xóa hồ sơ"
+                                                title="XÃ³a há»“ sÆ¡"
                                             >
                                                 <i className="bi bi-trash"></i>
                                             </button>
@@ -162,15 +162,15 @@ const PetHealth = () => {
                                 <div className="record-body">
                                     <div className="row">
                                         <div className="col-md-6">
-                                            <p><strong>Bác sĩ:</strong> {record.veterinarian || 'Chưa có thông tin'}</p>
-                                            <p><strong>Phòng khám:</strong> {record.clinic || 'Chưa có thông tin'}</p>
+                                            <p><strong>BÃ¡c sÄ©:</strong> {record.veterinarian || 'ChÆ°a cÃ³ thÃ´ng tin'}</p>
+                                            <p><strong>PhÃ²ng khÃ¡m:</strong> {record.clinic || 'ChÆ°a cÃ³ thÃ´ng tin'}</p>
                                         </div>
                                         <div className="col-md-6">
-                                            <p><strong>Triệu chứng:</strong> {record.symptoms || 'Chưa có thông tin'}</p>
-                                            <p><strong>Ngày tạo:</strong> {new Date(record.createdAt).toLocaleDateString('vi-VN')}</p>
+                                            <p><strong>Triá»‡u chá»©ng:</strong> {record.symptoms || 'ChÆ°a cÃ³ thÃ´ng tin'}</p>
+                                            <p><strong>NgÃ y táº¡o:</strong> {new Date(record.createdAt).toLocaleDateString('vi-VN')}</p>
                                         </div>
                                     </div>
-                                    <p><strong>Chẩn đoán:</strong> {record.diagnosis}</p>
+                                    <p><strong>Cháº©n Ä‘oÃ¡n:</strong> {record.diagnosis}</p>
                                 </div>
                             </div>
                         ))}
@@ -178,8 +178,8 @@ const PetHealth = () => {
                         {healthRecords.length === 0 && (
                             <div className="text-center py-5">
                                 <i className="bi bi-clipboard-data text-muted" style={{ fontSize: '3rem' }}></i>
-                                <p className="text-muted mt-3">Chưa có hồ sơ khám bệnh nào</p>
-                                <p className="text-muted small"><i className="bi bi-info-circle"></i> Hồ sơ khám bệnh được tạo bởi bác sĩ thú y sau khi khám</p>
+                                <p className="text-muted mt-3">ChÆ°a cÃ³ há»“ sÆ¡ khÃ¡m bá»‡nh nÃ o</p>
+                                <p className="text-muted small"><i className="bi bi-info-circle"></i> Há»“ sÆ¡ khÃ¡m bá»‡nh Ä‘Æ°á»£c táº¡o bá»Ÿi bÃ¡c sÄ© thÃº y sau khi khÃ¡m</p>
                             </div>
                         )}
                     </div>
@@ -189,10 +189,10 @@ const PetHealth = () => {
                 return (
                     <div className="vaccinations">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4>Lịch sử tiêm chủng</h4>
+                            <h4>Lá»‹ch sá»­ tiÃªm chá»§ng</h4>
                             <div className="alert alert-info mb-0 py-2 px-3" style={{ fontSize: '0.85rem' }}>
                                 <i className="bi bi-info-circle me-2"></i>
-                                Lịch sử tiêm chủng được cập nhật bởi bác sĩ thú y
+                                Lá»‹ch sá»­ tiÃªm chá»§ng Ä‘Æ°á»£c cáº­p nháº­t bá»Ÿi bÃ¡c sÄ© thÃº y
                             </div>
                         </div>
 
@@ -205,26 +205,26 @@ const PetHealth = () => {
                                             {vaccine.vaccineName}
                                         </h5>
                                         <p className="text-muted mb-1">
-                                            <strong>Ngày tiêm:</strong> {new Date(vaccine.vaccinationDate).toLocaleDateString('vi-VN')}
+                                            <strong>NgÃ y tiÃªm:</strong> {new Date(vaccine.vaccinationDate).toLocaleDateString('vi-VN')}
                                         </p>
                                         {vaccine.nextDueDate && (
                                             <p className="text-muted mb-1">
-                                                <strong>Tiêm tiếp theo:</strong> {new Date(vaccine.nextDueDate).toLocaleDateString('vi-VN')}
+                                                <strong>TiÃªm tiáº¿p theo:</strong> {new Date(vaccine.nextDueDate).toLocaleDateString('vi-VN')}
                                             </p>
                                         )}
                                         {vaccine.veterinarian && (
                                             <p className="text-muted mb-1">
-                                                <strong>Bác sĩ:</strong> {vaccine.veterinarian}
+                                                <strong>BÃ¡c sÄ©:</strong> {vaccine.veterinarian}
                                             </p>
                                         )}
                                         {vaccine.clinic && (
                                             <p className="text-muted mb-1">
-                                                <strong>Phòng khám:</strong> {vaccine.clinic}
+                                                <strong>PhÃ²ng khÃ¡m:</strong> {vaccine.clinic}
                                             </p>
                                         )}
                                         {vaccine.batchNumber && (
                                             <p className="text-muted mb-0">
-                                                <strong>Số lô:</strong> {vaccine.batchNumber}
+                                                <strong>Sá»‘ lÃ´:</strong> {vaccine.batchNumber}
                                             </p>
                                         )}
                                     </div>
@@ -234,12 +234,12 @@ const PetHealth = () => {
                                         padding: '6px 12px',
                                         borderRadius: '20px',
                                         fontWeight: '600'
-                                    }}>Đã tiêm</span>
+                                    }}>ÄÃ£ tiÃªm</span>
                                 </div>
                                 {vaccine.notes && (
                                     <div className="mt-2">
                                         <small className="text-muted">
-                                            <strong>Ghi chú:</strong> {vaccine.notes}
+                                            <strong>Ghi chÃº:</strong> {vaccine.notes}
                                         </small>
                                     </div>
                                 )}
@@ -249,7 +249,7 @@ const PetHealth = () => {
                         {vaccinations.length === 0 && (
                             <div className="text-center py-5">
                                 <i className="bi bi-shield-check text-muted" style={{ fontSize: '3rem' }}></i>
-                                <p className="text-muted mt-3">Chưa có lịch sử tiêm chủng nào</p>
+                                <p className="text-muted mt-3">ChÆ°a cÃ³ lá»‹ch sá»­ tiÃªm chá»§ng nÃ o</p>
                             </div>
                         )}
                     </div>
@@ -259,13 +259,13 @@ const PetHealth = () => {
                 return (
                     <div className="weight-records">
                         <div className="d-flex justify-content-between align-items-center mb-4">
-                            <h4>Theo dõi cân nặng</h4>
+                            <h4>Theo dÃµi cÃ¢n náº·ng</h4>
                             <button
                                 className="btn btn-warning"
                                 onClick={() => window.location.href = `/pet/${petId}/health/add`}
                             >
                                 <i className="bi bi-plus-circle me-2"></i>
-                                Thêm cân nặng
+                                ThÃªm cÃ¢n náº·ng
                             </button>
                         </div>
 
@@ -278,10 +278,10 @@ const PetHealth = () => {
                                             {record.weight} kg
                                         </h5>
                                         <p className="text-muted mb-1">
-                                            <strong>Ngày cân:</strong> {new Date(record.recordDate).toLocaleDateString('vi-VN')}
+                                            <strong>NgÃ y cÃ¢n:</strong> {new Date(record.recordDate).toLocaleDateString('vi-VN')}
                                         </p>
                                         <p className="text-muted mb-0">
-                                            <strong>Ghi chú:</strong> {record.notes || 'Không có ghi chú'}
+                                            <strong>Ghi chÃº:</strong> {record.notes || 'KhÃ´ng cÃ³ ghi chÃº'}
                                         </p>
                                     </div>
                                     <span className="badge" style={{
@@ -290,7 +290,7 @@ const PetHealth = () => {
                                         padding: '6px 12px',
                                         borderRadius: '20px',
                                         fontWeight: '600'
-                                    }}>Ghi nhận</span>
+                                    }}>Ghi nháº­n</span>
                                 </div>
                             </div>
                         ))}
@@ -298,7 +298,7 @@ const PetHealth = () => {
                         {weightRecords.length === 0 && (
                             <div className="text-center py-5">
                                 <i className="bi bi-speedometer2 text-muted" style={{ fontSize: '3rem' }}></i>
-                                <p className="text-muted mt-3">Chưa có bản ghi cân nặng nào</p>
+                                <p className="text-muted mt-3">ChÆ°a cÃ³ báº£n ghi cÃ¢n náº·ng nÃ o</p>
                             </div>
                         )}
                     </div>
@@ -316,7 +316,7 @@ const PetHealth = () => {
                     <div className="spinner-border text-primary mb-3" role="status" style={{ width: "3rem", height: "3rem" }}>
                         <span className="visually-hidden">Loading...</span>
                     </div>
-                    <p className="text-muted fs-5">Đang tải hồ sơ sức khỏe...</p>
+                    <p className="text-muted fs-5">Äang táº£i há»“ sÆ¡ sá»©c khá»e...</p>
                 </div>
             </div>
         )
@@ -443,7 +443,7 @@ const PetHealth = () => {
           padding: 10px 20px;
           border-radius: 25px;
           font-weight: 600;
-          font-size: 14px;
+                    font-size: 16px;
         }
 
         .nav-tabs {
@@ -597,11 +597,11 @@ const PetHealth = () => {
                     <div className="header-content">
                         <button className="back-btn" onClick={() => window.location.href = "/user/pets"}>
                             <i className="bi bi-arrow-left"></i>
-                            Quay lại
+                            Quay láº¡i
                         </button>
                         <h1 className="page-title">
                             <i className="bi bi-heart-pulse-fill me-2"></i>
-                            Hồ sơ sức khỏe
+                            Há»“ sÆ¡ sá»©c khá»e
                         </h1>
                         <div></div>
                     </div>
@@ -622,8 +622,8 @@ const PetHealth = () => {
                                     <div className="pet-details">
                                         <h3>{pet.name}</h3>
                                         <p className="text-muted mb-2">
-                                            {pet.species === "Dog" ? "🐕 Chó" : pet.species === "Cat" ? "🐱 Mèo" : pet.species} •
-                                            {pet.breed} • {pet.age} tuổi
+                                            {pet.species === "Dog" ? "ðŸ• ChÃ³" : pet.species === "Cat" ? "ðŸ± MÃ¨o" : pet.species} â€¢
+                                            {pet.breed} â€¢ {pet.age} tuá»•i
                                         </p>
                                     </div>
                                     <div
@@ -635,7 +635,7 @@ const PetHealth = () => {
                                         }}
                                     >
                                         <i className="bi bi-heart-pulse"></i>
-                                        <span>Sức khỏe tốt</span>
+                                        <span>Sá»©c khá»e tá»‘t</span>
                                     </div>
                                 </div>
                             </div>
@@ -649,7 +649,7 @@ const PetHealth = () => {
                                     onClick={() => setActiveTab('records')}
                                 >
                                     <i className="bi bi-clipboard-data me-2"></i>
-                                    Hồ sơ khám bệnh
+                                    Há»“ sÆ¡ khÃ¡m bá»‡nh
                                 </button>
                             </li>
                             <li className="nav-item">
@@ -658,7 +658,7 @@ const PetHealth = () => {
                                     onClick={() => setActiveTab('vaccinations')}
                                 >
                                     <i className="bi bi-shield-check me-2"></i>
-                                    Tiêm chủng
+                                    TiÃªm chá»§ng
                                 </button>
                             </li>
                             <li className="nav-item">
@@ -667,7 +667,7 @@ const PetHealth = () => {
                                     onClick={() => setActiveTab('medications')}
                                 >
                                     <i className="bi bi-speedometer2 me-2"></i>
-                                    Cân nặng
+                                    CÃ¢n náº·ng
                                 </button>
                             </li>
                         </ul>
@@ -688,7 +688,7 @@ const PetHealth = () => {
                             <div className="modal-header">
                                 <h5 className="modal-title">
                                     <i className="bi bi-clipboard-data me-2"></i>
-                                    Chi tiết hồ sơ bệnh án
+                                    Chi tiáº¿t há»“ sÆ¡ bá»‡nh Ã¡n
                                 </h5>
                                 <button
                                     type="button"
@@ -699,42 +699,42 @@ const PetHealth = () => {
                             <div className="modal-body">
                                 <div className="row mb-3">
                                     <div className="col-md-6">
-                                        <strong><i className="bi bi-calendar me-2"></i>Ngày khám:</strong>
+                                        <strong><i className="bi bi-calendar me-2"></i>NgÃ y khÃ¡m:</strong>
                                         <p>{new Date(selectedRecord.recordDate).toLocaleDateString('vi-VN')}</p>
                                     </div>
                                     <div className="col-md-6">
-                                        <strong><i className="bi bi-person-badge me-2"></i>Bác sĩ:</strong>
-                                        <p>{selectedRecord.veterinarian || 'Chưa có thông tin'}</p>
+                                        <strong><i className="bi bi-person-badge me-2"></i>BÃ¡c sÄ©:</strong>
+                                        <p>{selectedRecord.veterinarian || 'ChÆ°a cÃ³ thÃ´ng tin'}</p>
                                     </div>
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-md-12">
-                                        <strong><i className="bi bi-hospital me-2"></i>Phòng khám:</strong>
-                                        <p>{selectedRecord.clinic || 'Chưa có thông tin'}</p>
+                                        <strong><i className="bi bi-hospital me-2"></i>PhÃ²ng khÃ¡m:</strong>
+                                        <p>{selectedRecord.clinic || 'ChÆ°a cÃ³ thÃ´ng tin'}</p>
                                     </div>
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-md-12">
-                                        <strong><i className="bi bi-exclamation-triangle me-2"></i>Triệu chứng:</strong>
-                                        <p>{selectedRecord.symptoms || 'Chưa có thông tin'}</p>
+                                        <strong><i className="bi bi-exclamation-triangle me-2"></i>Triá»‡u chá»©ng:</strong>
+                                        <p>{selectedRecord.symptoms || 'ChÆ°a cÃ³ thÃ´ng tin'}</p>
                                     </div>
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-md-12">
-                                        <strong><i className="bi bi-clipboard-check me-2"></i>Chẩn đoán:</strong>
+                                        <strong><i className="bi bi-clipboard-check me-2"></i>Cháº©n Ä‘oÃ¡n:</strong>
                                         <p>{selectedRecord.diagnosis}</p>
                                     </div>
                                 </div>
                                 <div className="row mb-3">
                                     <div className="col-md-12">
-                                        <strong><i className="bi bi-bandaid me-2"></i>Điều trị:</strong>
-                                        <p>{selectedRecord.treatment || 'Chưa có thông tin'}</p>
+                                        <strong><i className="bi bi-bandaid me-2"></i>Äiá»u trá»‹:</strong>
+                                        <p>{selectedRecord.treatment || 'ChÆ°a cÃ³ thÃ´ng tin'}</p>
                                     </div>
                                 </div>
                                 {selectedRecord.notes && (
                                     <div className="row mb-3">
                                         <div className="col-md-12">
-                                            <strong><i className="bi bi-journal-text me-2"></i>Ghi chú:</strong>
+                                            <strong><i className="bi bi-journal-text me-2"></i>Ghi chÃº:</strong>
                                             <p>{selectedRecord.notes}</p>
                                         </div>
                                     </div>
@@ -743,7 +743,7 @@ const PetHealth = () => {
                                     <div className="col-md-12">
                                         <small className="text-muted">
                                             <i className="bi bi-clock me-2"></i>
-                                            Tạo lúc: {new Date(selectedRecord.createdAt).toLocaleString('vi-VN')}
+                                            Táº¡o lÃºc: {new Date(selectedRecord.createdAt).toLocaleString('vi-VN')}
                                         </small>
                                     </div>
                                 </div>
@@ -754,7 +754,7 @@ const PetHealth = () => {
                                     className="btn btn-secondary"
                                     onClick={() => setShowDetailModal(false)}
                                 >
-                                    Đóng
+                                    ÄÃ³ng
                                 </button>
                             </div>
                         </div>
@@ -766,3 +766,4 @@ const PetHealth = () => {
 }
 
 export default PetHealth
+

@@ -1,4 +1,4 @@
-.vet-medical-records {
+﻿.vet-medical-records {
     padding: 20px;
     background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 100%);
     min-height: 100vh;
@@ -109,7 +109,7 @@
 
 .pet-species {
     color: #64748b;
-    font-size: 14px;
+    font-size: 16px;
     margin: 0;
     font-weight: 500;
 }
@@ -120,7 +120,7 @@
 
 .info-item {
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 16px;
     color: #475569;
 }
 

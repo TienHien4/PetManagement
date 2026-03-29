@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { useState } from "react"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
@@ -6,130 +6,130 @@ import Header from "../components/home/Header"
 import Footer from "../components/home/Footer"
 
 const ContactPage = () => {
-    const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
+    service: "",
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState({})
+
+  const services = [
+    { value: "general", label: "KhÃ¡m bá»‡nh tá»•ng quÃ¡t" },
+    { value: "vaccine", label: "TiÃªm phÃ²ng vaccine" },
+    { value: "surgery", label: "Pháº«u thuáº­t" },
+    { value: "grooming", label: "Spa & Grooming" },
+    { value: "emergency", label: "Cáº¥p cá»©u" },
+    { value: "consultation", label: "TÆ° váº¥n" },
+  ]
+
+  const contactInfo = [
+    {
+      icon: "bi-telephone",
+      title: "Äiá»‡n thoáº¡i",
+      content: "0382562504",
+      link: "tel:0382562504",
+      color: "#e74c3c",
+    },
+    {
+      icon: "bi-envelope",
+      title: "Email",
+      content: "haisesasakilop8@gmail.com",
+      link: "mailto:haisesasakilop8@gmail.com",
+      color: "#3498db",
+    },
+    {
+      icon: "bi-geo-alt",
+      title: "Äá»‹a chá»‰",
+      content: "Thuáº­n ThÃ nh - Báº¯c Ninh",
+      link: "#",
+      color: "#2ecc71",
+    },
+    {
+      icon: "bi-clock",
+      title: "Giá» lÃ m viá»‡c",
+      content: "8:00 - 17:00 (Thá»© 2 - Thá»© 7)",
+      link: "#",
+      color: "#f39c12",
+    },
+  ]
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }))
+    }
+  }
+
+  const validateForm = () => {
+    const newErrors = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Vui lÃ²ng nháº­p há» tÃªn"
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Vui lÃ²ng nháº­p email"
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email khÃ´ng há»£p lá»‡"
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Vui lÃ²ng nháº­p sá»‘ Ä‘iá»‡n thoáº¡i"
+    } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ""))) {
+      newErrors.phone = "Sá»‘ Ä‘iá»‡n thoáº¡i khÃ´ng há»£p lá»‡"
+    }
+
+    if (!formData.subject.trim()) {
+      newErrors.subject = "Vui lÃ²ng nháº­p tiÃªu Ä‘á»"
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "Vui lÃ²ng nháº­p ná»™i dung tin nháº¯n"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    // Simulate API call
+    setTimeout(() => {
+      alert("Cáº£m Æ¡n báº¡n Ä‘Ã£ liÃªn há»‡! ChÃºng tÃ´i sáº½ pháº£n há»“i trong thá»i gian sá»›m nháº¥t.")
+      setFormData({
         name: "",
         email: "",
         phone: "",
         subject: "",
         message: "",
         service: "",
-    })
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [errors, setErrors] = useState({})
+      })
+      setIsSubmitting(false)
+    }, 2000)
+  }
 
-    const services = [
-        { value: "general", label: "Khám bệnh tổng quát" },
-        { value: "vaccine", label: "Tiêm phòng vaccine" },
-        { value: "surgery", label: "Phẫu thuật" },
-        { value: "grooming", label: "Spa & Grooming" },
-        { value: "emergency", label: "Cấp cứu" },
-        { value: "consultation", label: "Tư vấn" },
-    ]
-
-    const contactInfo = [
-        {
-            icon: "bi-telephone",
-            title: "Điện thoại",
-            content: "0382562504",
-            link: "tel:0382562504",
-            color: "#e74c3c",
-        },
-        {
-            icon: "bi-envelope",
-            title: "Email",
-            content: "haisesasakilop8@gmail.com",
-            link: "mailto:haisesasakilop8@gmail.com",
-            color: "#3498db",
-        },
-        {
-            icon: "bi-geo-alt",
-            title: "Địa chỉ",
-            content: "Thuận Thành - Bắc Ninh",
-            link: "#",
-            color: "#2ecc71",
-        },
-        {
-            icon: "bi-clock",
-            title: "Giờ làm việc",
-            content: "8:00 - 17:00 (Thứ 2 - Thứ 7)",
-            link: "#",
-            color: "#f39c12",
-        },
-    ]
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }))
-        // Clear error when user starts typing
-        if (errors[name]) {
-            setErrors((prev) => ({
-                ...prev,
-                [name]: "",
-            }))
-        }
-    }
-
-    const validateForm = () => {
-        const newErrors = {}
-
-        if (!formData.name.trim()) {
-            newErrors.name = "Vui lòng nhập họ tên"
-        }
-
-        if (!formData.email.trim()) {
-            newErrors.email = "Vui lòng nhập email"
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Email không hợp lệ"
-        }
-
-        if (!formData.phone.trim()) {
-            newErrors.phone = "Vui lòng nhập số điện thoại"
-        } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ""))) {
-            newErrors.phone = "Số điện thoại không hợp lệ"
-        }
-
-        if (!formData.subject.trim()) {
-            newErrors.subject = "Vui lòng nhập tiêu đề"
-        }
-
-        if (!formData.message.trim()) {
-            newErrors.message = "Vui lòng nhập nội dung tin nhắn"
-        }
-
-        setErrors(newErrors)
-        return Object.keys(newErrors).length === 0
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-
-        if (!validateForm()) {
-            return
-        }
-
-        setIsSubmitting(true)
-
-        // Simulate API call
-        setTimeout(() => {
-            alert("Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.")
-            setFormData({
-                name: "",
-                email: "",
-                phone: "",
-                subject: "",
-                message: "",
-                service: "",
-            })
-            setIsSubmitting(false)
-        }, 2000)
-    }
-
-    return (
-        <>
-            <style jsx>{`
+  return (
+    <>
+      <style jsx>{`
         .contact-page {
           min-height: 100vh;
           background: linear-gradient(135deg, #2c3e50 0%, #3498db 50%, #9b59b6 100%);
@@ -303,7 +303,7 @@ const ContactPage = () => {
           color: white;
           font-weight: 600;
           margin-bottom: 8px;
-          font-size: 14px;
+          font-size: 16px;
         }
 
         .form-control {
@@ -335,7 +335,7 @@ const ContactPage = () => {
 
         .error-message {
           color: #ff6b6b;
-          font-size: 12px;
+          font-size: 14px;
           margin-top: 5px;
           display: flex;
           align-items: center;
@@ -551,241 +551,242 @@ const ContactPage = () => {
         }
       `}</style>
 
-            <div className="contact-page">
-                <Header></Header>
-                <div className="geometric-shapes">
-                    <div className="shape circle"></div>
-                    <div className="shape square"></div>
-                    <div className="shape triangle"></div>
-                    <div className="shape circle"></div>
-                </div>
+      <div className="contact-page">
+        <Header></Header>
+        <div className="geometric-shapes">
+          <div className="shape circle"></div>
+          <div className="shape square"></div>
+          <div className="shape triangle"></div>
+          <div className="shape circle"></div>
+        </div>
 
-                <div className="content-wrapper">
-                    <div className="container">
-                        {/* Hero Section */}
-                        <div className="hero-section">
-                            <h1 className="hero-title">Liên Hệ Với Chúng Tôi</h1>
-                            <p className="hero-subtitle">
-                                Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn về mọi vấn đề liên quan đến thú cưng
-                            </p>
-                        </div>
-
-                        {/* Contact Content */}
-                        <div className="contact-content">
-                            {/* Contact Form */}
-                            <div className="contact-form-section">
-                                <h2 className="form-title">Gửi Tin Nhắn</h2>
-                                <form onSubmit={handleSubmit}>
-                                    <div className="row">
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    <i className="bi bi-person"></i> Họ và tên *
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    className={`form-control ${errors.name ? "error" : ""}`}
-                                                    placeholder="Nhập họ và tên của bạn"
-                                                    value={formData.name}
-                                                    onChange={handleInputChange}
-                                                />
-                                                {errors.name && (
-                                                    <div className="error-message">
-                                                        <i className="bi bi-exclamation-circle"></i>
-                                                        {errors.name}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    <i className="bi bi-envelope"></i> Email *
-                                                </label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    className={`form-control ${errors.email ? "error" : ""}`}
-                                                    placeholder="Nhập địa chỉ email"
-                                                    value={formData.email}
-                                                    onChange={handleInputChange}
-                                                />
-                                                {errors.email && (
-                                                    <div className="error-message">
-                                                        <i className="bi bi-exclamation-circle"></i>
-                                                        {errors.email}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="row">
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    <i className="bi bi-telephone"></i> Số điện thoại *
-                                                </label>
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    className={`form-control ${errors.phone ? "error" : ""}`}
-                                                    placeholder="Nhập số điện thoại"
-                                                    value={formData.phone}
-                                                    onChange={handleInputChange}
-                                                />
-                                                {errors.phone && (
-                                                    <div className="error-message">
-                                                        <i className="bi bi-exclamation-circle"></i>
-                                                        {errors.phone}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="form-group">
-                                                <label className="form-label">
-                                                    <i className="bi bi-heart-pulse"></i> Dịch vụ quan tâm
-                                                </label>
-                                                <select
-                                                    name="service"
-                                                    className="form-control form-select"
-                                                    value={formData.service}
-                                                    onChange={handleInputChange}
-                                                >
-                                                    <option value="">Chọn dịch vụ</option>
-                                                    {services.map((service) => (
-                                                        <option key={service.value} value={service.value}>
-                                                            {service.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label className="form-label">
-                                            <i className="bi bi-chat-text"></i> Tiêu đề *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="subject"
-                                            className={`form-control ${errors.subject ? "error" : ""}`}
-                                            placeholder="Nhập tiêu đề tin nhắn"
-                                            value={formData.subject}
-                                            onChange={handleInputChange}
-                                        />
-                                        {errors.subject && (
-                                            <div className="error-message">
-                                                <i className="bi bi-exclamation-circle"></i>
-                                                {errors.subject}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label className="form-label">
-                                            <i className="bi bi-chat-dots"></i> Nội dung tin nhắn *
-                                        </label>
-                                        <textarea
-                                            name="message"
-                                            className={`form-control form-textarea ${errors.message ? "error" : ""}`}
-                                            placeholder="Nhập nội dung tin nhắn của bạn..."
-                                            value={formData.message}
-                                            onChange={handleInputChange}
-                                        ></textarea>
-                                        {errors.message && (
-                                            <div className="error-message">
-                                                <i className="bi bi-exclamation-circle"></i>
-                                                {errors.message}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                                        {isSubmitting ? (
-                                            <>
-                                                <div className="loading-spinner"></div>
-                                                Đang gửi...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <i className="bi bi-send"></i>
-                                                Gửi tin nhắn
-                                            </>
-                                        )}
-                                    </button>
-                                </form>
-                            </div>
-
-                            {/* Contact Info */}
-                            <div className="contact-info-section">
-                                <h2 className="info-title">Thông Tin Liên Hệ</h2>
-                                <div className="contact-info-grid">
-                                    {contactInfo.map((info, index) => (
-                                        <div key={index} className="contact-info-card">
-                                            <div className="contact-icon" style={{ backgroundColor: info.color }}>
-                                                <i className={`bi ${info.icon}`}></i>
-                                            </div>
-                                            <h3 className="contact-info-title">{info.title}</h3>
-                                            <a
-                                                href={info.link}
-                                                className="contact-info-content"
-                                                onClick={info.link === "#" ? (e) => e.preventDefault() : undefined}
-                                            >
-                                                {info.content}
-                                            </a>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Quick Contact */}
-                                <div className="contact-info-card">
-                                    <div className="contact-icon" style={{ backgroundColor: "#9b59b6" }}>
-                                        <i className="bi bi-chat-heart"></i>
-                                    </div>
-                                    <h3 className="contact-info-title">Liên hệ nhanh</h3>
-                                    <p className="contact-info-content">Gọi ngay hotline để được tư vấn miễn phí và đặt lịch hẹn</p>
-                                    <div style={{ marginTop: "15px" }}>
-                                        <a
-                                            href="tel:0382562504"
-                                            className="submit-btn"
-                                            style={{
-                                                display: "inline-flex",
-                                                width: "auto",
-                                                padding: "12px 24px",
-                                                textDecoration: "none",
-                                            }}
-                                        >
-                                            <i className="bi bi-telephone"></i>
-                                            Gọi ngay
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Map Section */}
-                        <div className="map-section">
-                            <h2 className="map-title">Vị Trí Của Chúng Tôi</h2>
-                            <div className="map-placeholder">
-                                <div style={{ textAlign: "center" }}>
-                                    <i className="bi bi-geo-alt" style={{ fontSize: "48px", marginBottom: "15px" }}></i>
-                                    <br />
-                                    <strong>Thuận Thành - Bắc Ninh</strong>
-                                    <br />
-                                    <span style={{ opacity: 0.8 }}>Bản đồ sẽ được tích hợp tại đây</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <Footer></Footer>
+        <div className="content-wrapper">
+          <div className="container">
+            {/* Hero Section */}
+            <div className="hero-section">
+              <h1 className="hero-title">LiÃªn Há»‡ Vá»›i ChÃºng TÃ´i</h1>
+              <p className="hero-subtitle">
+                ChÃºng tÃ´i luÃ´n sáºµn sÃ ng há»— trá»£ vÃ  tÆ° váº¥n cho báº¡n vá» má»i váº¥n Ä‘á» liÃªn quan Ä‘áº¿n thÃº cÆ°ng
+              </p>
             </div>
-        </>
-    )
+
+            {/* Contact Content */}
+            <div className="contact-content">
+              {/* Contact Form */}
+              <div className="contact-form-section">
+                <h2 className="form-title">Gá»­i Tin Nháº¯n</h2>
+                <form onSubmit={handleSubmit}>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="form-label">
+                          <i className="bi bi-person"></i> Há» vÃ  tÃªn *
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          className={`form-control ${errors.name ? "error" : ""}`}
+                          placeholder="Nháº­p há» vÃ  tÃªn cá»§a báº¡n"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                        />
+                        {errors.name && (
+                          <div className="error-message">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {errors.name}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="form-label">
+                          <i className="bi bi-envelope"></i> Email *
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          className={`form-control ${errors.email ? "error" : ""}`}
+                          placeholder="Nháº­p Ä‘á»‹a chá»‰ email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                        />
+                        {errors.email && (
+                          <div className="error-message">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {errors.email}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="form-label">
+                          <i className="bi bi-telephone"></i> Sá»‘ Ä‘iá»‡n thoáº¡i *
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          className={`form-control ${errors.phone ? "error" : ""}`}
+                          placeholder="Nháº­p sá»‘ Ä‘iá»‡n thoáº¡i"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                        />
+                        {errors.phone && (
+                          <div className="error-message">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {errors.phone}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="form-group">
+                        <label className="form-label">
+                          <i className="bi bi-heart-pulse"></i> Dá»‹ch vá»¥ quan tÃ¢m
+                        </label>
+                        <select
+                          name="service"
+                          className="form-control form-select"
+                          value={formData.service}
+                          onChange={handleInputChange}
+                        >
+                          <option value="">Chá»n dá»‹ch vá»¥</option>
+                          {services.map((service) => (
+                            <option key={service.value} value={service.value}>
+                              {service.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">
+                      <i className="bi bi-chat-text"></i> TiÃªu Ä‘á» *
+                    </label>
+                    <input
+                      type="text"
+                      name="subject"
+                      className={`form-control ${errors.subject ? "error" : ""}`}
+                      placeholder="Nháº­p tiÃªu Ä‘á» tin nháº¯n"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                    />
+                    {errors.subject && (
+                      <div className="error-message">
+                        <i className="bi bi-exclamation-circle"></i>
+                        {errors.subject}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">
+                      <i className="bi bi-chat-dots"></i> Ná»™i dung tin nháº¯n *
+                    </label>
+                    <textarea
+                      name="message"
+                      className={`form-control form-textarea ${errors.message ? "error" : ""}`}
+                      placeholder="Nháº­p ná»™i dung tin nháº¯n cá»§a báº¡n..."
+                      value={formData.message}
+                      onChange={handleInputChange}
+                    ></textarea>
+                    {errors.message && (
+                      <div className="error-message">
+                        <i className="bi bi-exclamation-circle"></i>
+                        {errors.message}
+                      </div>
+                    )}
+                  </div>
+
+                  <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <div className="loading-spinner"></div>
+                        Äang gá»­i...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-send"></i>
+                        Gá»­i tin nháº¯n
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+
+              {/* Contact Info */}
+              <div className="contact-info-section">
+                <h2 className="info-title">ThÃ´ng Tin LiÃªn Há»‡</h2>
+                <div className="contact-info-grid">
+                  {contactInfo.map((info, index) => (
+                    <div key={index} className="contact-info-card">
+                      <div className="contact-icon" style={{ backgroundColor: info.color }}>
+                        <i className={`bi ${info.icon}`}></i>
+                      </div>
+                      <h3 className="contact-info-title">{info.title}</h3>
+                      <a
+                        href={info.link}
+                        className="contact-info-content"
+                        onClick={info.link === "#" ? (e) => e.preventDefault() : undefined}
+                      >
+                        {info.content}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Quick Contact */}
+                <div className="contact-info-card">
+                  <div className="contact-icon" style={{ backgroundColor: "#9b59b6" }}>
+                    <i className="bi bi-chat-heart"></i>
+                  </div>
+                  <h3 className="contact-info-title">LiÃªn há»‡ nhanh</h3>
+                  <p className="contact-info-content">Gá»i ngay hotline Ä‘á»ƒ Ä‘Æ°á»£c tÆ° váº¥n miá»…n phÃ­ vÃ  Ä‘áº·t lá»‹ch háº¹n</p>
+                  <div style={{ marginTop: "15px" }}>
+                    <a
+                      href="tel:0382562504"
+                      className="submit-btn"
+                      style={{
+                        display: "inline-flex",
+                        width: "auto",
+                        padding: "12px 24px",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <i className="bi bi-telephone"></i>
+                      Gá»i ngay
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Map Section */}
+            <div className="map-section">
+              <h2 className="map-title">Vá»‹ TrÃ­ Cá»§a ChÃºng TÃ´i</h2>
+              <div className="map-placeholder">
+                <div style={{ textAlign: "center" }}>
+                  <i className="bi bi-geo-alt" style={{ fontSize: "48px", marginBottom: "15px" }}></i>
+                  <br />
+                  <strong>Thuáº­n ThÃ nh - Báº¯c Ninh</strong>
+                  <br />
+                  <span style={{ opacity: 0.8 }}>Báº£n Ä‘á»“ sáº½ Ä‘Æ°á»£c tÃ­ch há»£p táº¡i Ä‘Ã¢y</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Footer></Footer>
+      </div>
+    </>
+  )
 }
 
 export default ContactPage
+

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import axios from "axios"
@@ -72,7 +72,7 @@ const OrderManagement = () => {
       setFilteredOrders(response.data)
     } catch (err) {
       console.error("Error fetching orders:", err)
-      alert("Không thể tải danh sách đơn hàng!")
+      alert("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch Ä‘Æ¡n hÃ ng!")
     } finally {
       setLoading(false)
     }
@@ -215,17 +215,17 @@ const OrderManagement = () => {
         }
       )
 
-      alert("Cập nhật trạng thái đơn hàng thành công!")
+      alert("Cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng!")
       closeEditModal()
       getOrders()
     } catch (error) {
       console.error("Error updating order:", error)
-      alert("Không thể cập nhật đơn hàng. Vui lòng thử lại!")
+      alert("KhÃ´ng thá»ƒ cáº­p nháº­t Ä‘Æ¡n hÃ ng. Vui lÃ²ng thá»­ láº¡i!")
     }
   }
 
   const handleDeleteOrder = async (orderId) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) {
+    if (!window.confirm("Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a Ä‘Æ¡n hÃ ng nÃ y?")) {
       return
     }
 
@@ -237,21 +237,21 @@ const OrderManagement = () => {
         },
       })
 
-      alert("Xóa đơn hàng thành công!")
+      alert("XÃ³a Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng!")
       getOrders()
     } catch (error) {
       console.error("Error deleting order:", error)
-      alert("Không thể xóa đơn hàng. Vui lòng thử lại!")
+      alert("KhÃ´ng thá»ƒ xÃ³a Ä‘Æ¡n hÃ ng. Vui lÃ²ng thá»­ láº¡i!")
     }
   }
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      COMPLETED: { label: "Hoàn thành", className: "bg-success" },
-      PENDING: { label: "Chờ xử lý", className: "bg-warning text-dark" },
-      PROCESSING: { label: "Đang xử lý", className: "bg-info" },
-      PAID: { label: "Đã thanh toán", className: "bg-primary" },
-      CANCELLED: { label: "Đã hủy", className: "bg-danger" },
+      COMPLETED: { label: "HoÃ n thÃ nh", className: "bg-success" },
+      PENDING: { label: "Chá» xá»­ lÃ½", className: "bg-warning text-dark" },
+      PROCESSING: { label: "Äang xá»­ lÃ½", className: "bg-info" },
+      PAID: { label: "ÄÃ£ thanh toÃ¡n", className: "bg-primary" },
+      CANCELLED: { label: "ÄÃ£ há»§y", className: "bg-danger" },
     }
     const config = statusConfig[status] || statusConfig.PENDING
     return <span className={`badge ${config.className}`}>{config.label}</span>
@@ -463,7 +463,7 @@ const OrderManagement = () => {
           font-weight: 600;
           color: white;
           margin: 0;
-          font-size: 14px;
+          font-size: 16px;
         }
 
         .content-wrapper {
@@ -894,7 +894,7 @@ const OrderManagement = () => {
         <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
             <div className="logo">
-              <span className="logo-icon">🐾</span>
+              <span className="logo-icon">ðŸ¾</span>
               {!collapsed && <span>Order Management</span>}
             </div>
           </div>
@@ -905,7 +905,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin")}
               >
                 <i className="bi bi-bar-chart menu-icon"></i>
-                <span className="menu-text">Thống kê</span>
+                <span className="menu-text">Thá»‘ng kÃª</span>
               </button>
             </li>
             <li>
@@ -913,8 +913,8 @@ const OrderManagement = () => {
                 className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
                 onClick={() => handleNavigation("/admin/petmanagement")}
               >
-                <span className="menu-icon">🐾</span>
-                <span className="menu-text">Thú cưng</span>
+                <span className="menu-icon">ðŸ¾</span>
+                <span className="menu-text">ThÃº cÆ°ng</span>
               </button>
             </li>
             <li>
@@ -923,7 +923,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin/productmanagement")}
               >
                 <i className="bi bi-box-seam menu-icon"></i>
-                <span className="menu-text">Sản phẩm</span>
+                <span className="menu-text">Sáº£n pháº©m</span>
               </button>
             </li>
             <li>
@@ -932,7 +932,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin/usermanagement")}
               >
                 <i className="bi bi-person menu-icon"></i>
-                <span className="menu-text">Tài khoản</span>
+                <span className="menu-text">TÃ i khoáº£n</span>
               </button>
             </li>
             <li>
@@ -941,7 +941,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin/orders")}
               >
                 <i className="bi bi-bag menu-icon"></i>
-                <span className="menu-text">Đơn hàng</span>
+                <span className="menu-text">ÄÆ¡n hÃ ng</span>
               </button>
             </li>
           </ul>
@@ -975,9 +975,9 @@ const OrderManagement = () => {
               <div className="page-header">
                 <h1 className="page-title">
                   <i className="bi bi-box-seam"></i>
-                  Quản lý đơn hàng
+                  Quáº£n lÃ½ Ä‘Æ¡n hÃ ng
                 </h1>
-                <p className="page-subtitle">Quản lý thông tin và kho sản phẩm trong hệ thống</p>
+                <p className="page-subtitle">Quáº£n lÃ½ thÃ´ng tin vÃ  kho sáº£n pháº©m trong há»‡ thá»‘ng</p>
               </div>
 
 
@@ -987,7 +987,7 @@ const OrderManagement = () => {
                 <div className="d-flex search-controls" style={{ gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
                   <input
                     type="text"
-                    placeholder="Tìm kiếm theo mã đơn hàng hoặc ID khách hàng..."
+                    placeholder="TÃ¬m kiáº¿m theo mÃ£ Ä‘Æ¡n hÃ ng hoáº·c ID khÃ¡ch hÃ ng..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="search-input"
@@ -995,7 +995,7 @@ const OrderManagement = () => {
                   />
                   <button className="btn-search" onClick={handleSearch} disabled={loading}>
                     <i className="bi bi-search me-2"></i>
-                    Tìm kiếm
+                    TÃ¬m kiáº¿m
                   </button>
                 </div>
               </div>
@@ -1010,12 +1010,12 @@ const OrderManagement = () => {
                   <table className="table orders-table">
                     <thead>
                       <tr>
-                        <th style={{ width: "15%" }}>Mã đơn hàng</th>
-                        <th style={{ width: "15%" }}>Khách hàng</th>
-                        <th style={{ width: "15%" }}>Ngày đặt</th>
-                        <th style={{ width: "20%" }}>Tổng tiền</th>
-                        <th style={{ width: "15%" }}>Trạng thái</th>
-                        <th style={{ width: "20%" }}>Hành động</th>
+                        <th style={{ width: "15%" }}>MÃ£ Ä‘Æ¡n hÃ ng</th>
+                        <th style={{ width: "15%" }}>KhÃ¡ch hÃ ng</th>
+                        <th style={{ width: "15%" }}>NgÃ y Ä‘áº·t</th>
+                        <th style={{ width: "20%" }}>Tá»•ng tiá»n</th>
+                        <th style={{ width: "15%" }}>Tráº¡ng thÃ¡i</th>
+                        <th style={{ width: "20%" }}>HÃ nh Ä‘á»™ng</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1032,7 +1032,7 @@ const OrderManagement = () => {
                           </td>
                           <td>
                             <strong className="text-success">
-                              {order.totalPrice?.toLocaleString("vi-VN")} ₫
+                              {order.totalPrice?.toLocaleString("vi-VN")} â‚«
                             </strong>
                           </td>
                           <td>{getStatusBadge(order.status)}</td>
@@ -1040,21 +1040,21 @@ const OrderManagement = () => {
                             <button
                               className="action-btn btn-view"
                               onClick={() => openDetailModal(order)}
-                              title="Xem chi tiết"
+                              title="Xem chi tiáº¿t"
                             >
                               <Eye size={16} />
                             </button>
                             <button
                               className="action-btn btn-edit"
                               onClick={() => openEditModal(order)}
-                              title="Chỉnh sửa"
+                              title="Chá»‰nh sá»­a"
                             >
                               <Edit size={16} />
                             </button>
                             <button
                               className="action-btn btn-delete"
                               onClick={() => handleDeleteOrder(order.orderId)}
-                              title="Xóa"
+                              title="XÃ³a"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -1065,9 +1065,9 @@ const OrderManagement = () => {
                   </table>
                 ) : (
                   <div className="empty-state">
-                    <div className="empty-icon">📦</div>
-                    <h5>Không tìm thấy đơn hàng nào</h5>
-                    <p>Hãy thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc</p>
+                    <div className="empty-icon">ðŸ“¦</div>
+                    <h5>KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n hÃ ng nÃ o</h5>
+                    <p>HÃ£y thá»­ tÃ¬m kiáº¿m vá»›i tá»« khÃ³a khÃ¡c hoáº·c thay Ä‘á»•i bá»™ lá»c</p>
                   </div>
                 )}
               </div>
@@ -1084,7 +1084,7 @@ const OrderManagement = () => {
                 }}>
                   <div className="modal-content-custom">
                     <div className="modal-header-custom">
-                      <h3 className="modal-title">Chi tiết đơn hàng #{selectedOrder.orderId}</h3>
+                      <h3 className="modal-title">Chi tiáº¿t Ä‘Æ¡n hÃ ng #{selectedOrder.orderId}</h3>
                       <button className="btn-close-custom" onClick={closeDetailModal}>
                         <X size={24} />
                       </button>
@@ -1094,20 +1094,20 @@ const OrderManagement = () => {
                     <div className="order-detail-section">
                       <div className="section-title">
                         <i className="bi bi-person-circle"></i>
-                        Thông tin khách hàng
+                        ThÃ´ng tin khÃ¡ch hÃ ng
                       </div>
                       <div className="detail-card">
                         <p className="mb-2">
-                          <strong>ID khách hàng:</strong> {selectedOrder.userId || "N/A"}
+                          <strong>ID khÃ¡ch hÃ ng:</strong> {selectedOrder.userId || "N/A"}
                         </p>
                         <p className="mb-2">
-                          <strong>Ngày đặt:</strong>{" "}
+                          <strong>NgÃ y Ä‘áº·t:</strong>{" "}
                           {selectedOrder.orderDate
                             ? new Date(selectedOrder.orderDate).toLocaleString("vi-VN")
                             : "N/A"}
                         </p>
                         <p className="mb-0">
-                          <strong>Trạng thái:</strong> {getStatusBadge(selectedOrder.status)}
+                          <strong>Tráº¡ng thÃ¡i:</strong> {getStatusBadge(selectedOrder.status)}
                         </p>
                       </div>
                     </div>
@@ -1116,7 +1116,7 @@ const OrderManagement = () => {
                     <div className="order-detail-section">
                       <div className="section-title">
                         <i className="bi bi-cart3"></i>
-                        Sản phẩm đã đặt
+                        Sáº£n pháº©m Ä‘Ã£ Ä‘áº·t
                       </div>
                       {selectedOrder.orderItems && selectedOrder.orderItems.length > 0 ? (
                         selectedOrder.orderItems.map((item) => (
@@ -1126,27 +1126,27 @@ const OrderManagement = () => {
                                 <p className="fw-medium text-dark mb-1">
                                   {item.product?.name || "N/A"}
                                 </p>
-                                <small className="text-muted">Số lượng: {item.quantity}</small>
+                                <small className="text-muted">Sá»‘ lÆ°á»£ng: {item.quantity}</small>
                               </div>
                               <div className="text-end">
                                 <p className="text-success fw-bold mb-0">
-                                  {item.price?.toLocaleString("vi-VN")} ₫
+                                  {item.price?.toLocaleString("vi-VN")} â‚«
                                 </p>
                               </div>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted">Không có sản phẩm</p>
+                        <p className="text-muted">KhÃ´ng cÃ³ sáº£n pháº©m</p>
                       )}
                     </div>
 
                     {/* Total */}
                     <div className="detail-card">
                       <div className="d-flex justify-content-between align-items-center">
-                        <span className="fs-5 fw-semibold">Tổng cộng:</span>
+                        <span className="fs-5 fw-semibold">Tá»•ng cá»™ng:</span>
                         <span className="fs-4 fw-bold text-success">
-                          {selectedOrder.totalPrice?.toLocaleString("vi-VN")} ₫
+                          {selectedOrder.totalPrice?.toLocaleString("vi-VN")} â‚«
                         </span>
                       </div>
                     </div>
@@ -1161,7 +1161,7 @@ const OrderManagement = () => {
                 }}>
                   <div className="modal-content-custom">
                     <div className="modal-header-custom">
-                      <h3 className="modal-title">Chỉnh sửa đơn hàng #{selectedOrder.orderId}</h3>
+                      <h3 className="modal-title">Chá»‰nh sá»­a Ä‘Æ¡n hÃ ng #{selectedOrder.orderId}</h3>
                       <button className="btn-close-custom" onClick={closeEditModal}>
                         <X size={24} />
                       </button>
@@ -1169,27 +1169,27 @@ const OrderManagement = () => {
 
                     <form onSubmit={handleUpdateStatus}>
                       <div className="form-group">
-                        <label className="form-label">Trạng thái đơn hàng</label>
+                        <label className="form-label">Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng</label>
                         <select
                           value={editStatus}
                           onChange={(e) => setEditStatus(e.target.value)}
                           className="form-control-custom"
                           required
                         >
-                          <option value="PENDING">Chờ xử lý</option>
-                          <option value="PAID">Đã thanh toán</option>
-                          <option value="PROCESSING">Đang xử lý</option>
-                          <option value="COMPLETED">Hoàn thành</option>
-                          <option value="CANCELLED">Đã hủy</option>
+                          <option value="PENDING">Chá» xá»­ lÃ½</option>
+                          <option value="PAID">ÄÃ£ thanh toÃ¡n</option>
+                          <option value="PROCESSING">Äang xá»­ lÃ½</option>
+                          <option value="COMPLETED">HoÃ n thÃ nh</option>
+                          <option value="CANCELLED">ÄÃ£ há»§y</option>
                         </select>
                       </div>
 
                       <div className="modal-footer-custom">
                         <button type="button" className="btn-cancel" onClick={closeEditModal}>
-                          Hủy
+                          Há»§y
                         </button>
                         <button type="submit" className="btn-submit">
-                          Cập nhật
+                          Cáº­p nháº­t
                         </button>
                       </div>
                     </form>
@@ -1205,3 +1205,4 @@ const OrderManagement = () => {
 }
 
 export default OrderManagement
+

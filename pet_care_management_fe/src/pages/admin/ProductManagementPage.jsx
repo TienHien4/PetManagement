@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import axios from "axios"
@@ -279,7 +279,7 @@ const ProductManagementPage = () => {
         }
 
         .current-date {
-          font-size: 14px;
+          font-size: 16px;
           color: #666;
           margin: 0;
           text-transform: capitalize;
@@ -320,7 +320,7 @@ const ProductManagementPage = () => {
           font-weight: 600;
           color: white;
           margin: 0;
-          font-size: 14px;
+          font-size: 16px;
         }
 
         .page-header {
@@ -498,7 +498,7 @@ const ProductManagementPage = () => {
         <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
             <div className="logo">
-              <span className="logo-icon">📦</span>
+              <span className="logo-icon">ðŸ“¦</span>
               {!collapsed && <span>Product Management</span>}
             </div>
           </div>
@@ -509,7 +509,7 @@ const ProductManagementPage = () => {
                 onClick={() => handleNavigation("/admin")}
               >
                 <i className="bi bi-bar-chart menu-icon"></i>
-                <span className="menu-text">Thống kê</span>
+                <span className="menu-text">Thá»‘ng kÃª</span>
               </button>
             </li>
             <li>
@@ -517,14 +517,14 @@ const ProductManagementPage = () => {
                 className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
                 onClick={() => handleNavigation("/admin/petmanagement")}
               >
-                <span className="menu-icon">🐾</span>
-                <span className="menu-text">Thú cưng</span>
+                <span className="menu-icon">ðŸ¾</span>
+                <span className="menu-text">ThÃº cÆ°ng</span>
               </button>
             </li>
             <li>
               <button className="menu-item active">
                 <i className="bi bi-box-seam menu-icon"></i>
-                <span className="menu-text">Sản phẩm</span>
+                <span className="menu-text">Sáº£n pháº©m</span>
               </button>
             </li>
             <li>
@@ -533,7 +533,7 @@ const ProductManagementPage = () => {
                 onClick={() => handleNavigation("/admin/usermanagement")}
               >
                 <i className="bi bi-person menu-icon"></i>
-                <span className="menu-text">Tài khoản</span>
+                <span className="menu-text">TÃ i khoáº£n</span>
               </button>
             </li>
             <li>
@@ -542,7 +542,7 @@ const ProductManagementPage = () => {
                 onClick={() => handleNavigation("/admin/orders")}
               >
                 <i className="bi bi-bag menu-icon"></i>
-                <span className="menu-text">Đơn hàng</span>
+                <span className="menu-text">ÄÆ¡n hÃ ng</span>
               </button>
             </li>
           </ul>
@@ -578,10 +578,10 @@ const ProductManagementPage = () => {
           {/* Page Header */}
           <div className="page-header">
             <h1 className="page-title">
-              <span>📦</span>
-              <span>Quản lý sản phẩm</span>
+              <span>ðŸ“¦</span>
+              <span>Quáº£n lÃ½ sáº£n pháº©m</span>
             </h1>
-            <p className="page-subtitle">Quản lý thông tin và kho sản phẩm trong hệ thống</p>
+            <p className="page-subtitle">Quáº£n lÃ½ thÃ´ng tin vÃ  kho sáº£n pháº©m trong há»‡ thá»‘ng</p>
           </div>
 
           {/* Content */}
@@ -600,3 +600,4 @@ const ProductManagementPage = () => {
 }
 
 export default ProductManagementPage
+

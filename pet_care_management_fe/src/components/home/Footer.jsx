@@ -339,9 +339,9 @@ const Footer = () => {
                 <div className="footer-widget">
                   <div className="footer-logo-section">
                     <Link to="/" className="footer-logo">
-                      <img src={logo} alt="PetCare Logo" />
+                      <img src={logo} alt="Veterinary Clinic Logo" />
                     </Link>
-                    <h4 className="brand-text-footer">PetCare</h4>
+                    <h4 className="brand-text-footer">Veterinary Clinic</h4>
                     <p className="footer-description">
                       Chăm sóc thú cưng với tình yêu và chuyên nghiệp. Đồng hành cùng bạn trong hành trình nuôi dưỡng
                       những người bạn bốn chân.
@@ -396,7 +396,7 @@ const Footer = () => {
             <div className="row">
               <div className="col-12">
                 <p className="copyright-text">
-                  Bản quyền &copy; {new Date().getFullYear()} PetCare. Tất cả quyền được bảo lưu. | Được thiết kế với{" "}
+                  Bản quyền &copy; {new Date().getFullYear()} Veterinary Clinic. Tất cả quyền được bảo lưu. | Được thiết kế với{" "}
                   <i className="bi bi-heart-fill heart-icon"></i> bởi
                   <a href="https://colorlib.com" target="_blank" rel="noopener noreferrer">
                     {" "}

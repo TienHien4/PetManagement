@@ -583,7 +583,7 @@ const AboutPage = () => {
               </div>
               <div className="col-lg-6">
                 <div className="hero-image">
-                  <img src="https://img.freepik.com/premium-vector/cute-corgi-tricolor-dog-cartoon-vector-illustration_42750-1072.jpg?w=826" alt="Pet Care" className="img-fluid" />
+                  <img src="https://img.freepik.com/premium-vector/cute-corgi-tricolor-dog-cartoon-vector-illustration_42750-1072.jpg?w=826" alt="Veterinary Clinic" className="img-fluid" />
                 </div>
               </div>
             </div>

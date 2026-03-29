@@ -50,7 +50,7 @@ const VetLayout = () => {
                         </Button>
                         <Navbar.Brand className="brand-title">
                             <FaPaw className="me-2 text-primary" />
-                            PetCare VET
+                            Veterinary Clinic VET
                         </Navbar.Brand>
                     </div>
 
