@@ -194,43 +194,107 @@ const UserChat = () => {
             {isConnecting && (
                 <div style={{
                     position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    padding: '8px 16px',
-                    background: '#ffc107',
+                    top: '20px',
+                    right: '20px',
+                    padding: '10px 20px',
+                    background: 'rgba(255, 193, 7, 0.95)',
                     color: '#000',
-                    borderRadius: '4px',
+                    borderRadius: '50px',
                     fontSize: '14px',
-                    zIndex: 1000
+                    fontWeight: '600',
+                    zIndex: 1000,
+                    boxShadow: '0 4px 20px rgba(255, 193, 7, 0.3)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
                 }}>
-                    Đang kết nối WebSocket...
+                    <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: '#fff',
+                        animation: 'pulse 1.5s ease-in-out infinite'
+                    }}></div>
+                    Đang kết nối...
                 </div>
             )}
             <div className="chat-sidebar">
-                <h3>Danh sách bác sĩ</h3>
-                {vets.map(vet => (
-                    <div key={vet.id || vet.userId} className="vet-item" onClick={() => startConversation(vet.id || vet.userId)}>
-                        <div className="vet-avatar">
-                            {(vet.userName || vet.fullName || 'V')?.charAt(0)?.toUpperCase()}
-                        </div>
-                        <div className="vet-info">
-                            <div className="vet-name">{vet.userName || vet.fullName || 'Bác sĩ'}</div>
-                            <div className="vet-specialty">Bác sĩ thú y</div>
-                        </div>
+                <h3>👨‍⚕️ Danh sách bác sĩ</h3>
+                {vets.length === 0 ? (
+                    <div style={{
+                        padding: '40px 20px',
+                        textAlign: 'center',
+                        color: '#a0aec0',
+                        fontSize: '0.95rem'
+                    }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '10px' }}>🩺</div>
+                        Không có bác sĩ nào
                     </div>
-                ))}
+                ) : (
+                    vets.map(vet => (
+                        <div
+                            key={vet.id || vet.userId}
+                            className="vet-item"
+                            onClick={() => startConversation(vet.id || vet.userId)}
+                        >
+                            <div className="vet-avatar">
+                                {(vet.userName || vet.fullName || 'V')?.charAt(0)?.toUpperCase()}
+                            </div>
+                            <div className="vet-info">
+                                <div className="vet-name">{vet.userName || vet.fullName || 'Bác sĩ'}</div>
+                                <div className="vet-specialty">🩺 Bác sĩ thú y</div>
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
 
             <div className="chat-main">
                 {selectedConversation ? (
                     <>
+                        <div className="chat-header" style={{
+                            padding: '20px 30px',
+                            borderBottom: '1px solid rgba(240, 147, 251, 0.1)',
+                            background: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '15px'
+                        }}>
+                            <div style={{
+                                width: '45px',
+                                height: '45px',
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: '700',
+                                fontSize: '1.1rem',
+                                boxShadow: '0 4px 15px rgba(240, 147, 251, 0.3)'
+                            }}>
+                                👨‍⚕️
+                            </div>
+                            <div>
+                                <div style={{ fontWeight: '700', fontSize: '1.1rem', color: '#2d3748' }}>
+                                    Bác sĩ thú y
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: '#a0aec0' }}>
+                                    Đang hoạt động
+                                </div>
+                            </div>
+                        </div>
                         <div className="chat-messages">
                             {messages.map((msg, index) => (
                                 <div key={msg.id || msg.tempTimestamp || index}
                                     className={`message ${msg.senderId === getUserId(currentUser) ? 'sent' : 'received'}`}>
                                     <div className="message-content">{msg.content}</div>
                                     <div className="message-time">
-                                        {new Date(msg.createdAt).toLocaleTimeString()}
+                                        {new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
                                     </div>
                                 </div>
                             ))}
@@ -245,7 +309,10 @@ const UserChat = () => {
                                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                                 placeholder="Nhập tin nhắn..."
                             />
-                            <button onClick={sendMessage}>Gửi</button>
+                            <button onClick={sendMessage}>
+                                <span style={{ marginRight: '5px' }}>📤</span>
+                                Gửi
+                            </button>
                         </div>
                     </>
                 ) : (

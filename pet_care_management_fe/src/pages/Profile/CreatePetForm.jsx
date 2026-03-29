@@ -149,7 +149,19 @@ const CreatePetForm = () => {
 
       console.log("Pet created successfully:", res.data);
       alert("Thêm thú cưng thành công!");
-      window.location.href = "/user/pets";
+      
+      // Check where user came from and redirect accordingly
+      const userRole = localStorage.getItem('role');
+      if (userRole === 'ADMIN' && window.location.pathname.includes('/admin')) {
+        window.location.href = "/admin/petmanagement";
+      } else {
+        // Use history back or default to user pets page
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = "/user/pets";
+        }
+      }
     } catch (error) {
       console.error("Error creating pet:", error);
 

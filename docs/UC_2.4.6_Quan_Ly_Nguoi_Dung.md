@@ -42,3 +42,18 @@
 | 5c | Hệ thống | Nếu tìm kiếm không có kết quả thì hiển thị "Không tìm thấy người dùng" |
 
 **Hậu điều kiện**: Thông tin người dùng được cập nhật và quyền hạn được quản lý
+
+## 3.2.2.6. Kiểm thử chức năng quản lý người dùng
+
+### Bảng 3.6 Danh sách test case chức năng quản lý người dùng
+
+| Tên test case | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Trạng thái |
+|---------------|-------------------|------------------|-----------------|------------|
+| Xem danh sách người dùng | Admin truy cập /admin/usermanagement | Hiển thị danh sách người dùng với: Avatar, Tên, Email, Vai trò | Hiển thị danh sách người dùng với: Avatar, Tên, Email, Vai trò | PASS |
+| Tìm kiếm người dùng theo email | Admin nhập "test@example.com" vào ô tìm kiếm → Enter | Hiển thị người dùng có email khớp với từ khóa | Hiển thị người dùng có email khớp với từ khóa | PASS |
+| Chỉnh sửa thông tin người dùng thành công | Admin click "Chỉnh sửa" → cập nhật tên → nhấn "Lưu" | Hiển thị thông báo "Cập nhật thành công!" và thông tin được cập nhật | Hiển thị thông báo "Cập nhật thành công!" và thông tin được cập nhật | PASS |
+| Cập nhật email đã tồn tại | Admin chỉnh sửa người dùng → đổi email thành email đã có → nhấn "Lưu" | Hiển thị "Email đã được sử dụng" | Hiển thị "Email đã được sử dụng" | PASS |
+| Phân quyền người dùng thành VET | Admin chọn người dùng → thay đổi vai trò từ USER sang VET → lưu | Vai trò được cập nhật thành VET và badge hiển thị "VET" | Vai trò được cập nhật thành VET và badge hiển thị "VET" | PASS |
+| Phân quyền người dùng thành ADMIN | Admin chọn người dùng → thay đổi vai trò từ USER sang ADMIN → lưu | Vai trò được cập nhật thành ADMIN và badge hiển thị "ADMIN" | Vai trò được cập nhật thành ADMIN và badge hiển thị "ADMIN" | PASS |
+| Xóa người dùng có ràng buộc dữ liệu | Admin chọn người dùng có đơn hàng → click "Xóa" | Hiển thị "Không thể xóa người dùng" | Hiển thị "Không thể xóa người dùng" | PASS |
+| Tìm kiếm không có kết quả | Admin nhập "nonexistent@test.com" vào ô tìm kiếm | Hiển thị "Không tìm thấy người dùng" | Hiển thị "Không tìm thấy người dùng" | PASS |

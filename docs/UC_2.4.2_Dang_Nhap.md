@@ -26,6 +26,20 @@
 
 **Hậu điều kiện**: Người dùng được chuyển hướng đến trang tương ứng với vai trò của mình
 
+## 3.2.2.2. Kiểm thử chức năng đăng nhập
+
+### Bảng 3.2 Danh sách test case chức năng đăng nhập
+
+| Tên test case | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Trạng thái |
+|---------------|-------------------|------------------|-----------------|------------|
+| Đăng nhập thành công với email hợp lệ | Nhập email "abc@#$" và mật khẩu "123456" → nhấn nút "Sign in" | Hiển thị thông báo "Login successfully!" và chuyển hướng đến trang người dùng | Hiển thị thông báo "Login successfully!" và chuyển hướng đến trang người dùng | PASS |
+| Đăng nhập sai mật khẩu | Nhập email "test@example.com" và mật khẩu sai → nhấn nút "Sign in" | Hiển thị thông báo "Email hoặc mật khẩu không đúng" | Hiển thị thông báo "Email hoặc mật khẩu không đúng" | PASS |
+| Đăng nhập sai cả email và mật khẩu | Nhập email "abc@#$" và mật khẩu "wrongpass" → nhấn nút "Sign in" | Hiển thị thông báo "Email hoặc mật khẩu không đúng" | Hiển thị thông báo "Email hoặc mật khẩu không đúng" | PASS |
+| Đăng nhập thành công với tài khoản Admin | Nhập email "admin@example.com" và mật khẩu "123456" → nhấn nút "Sign in" | Hiển thị thông báo "Login successfully!" và chuyển hướng đến trang Admin | Hiển thị thông báo "Login successfully!" và chuyển hướng đến trang Admin | PASS |
+| Đăng nhập thành công với tài khoản Bác sĩ | Nhập email "vet@example.com" và mật khẩu "123456" → nhấn nút "Sign in" | Hiển thị thông báo "Login successfully!" và chuyển hướng đến trang Bác sĩ | Hiển thị thông báo "Login successfully!" và chuyển hướng đến trang Bác sĩ | PASS |
+| Đăng nhập với thông tin để trống | Để trống email và mật khẩu → nhấn nút "Sign in" | Hiển thị thông báo "Vui lòng nhập đầy đủ thông tin" | Hiển thị thông báo "Vui lòng nhập đầy đủ thông tin" | PASS |
+| Đăng nhập với email không tồn tại | Nhập email "nonexistent@test.com" và mật khẩu "123456" → nhấn "Sign in" | Hiển thị thông báo "Email hoặc mật khẩu không đúng" | Hiển thị thông báo "Email hoặc mật khẩu không đúng" | PASS |
+
 ### Bước 1: Hiển thị form đăng nhập
 **Actor**: Người dùng truy cập `/login`  
 **System**: 

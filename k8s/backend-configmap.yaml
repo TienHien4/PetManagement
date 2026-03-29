@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: pet-management
+data:
+  # Spring Boot Configuration
+  SPRING_PROFILES_ACTIVE: "production"
+  
+  # Database Configuration
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql-service:3306/pet_care_management?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
+  
+  # Kafka Configuration
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-service:9092"
+  
+  # OAuth2 Configuration
+  OAUTH2_REDIRECT_URL: "http://localhost:3000/oauth2/redirect"
+  
+  # Application Configuration
+  SERVER_PORT: "8080"
+  
+  # Cloudinary Configuration (Add your values)
+  CLOUDINARY_CLOUD_NAME: ""
+  CLOUDINARY_API_KEY: ""
+  
+  # VNPay Configuration
+  VNPAY_RETURN_URL: "http://localhost:3000/payment/vnpay-return"
+  VNPAY_URL: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"

@@ -34,3 +34,17 @@
 | 5c | Hệ thống | Nếu bác sĩ không có lịch trống thì hiển thị "Bác sĩ không có lịch trống, vui lòng chọn thời gian khác" |
 
 **Hậu điều kiện**: Cuộc hẹn được lưu trữ và có thể theo dõi qua hệ thống
+
+## 3.2.2.3. Kiểm thử chức năng quản lý cuộc hẹn
+
+### Bảng 3.3 Danh sách test case chức năng quản lý cuộc hẹn
+
+| Tên test case | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Trạng thái |
+|---------------|-------------------|------------------|-----------------|------------|
+| Đặt lịch hẹn thành công | Chọn thú cưng, dịch vụ, bác sĩ, ngày giờ hợp lệ → nhập thông tin liên hệ → nhấn "Đặt lịch" | Hiển thị thông báo "Đặt lịch thành công!" và cuộc hẹn có trạng thái "PENDING" | Hiển thị thông báo "Đặt lịch thành công!" và cuộc hẹn có trạng thái "PENDING" | PASS |
+| Đặt lịch khi chưa có thú cưng | Người dùng chưa có thú cưng → truy cập trang đặt lịch | Hiển thị thông báo "Vui lòng thêm thú cưng trước khi đặt lịch" | Hiển thị thông báo "Vui lòng thêm thú cưng trước khi đặt lịch" | PASS |
+| Đặt lịch với thông tin không đầy đủ | Chọn thú cưng, dịch vụ nhưng không chọn bác sĩ → nhấn "Đặt lịch" | Hiển thị thông báo "Vui lòng nhập đầy đủ thông tin" | Hiển thị thông báo "Vui lòng nhập đầy đủ thông tin" | PASS |
+| Đặt lịch khi bác sĩ không có lịch trống | Chọn thú cưng, dịch vụ, bác sĩ, thời gian bác sĩ đã đầy lịch → nhấn "Đặt lịch" | Hiển thị "Bác sĩ không có lịch trống, vui lòng chọn thời gian khác" | Hiển thị "Bác sĩ không có lịch trống, vui lòng chọn thời gian khác" | PASS |
+| Bác sĩ xác nhận cuộc hẹn | Bác sĩ chọn cuộc hẹn "PENDING" → click "Xác nhận" | Trạng thái cuộc hẹn chuyển thành "CONFIRMED" và thông báo cho người dùng | Trạng thái cuộc hẹn chuyển thành "CONFIRMED" và thông báo cho người dùng | PASS |
+| Bác sĩ hoàn thành cuộc hẹn | Bác sĩ chọn cuộc hẹn "CONFIRMED" → click "Hoàn thành" | Trạng thái cuộc hẹn chuyển thành "COMPLETED" | Trạng thái cuộc hẹn chuyển thành "COMPLETED" | PASS |
+| Bác sĩ hủy cuộc hẹn | Bác sĩ chọn cuộc hẹn → click "Hủy" | Trạng thái cuộc hẹn chuyển thành "CANCELLED" và thông báo cho người dùng | Trạng thái cuộc hẹn chuyển thành "CANCELLED" và thông báo cho người dùng | PASS |

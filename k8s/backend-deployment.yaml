@@ -1,0 +1,144 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: pet-management
+  labels:
+    app: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: your-registry/pet-management-backend:latest  # Change this to your image
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: SPRING_PROFILES_ACTIVE
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: SPRING_DATASOURCE_URL
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: password
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: SPRING_KAFKA_BOOTSTRAP_SERVERS
+        - name: SECURITY_SIGNER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: signer-key
+        - name: OAUTH2_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: OAUTH2_REDIRECT_URL
+        - name: CLOUDINARY_CLOUD_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: CLOUDINARY_CLOUD_NAME
+        - name: CLOUDINARY_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: CLOUDINARY_API_KEY
+        - name: CLOUDINARY_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: vnpay-secret
+              key: hash-secret
+              optional: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+      initContainers:
+      - name: wait-for-mysql
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z mysql-service 3306; do echo waiting for mysql; sleep 2; done;']
+      - name: wait-for-kafka
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z kafka-service 9092; do echo waiting for kafka; sleep 2; done;']
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: pet-management
+  labels:
+    app: backend
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  sessionAffinity: ClientIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: pet-management
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard

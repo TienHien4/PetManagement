@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Nav, Navbar, NavDropdown, Card } from 'react-bootstrap';
-import { FaHome, FaCalendarAlt, FaChartBar, FaUser, FaSignOutAlt, FaBars, FaPaw } from 'react-icons/fa';
+import { FaHome, FaCalendarAlt, FaChartBar, FaUser, FaSignOutAlt, FaBars, FaPaw, FaClipboardList } from 'react-icons/fa';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import './VetLayout.css';
 
@@ -22,6 +22,8 @@ const VetLayout = () => {
                 return 'Dashboard';
             case '/vet/appointments':
                 return 'Quản lý cuộc hẹn';
+            case '/vet/medical-records':
+                return 'Hồ sơ sức khỏe';
             case '/vet/profile':
                 return 'Thông tin cá nhân';
             default:
@@ -100,6 +102,14 @@ const VetLayout = () => {
                                 <span className="sidebar-text">Cuộc hẹn</span>
                             </Nav.Link>
 
+                            <Nav.Link
+                                as={Link}
+                                to="/vet/medical-records"
+                                className={`sidebar-link ${isActiveRoute('/vet/medical-records') ? 'active' : ''}`}
+                            >
+                                <FaClipboardList className="sidebar-icon" />
+                                <span className="sidebar-text">Hồ sơ sức khỏe</span>
+                            </Nav.Link>
 
                         </Nav>
                     </div>

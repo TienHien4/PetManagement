@@ -95,7 +95,9 @@ const VetAppointments = () => {
         // Filter by date
         if (selectedDate) {
             filtered = filtered.filter(app => {
-                const appointmentDate = new Date(app.appointmentDate).toISOString().split('T')[0];
+                const raw = app.date || app.appointmentDate;
+                if (!raw) return false;
+                const appointmentDate = new Date(raw).toISOString().split('T')[0];
                 return appointmentDate === selectedDate;
             });
         }
@@ -385,7 +387,7 @@ const VetAppointments = () => {
                             <thead className="table-dark">
                                 <tr>
                                     <th style={{ width: '100px' }}>Mã cuộc hẹn</th>
-                                    <th style={{ width: '300px' }}>Tên khách hàng</th>
+                                    <th style={{ width: '300px' }}>Dịch vụ</th>
                                     <th style={{ width: '250px' }}>Email khách hàng</th>
                                     <th style={{ width: '180px' }}>Ngày hẹn</th>
                                     <th style={{ width: '150px' }}>Trạng thái</th>

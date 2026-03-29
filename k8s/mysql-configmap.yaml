@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-script
+  namespace: pet-management
+data:
+  init.sql: |
+    -- Pet Care Management Database Initialization
+    -- This script will run automatically when MySQL starts
+    
+    USE pet_care_management;
+    
+    -- Add any initial database setup here
+    -- Tables will be created automatically by Spring Boot JPA
+    
+    -- Example: Create indexes for better performance
+    -- CREATE INDEX idx_user_email ON users(email);
+    -- CREATE INDEX idx_pet_user_id ON pets(user_id);

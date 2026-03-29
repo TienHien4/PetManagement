@@ -1,6 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import axios from "axios"
+import apiClient from '../../services/customizeAxios'
 import logo from '../../assets/img/logo.png';
 import useCartCount from '../../hooks/useCartCount';
 import "bootstrap/dist/css/bootstrap.min.css"
@@ -12,7 +14,68 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [userName, setUserName] = useState("")
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { cartCount } = useCartCount()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Chat với bác sĩ - kiểm tra đăng nhập
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const userData = localStorage.getItem('user')
+      setIsLoggedIn(!!userData && userData !== 'null')
+    }
+    checkLoginStatus()
+    window.addEventListener('storage', checkLoginStatus)
+    return () => window.removeEventListener('storage', checkLoginStatus)
+  }, [location.pathname])
+
+  // Chat với bác sĩ - đếm tin nhắn chưa đọc
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      const userData = localStorage.getItem('user')
+      if (!userData || userData === 'null') return
+      try {
+        const user = JSON.parse(userData)
+        if (!user.userId) return
+        const response = await apiClient.get(`/api/chat/unread/${user.userId}`)
+        setUnreadCount(response.data || 0)
+      } catch (error) {
+        console.error('Error loading unread count:', error)
+      }
+    }
+    if (isLoggedIn) {
+      loadUnreadCount()
+      const interval = setInterval(loadUnreadCount, 30000)
+      return () => clearInterval(interval)
+    }
+  }, [isLoggedIn])
+
+  const handleChatClick = () => {
+    const userData = localStorage.getItem('user')
+    if (!userData || userData === 'null') {
+      alert('Vui lòng đăng nhập để sử dụng chat')
+      navigate('/login')
+      return
+    }
+    try {
+      const user = JSON.parse(userData)
+      if (!user.userId) {
+        navigate('/login')
+        return
+      }
+      const roles = user.roles || []
+      if (roles.includes('VET')) {
+        navigate('/vet/chat')
+      } else if (roles.includes('USER') || roles.includes('ADMIN')) {
+        navigate('/user/chat')
+      }
+    } catch (error) {
+      console.error('Error parsing user data:', error)
+      navigate('/login')
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,7 +126,6 @@ const Header = () => {
   const navigationItems = [
     { href: "/home", label: "Trang chủ", icon: "bi-house" },
     { href: "/about", label: "Giới thiệu", icon: "bi-info-circle" },
-    { href: "/news", label: "Tin tức", icon: "bi-newspaper" },
     { href: "/services", label: "Dịch vụ", icon: "bi-heart-pulse" },
     { href: "/products", label: "Sản phẩm", icon: "bi-box-seam" },
     { href: "/shopping-cart", label: "Giỏ hàng", icon: "bi-cart3" },
@@ -84,12 +146,12 @@ const Header = () => {
 
         .header-top {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          padding: 14px 0;
+          padding: 10px 0;
           transition: all 0.3s ease;
         }
 
         .header-top.scrolled {
-          padding: 8px 0;
+          padding: 6px 0;
           transform: none;
           opacity: 1;
         }
@@ -112,49 +174,59 @@ const Header = () => {
         .contact-info {
           display: flex;
           align-items: center;
-          gap: 32px;
+          gap: 24px;
         }
 
         .contact-item1 {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
           color: white;
           text-decoration: none;
-          font-size: 15px;
-          font-weight: 500;
+          font-size: 13px;
+          font-weight: 400;
+          letter-spacing: 0.3px;
           transition: all 0.3s ease;
+          opacity: 0.9;
         }
 
         .contact-item1:hover {
-          color: rgba(255, 255, 255, 0.8);
+          opacity: 1;
           transform: translateY(-1px);
         }
 
         .contact-icon {
-          font-size: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 28px;
+          height: 28px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          font-size: 13px;
+          flex-shrink: 0;
         }
 
         .social-links {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 20px;
+          gap: 12px;
         }
 
         .social-link {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 44px;
-          height: 44px;
+          width: 32px;
+          height: 32px;
           background: rgba(255, 255, 255, 0.15);
           border-radius: 50%;
           color: white;
           text-decoration: none;
           transition: all 0.3s ease;
           backdrop-filter: blur(10px);
-          font-size: 18px;
+          font-size: 14px;
         }
 
         .social-link:hover {
@@ -162,6 +234,53 @@ const Header = () => {
           transform: translateY(-2px);
           color: white;
           box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-doctor-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 44px;
+          height: 44px;
+          background: rgba(76, 175, 80, 0.9);
+          border-radius: 50%;
+          color: white;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          backdrop-filter: blur(10px);
+          font-size: 20px;
+          position: relative;
+        }
+
+        .chat-doctor-btn:hover {
+          background: rgba(76, 175, 80, 1);
+          transform: translateY(-2px) scale(1.1);
+          box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .chat-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background: #f44336;
+          color: white;
+          border-radius: 50%;
+          min-width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: bold;
+          border: 2px solid white;
+          padding: 0 4px;
+          animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
         }
 
         .user-dropdown {
@@ -489,11 +608,17 @@ const Header = () => {
           }
           
           .contact-info {
-            gap: 20px;
+            gap: 16px;
           }
           
           .contact-item1 {
-            font-size: 13px;
+            font-size: 12px;
+          }
+
+          .contact-icon {
+            width: 26px;
+            height: 26px;
+            font-size: 12px;
           }
           
           .social-links {
@@ -509,13 +634,24 @@ const Header = () => {
 
         @media (max-width: 768px) {
           .header-top {
-            padding: 10px 0;
+            padding: 8px 0;
           }
           
           .contact-info {
-            flex-direction: column;
-            gap: 8px;
-            align-items: flex-start;
+            flex-direction: row;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+          }
+
+          .contact-item1 {
+            font-size: 11px;
+          }
+
+          .contact-icon {
+            width: 24px;
+            height: 24px;
+            font-size: 11px;
           }
           
           .brand-text {
@@ -582,6 +718,20 @@ const Header = () => {
                   <a href="#" className="social-link">
                     <i className="bi bi-instagram"></i>
                   </a>
+                  {isLoggedIn && (
+                    <button
+                      className="chat-doctor-btn"
+                      onClick={handleChatClick}
+                      title="Chat với bác sĩ"
+                    >
+                      <i className="bi bi-chat-dots-fill"></i>
+                      {unreadCount > 0 && (
+                        <span className="chat-badge">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
               <div className="col-lg-3 col-md-3">

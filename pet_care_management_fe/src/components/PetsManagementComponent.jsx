@@ -614,6 +614,17 @@ const PetsManagement = () => {
               <option value="Dog">🐕 Chó</option>
               <option value="Cat">🐱 Mèo</option>
             </select>
+            <button 
+              className="btn-search" 
+              onClick={handleAddPet}
+              style={{ 
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                minWidth: "160px"
+              }}
+            >
+              <i className="bi bi-plus-circle me-2"></i>
+              Thêm thú cưng
+            </button>
           </div>
         </div>
 

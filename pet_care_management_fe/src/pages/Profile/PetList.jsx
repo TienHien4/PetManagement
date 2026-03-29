@@ -83,10 +83,6 @@ const PetList = () => {
     window.location.href = `/pet/health/${petId}`
   }
 
-  const handleAddHealthRecord = (petId) => {
-    window.location.href = `/pet/health/${petId}/add`
-  }
-
   const handleGoBack = () => {
     window.history.back()
   }
@@ -803,23 +799,15 @@ const PetList = () => {
             {/* Card Header */}
             <div className="card-header">
               <div className="d-flex justify-content-between align-items-center">
-                <div>
-                  <h2 className="pets-title">🐾 Danh sách thú cưng</h2>
-                  <p className="pets-subtitle">Quản lý và theo dõi sức khỏe những người bạn nhỏ của bạn</p>
-                </div>
-                <div className="d-flex gap-2">
-                  <button
-                    className="btn btn-outline-info d-flex align-items-center gap-2"
-                    onClick={() => window.location.href = "/pet/health-dashboard"}
-                    title="Xem tổng quan sức khỏe"
-                  >
-                    <i className="bi bi-graph-up"></i>
-                    Tổng quan sức khỏe
-                  </button>
+                <div className="d-flex align-items-center gap-3">
                   <button className="add-pet-btn" onClick={handleAddPet}>
                     <i className="bi bi-plus-circle"></i>
                     Thêm thú cưng
                   </button>
+                  <div>
+                    <h2 className="pets-title">🐾 Danh sách thú cưng</h2>
+                    <p className="pets-subtitle">Quản lý và theo dõi sức khỏe những người bạn nhỏ của bạn</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -860,17 +848,10 @@ const PetList = () => {
                                 className="health-btn btn-health-view"
                                 onClick={() => handleViewHealth(pet.id)}
                                 title="Xem hồ sơ sức khỏe"
+                                style={{ width: '100%' }}
                               >
                                 <i className="bi bi-clipboard-data"></i>
-                                Hồ sơ
-                              </button>
-                              <button
-                                className="health-btn btn-health-add"
-                                onClick={() => handleAddHealthRecord(pet.id)}
-                                title="Thêm bản ghi sức khỏe"
-                              >
-                                <i className="bi bi-plus-circle"></i>
-                                Thêm
+                                Xem Hồ Sơ Sức Khỏe
                               </button>
                             </div>
 

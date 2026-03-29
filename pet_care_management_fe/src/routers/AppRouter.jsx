@@ -31,12 +31,10 @@ import PetHealth from '../pages/Profile/PetHealth';
 import VetLayout from '../pages/vet/VetLayout';
 import VetDashboard from '../pages/vet/VetDashboard';
 import VetAppointments from '../pages/vet/VetAppointments';
+import VetMedicalRecords from '../pages/vet/VetMedicalRecords';
 
 import UserChat from '../pages/Profile/UserChat';
 import VetChat from '../pages/vet/VetChat';
-
-// Floating Chat Button
-import FloatingChatButton from '../components/FloatingChatButton';
 
 // Payment Components
 import VNPayReturn from '../pages/Payment/VNPayReturn';
@@ -86,6 +84,11 @@ const AppRouter = () => {
                 <Route path='/admin/orders' element={
                     <ProtectedRoute allowedRoles={['ADMIN']}>
                         <OrderManagement />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/addPet" element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                        <CreatePetForm />
                     </ProtectedRoute>
                 } />
 
@@ -142,11 +145,6 @@ const AppRouter = () => {
                         <PetHealth />
                     </ProtectedRoute>
                 } />
-                <Route path="/pet/health/:petId/add" element={
-                    <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
-                        <AddHealthRecord />
-                    </ProtectedRoute>
-                } />
                 <Route path="/user/chat" element={
                     <ProtectedRoute allowedRoles={['USER', 'ADMIN']}>
                         <UserChat />
@@ -169,6 +167,7 @@ const AppRouter = () => {
                 }>
                     <Route path="dashboard" element={<VetDashboard />} />
                     <Route path="appointments" element={<VetAppointments />} />
+                    <Route path="medical-records" element={<VetMedicalRecords />} />
                 </Route>
 
                 {/* Unauthorized page */}
@@ -179,9 +178,6 @@ const AppRouter = () => {
                     </div>
                 } />
             </Routes>
-
-            {/* Show floating chat button only for logged-in users */}
-            {user && (user.userId || user.id) && <FloatingChatButton />}
         </Router>
     );
 };

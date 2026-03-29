@@ -7,6 +7,8 @@ import Footer from "../components/home/Footer"
 
 const AboutPage = () => {
   const [isVisible, setIsVisible] = useState({})
+  const [team, setTeam] = useState([])
+  const [loadingTeam, setLoadingTeam] = useState(true)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -27,6 +29,41 @@ const AboutPage = () => {
     elements.forEach((el) => observer.observe(el))
 
     return () => observer.disconnect()
+  }, [team, loadingTeam])
+
+  // Fetch danh sách bác sĩ từ API
+  useEffect(() => {
+    const fetchVets = async () => {
+      try {
+        console.log('Fetching vets...')
+        const res = await fetch('http://localhost:8080/api/vet/getAllVet')
+        console.log('Response status:', res.status)
+        if (!res.ok) throw new Error('API error: ' + res.status)
+        const vets = await res.json()
+        console.log('Vets data:', vets)
+        if (Array.isArray(vets) && vets.length > 0) {
+          const formattedTeam = vets.map(vet => ({
+            id: vet.id,
+            name: vet.name || 'Bác sĩ',
+            position: vet.specialty || 'Bác sĩ thú y',
+            email: vet.email,
+            phone: vet.phoneNumber,
+            clinic: vet.clinicAddress,
+          }))
+          setTeam(formattedTeam)
+          console.log('Team set:', formattedTeam)
+        } else {
+          console.log('No vets found or invalid data')
+          setTeam([])
+        }
+      } catch (error) {
+        console.error('Error fetching vets:', error)
+        setTeam([])
+      } finally {
+        setLoadingTeam(false)
+      }
+    }
+    fetchVets()
   }, [])
 
   const stats = [
@@ -75,32 +112,18 @@ const AboutPage = () => {
     },
   ]
 
-  const team = [
-    {
-      name: "Dr. Nguyễn Văn A",
-      position: "Giám đốc & Bác sĩ trưởng",
-      image: "/placeholder.svg?height=300&width=300",
-      experience: "15 năm kinh nghiệm",
-    },
-    {
-      name: "Dr. Trần Thị B",
-      position: "Bác sĩ phẫu thuật",
-      image: "/placeholder.svg?height=300&width=300",
-      experience: "12 năm kinh nghiệm",
-    },
-    {
-      name: "Dr. Lê Văn C",
-      position: "Bác sĩ nội khoa",
-      image: "/placeholder.svg?height=300&width=300",
-      experience: "10 năm kinh nghiệm",
-    },
-    {
-      name: "Dr. Phạm Thị D",
-      position: "Bác sĩ da liễu",
-      image: "/placeholder.svg?height=300&width=300",
-      experience: "8 năm kinh nghiệm",
-    },
-  ]
+  // Hàm lấy chữ cái đầu cho avatar
+  const getInitials = (name) => {
+    if (!name) return 'BS'
+    const parts = name.split(' ')
+    if (parts.length >= 2) {
+      return parts[parts.length - 2].charAt(0) + parts[parts.length - 1].charAt(0)
+    }
+    return name.charAt(0)
+  }
+
+  // Mảng màu cho avatar
+  const avatarColors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#43e97b', '#fa709a', '#fee140']
 
   return (
     <>
@@ -393,6 +416,18 @@ const AboutPage = () => {
           object-fit: cover;
         }
 
+        .team-avatar {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 2.5rem;
+          font-weight: 700;
+          letter-spacing: 2px;
+        }
+
         .team-name {
           font-size: 1.3rem;
           font-weight: 600;
@@ -409,6 +444,16 @@ const AboutPage = () => {
         .team-experience {
           color: #666;
           font-size: 0.9rem;
+        }
+
+        .team-contact {
+          color: #888;
+          font-size: 0.85rem;
+          margin-bottom: 0.3rem;
+        }
+
+        .team-contact i {
+          color: #667eea;
         }
 
         .cta-section {
@@ -609,22 +654,54 @@ const AboutPage = () => {
             <h2 className="section-title">Đội ngũ chuyên gia</h2>
             <p className="section-subtitle">Đội ngũ bác sĩ thú y giàu kinh nghiệm và tận tâm</p>
 
-            <div className="team-grid">
-              {team.map((member, index) => (
-                <div
-                  key={index}
-                  className={`team-card animate-on-scroll ${isVisible[`team-${index}`] ? "visible" : ""}`}
-                  id={`team-${index}`}
-                >
-                  <div className="team-image">
-                    <img src={member.image || "/placeholder.svg"} alt={member.name} />
-                  </div>
-                  <h4 className="team-name">{member.name}</h4>
-                  <p className="team-position">{member.position}</p>
-                  <p className="team-experience">{member.experience}</p>
+            {loadingTeam ? (
+              <div className="text-center py-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Đang tải...</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : team.length === 0 ? (
+              <div className="text-center py-5">
+                <i className="bi bi-people" style={{ fontSize: '3rem', color: '#ccc' }}></i>
+                <p className="mt-3" style={{ color: '#999' }}>Chưa có thông tin bác sĩ</p>
+              </div>
+            ) : (
+              <div className="team-grid">
+                {team.map((member, index) => (
+                  <div
+                    key={member.id || index}
+                    className={`team-card animate-on-scroll ${isVisible[`team-${index}`] ? "visible" : ""}`}
+                    id={`team-${index}`}
+                  >
+                    <div className="team-image">
+                      <div
+                        className="team-avatar"
+                        style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
+                      >
+                        <span>{getInitials(member.name)}</span>
+                      </div>
+                    </div>
+                    <h4 className="team-name">{member.name}</h4>
+                    <p className="team-position">{member.position}</p>
+                    {member.email && (
+                      <p className="team-contact">
+                        <i className="bi bi-envelope me-1"></i>{member.email}
+                      </p>
+                    )}
+                    {member.phone && (
+                      <p className="team-contact">
+                        <i className="bi bi-telephone me-1"></i>{member.phone}
+                      </p>
+                    )}
+                    {member.clinic && (
+                      <p className="team-contact">
+                        <i className="bi bi-geo-alt me-1"></i>{member.clinic}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

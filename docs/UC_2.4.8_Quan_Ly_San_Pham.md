@@ -44,6 +44,21 @@
 
 **Hậu điều kiện**: Sản phẩm được cập nhật trong hệ thống và hiển thị cho người mua
 
+## 3.2.2.8. Kiểm thử chức năng quản lý sản phẩm
+
+### Bảng 3.8 Danh sách test case chức năng quản lý sản phẩm
+
+| Tên test case | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Trạng thái |
+|---------------|-------------------|------------------|-----------------|------------|
+| Thêm sản phẩm thành công | Admin truy cập /admin/productmanagement → click "Thêm sản phẩm mới" → nhập tên, loại, giá, số lượng, mô tả, upload ảnh → nhấn "Lưu" | Hiển thị thông báo "Thêm sản phẩm thành công!" và sản phẩm xuất hiện trong danh sách | Hiển thị thông báo "Thêm sản phẩm thành công!" và sản phẩm xuất hiện trong danh sách | PASS |
+| Thêm sản phẩm với thông tin không đầy đủ | Admin click "Thêm sản phẩm mới" → nhập tên nhưng để trống giá và số lượng → nhấn "Lưu" | Hiển thị "Vui lòng nhập đầy đủ thông tin" | Hiển thị "Vui lòng nhập đầy đủ thông tin" | PASS |
+| Thêm sản phẩm với giá âm | Admin nhập tên, giá = -1000, số lượng = 10 → nhấn "Lưu" | Hiển thị "Giá và số lượng phải là số dương" | Hiển thị "Giá và số lượng phải là số dương" | PASS |
+| Thêm sản phẩm với số lượng âm | Admin nhập tên, giá = 50000, số lượng = -5 → nhấn "Lưu" | Hiển thị "Giá và số lượng phải là số dương" | Hiển thị "Giá và số lượng phải là số dương" | PASS |
+| Sửa sản phẩm thành công | Admin click "Chỉnh sửa" sản phẩm → cập nhật giá và số lượng → nhấn "Cập nhật" | Hiển thị thông báo "Cập nhật thành công!" và thông tin được cập nhật | Hiển thị thông báo "Cập nhật thành công!" và thông tin được cập nhật | PASS |
+| Sửa sản phẩm với ảnh mới | Admin chỉnh sửa sản phẩm → upload ảnh mới → nhấn "Cập nhật" | Ảnh mới được upload lên Cloudinary và thay thế ảnh cũ | Ảnh mới được upload lên Cloudinary và thay thế ảnh cũ | PASS |
+| Xóa sản phẩm thành công | Admin click "Xóa" trên sản phẩm → xác nhận trong hộp thoại | Sản phẩm bị xóa khỏi database và danh sách được cập nhật | Sản phẩm bị xóa khỏi database và danh sách được cập nhật | PASS |
+| Xóa sản phẩm có trong đơn hàng | Admin click "Xóa" sản phẩm đang có trong đơn hàng → xác nhận | Hiển thị "Không thể xóa sản phẩm đang có trong đơn hàng" | Hiển thị "Không thể xóa sản phẩm đang có trong đơn hàng" | PASS |
+
 ## Biểu đồ Sequence - Quản lý sản phẩm
 
 ```mermaid

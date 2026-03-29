@@ -138,31 +138,51 @@ const AddHealthRecord = () => {
 
     const submitMedicalRecord = async () => {
         const accessToken = localStorage.getItem("accessToken")
+
+        // Validate required fields
+        if (!medicalForm.recordDate) {
+            setErrorMessage("Vui lòng chọn ngày khám!")
+            return
+        }
+        if (!medicalForm.diagnosis || medicalForm.diagnosis.trim() === '') {
+            setErrorMessage("Vui lòng nhập chẩn đoán!")
+            return
+        }
+
         try {
             setSubmitting(true)
+            setErrorMessage('')
 
             const payload = {
                 petId: parseInt(petId),
                 recordDate: medicalForm.recordDate,
-                diagnosis: medicalForm.diagnosis,
-                treatment: medicalForm.treatment,
-                veterinarian: medicalForm.veterinarian,
-                clinic: medicalForm.clinic,
-                symptoms: medicalForm.symptoms,
-                notes: medicalForm.notes
+                diagnosis: medicalForm.diagnosis.trim(),
+                treatment: medicalForm.treatment ? medicalForm.treatment.trim() : '',
+                veterinarian: medicalForm.veterinarian ? medicalForm.veterinarian.trim() : '',
+                clinic: medicalForm.clinic ? medicalForm.clinic.trim() : '',
+                symptoms: medicalForm.symptoms ? medicalForm.symptoms.trim() : '',
+                notes: medicalForm.notes ? medicalForm.notes.trim() : ''
             }
 
-            await axios.post('http://localhost:8080/api/medical-records', payload, {
+            const response = await axios.post('http://localhost:8080/api/medical-records', payload, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
 
-            setSuccessMessage("Thêm hồ sơ bệnh án thành công!")
-            setTimeout(() => {
-                navigate(`/pet/health/${petId}`)
-            }, 2000)
+            if (response.status === 200) {
+                setSuccessMessage("Thêm hồ sơ bệnh án thành công!")
+                setTimeout(() => {
+                    navigate(`/pet/health/${petId}`)
+                }, 1500)
+            }
         } catch (error) {
             console.error("Error adding medical record:", error)
-            setErrorMessage("Không thể thêm hồ sơ bệnh án!")
+            if (error.response) {
+                setErrorMessage(error.response.data || "Không thể thêm hồ sơ bệnh án!")
+            } else if (error.request) {
+                setErrorMessage("Đã xảy ra lỗi kết nối. Vui lòng thử lại!")
+            } else {
+                setErrorMessage("Không thể thêm hồ sơ bệnh án!")
+            }
         } finally {
             setSubmitting(false)
         }
@@ -170,31 +190,51 @@ const AddHealthRecord = () => {
 
     const submitVaccination = async () => {
         const accessToken = localStorage.getItem("accessToken")
+
+        // Validate required fields
+        if (!vaccinationForm.vaccineName || vaccinationForm.vaccineName.trim() === '') {
+            setErrorMessage("Vui lòng nhập tên vaccine!")
+            return
+        }
+        if (!vaccinationForm.vaccinationDate) {
+            setErrorMessage("Vui lòng chọn ngày tiêm!")
+            return
+        }
+
         try {
             setSubmitting(true)
+            setErrorMessage('')
 
             const payload = {
                 petId: parseInt(petId),
-                vaccineName: vaccinationForm.vaccineName,
+                vaccineName: vaccinationForm.vaccineName.trim(),
                 vaccinationDate: vaccinationForm.vaccinationDate,
-                nextDueDate: vaccinationForm.nextDueDate,
-                veterinarian: vaccinationForm.veterinarian,
-                clinic: vaccinationForm.clinic,
-                batchNumber: vaccinationForm.batchNumber,
-                notes: vaccinationForm.notes
+                nextDueDate: vaccinationForm.nextDueDate || null,
+                veterinarian: vaccinationForm.veterinarian ? vaccinationForm.veterinarian.trim() : '',
+                clinic: vaccinationForm.clinic ? vaccinationForm.clinic.trim() : '',
+                batchNumber: vaccinationForm.batchNumber ? vaccinationForm.batchNumber.trim() : '',
+                notes: vaccinationForm.notes ? vaccinationForm.notes.trim() : ''
             }
 
-            await axios.post('http://localhost:8080/api/vaccinations', payload, {
+            const response = await axios.post('http://localhost:8080/api/vaccinations', payload, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
 
-            setSuccessMessage("Thêm thông tin tiêm chủng thành công!")
-            setTimeout(() => {
-                navigate(`/pet/health/${petId}`)
-            }, 2000)
+            if (response.status === 200) {
+                setSuccessMessage("Thêm thông tin tiêm chủng thành công!")
+                setTimeout(() => {
+                    navigate(`/pet/health/${petId}`)
+                }, 1500)
+            }
         } catch (error) {
             console.error("Error adding vaccination:", error)
-            setErrorMessage("Không thể thêm thông tin tiêm chủng!")
+            if (error.response) {
+                setErrorMessage(error.response.data || "Không thể thêm thông tin tiêm chủng!")
+            } else if (error.request) {
+                setErrorMessage("Đã xảy ra lỗi kết nối. Vui lòng thử lại!")
+            } else {
+                setErrorMessage("Không thể thêm thông tin tiêm chủng!")
+            }
         } finally {
             setSubmitting(false)
         }
@@ -202,27 +242,47 @@ const AddHealthRecord = () => {
 
     const submitWeightRecord = async () => {
         const accessToken = localStorage.getItem("accessToken")
+
+        // Validate required fields
+        if (!weightForm.weight || weightForm.weight <= 0) {
+            setErrorMessage("Vui lòng nhập cân nặng hợp lệ (lớn hơn 0)!")
+            return
+        }
+        if (!weightForm.recordDate) {
+            setErrorMessage("Vui lòng chọn ngày cân!")
+            return
+        }
+
         try {
             setSubmitting(true)
+            setErrorMessage('')
 
             const payload = {
                 petId: parseInt(petId),
                 weight: parseFloat(weightForm.weight),
                 recordDate: weightForm.recordDate,
-                notes: weightForm.notes
+                notes: weightForm.notes ? weightForm.notes.trim() : ''
             }
 
-            await axios.post('http://localhost:8080/api/weight-records', payload, {
+            const response = await axios.post('http://localhost:8080/api/weight-records', payload, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
 
-            setSuccessMessage("Thêm thông tin cân nặng thành công!")
-            setTimeout(() => {
-                navigate(`/pet/health/${petId}`)
-            }, 2000)
+            if (response.status === 200) {
+                setSuccessMessage("Thêm thông tin cân nặng thành công!")
+                setTimeout(() => {
+                    navigate(`/pet/health/${petId}`)
+                }, 1500)
+            }
         } catch (error) {
             console.error("Error adding weight record:", error)
-            setErrorMessage("Không thể thêm thông tin cân nặng!")
+            if (error.response) {
+                setErrorMessage(error.response.data || "Không thể thêm thông tin cân nặng!")
+            } else if (error.request) {
+                setErrorMessage("Đã xảy ra lỗi kết nối. Vui lòng thử lại!")
+            } else {
+                setErrorMessage("Không thể thêm thông tin cân nặng!")
+            }
         } finally {
             setSubmitting(false)
         }
@@ -257,7 +317,7 @@ const AddHealthRecord = () => {
         <>
             <style jsx>{`
         .add-record-container {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
           min-height: 100vh;
           position: relative;
           overflow-x: hidden;
@@ -272,12 +332,12 @@ const AddHealthRecord = () => {
         }
 
         .form-card {
-          background: rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
           border-radius: 25px;
           padding: 40px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         .form-header {
@@ -288,7 +348,7 @@ const AddHealthRecord = () => {
         .form-title {
           font-size: 28px;
           font-weight: 700;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -296,13 +356,14 @@ const AddHealthRecord = () => {
         }
 
         .pet-info {
-          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
           padding: 20px;
           border-radius: 15px;
           margin-bottom: 30px;
           display: flex;
           align-items: center;
           gap: 16px;
+          border: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         .pet-avatar {
@@ -328,7 +389,7 @@ const AddHealthRecord = () => {
         .form-input, .form-select, .form-textarea {
           width: 100%;
           padding: 12px 16px;
-          border: 2px solid #e1e5e9;
+          border: 2px solid #e0e7ff;
           border-radius: 12px;
           font-size: 16px;
           transition: all 0.3s ease;
@@ -337,8 +398,8 @@ const AddHealthRecord = () => {
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
           outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          border-color: #6366f1;
+          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
           transform: translateY(-1px);
         }
 
@@ -354,7 +415,7 @@ const AddHealthRecord = () => {
         }
 
         .btn-cancel {
-          background: #6c757d;
+          background: #64748b;
           border: none;
           border-radius: 12px;
           padding: 12px 24px;
@@ -366,14 +427,15 @@ const AddHealthRecord = () => {
         }
 
         .btn-cancel:hover {
-          background: #5a6268;
+          background: #475569;
           transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
           color: white;
           text-decoration: none;
         }
 
         .btn-submit {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
           border: none;
           border-radius: 12px;
           padding: 12px 24px;
@@ -385,7 +447,8 @@ const AddHealthRecord = () => {
 
         .btn-submit:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+          box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         }
 
         .btn-submit:disabled {

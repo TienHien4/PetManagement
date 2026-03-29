@@ -46,6 +46,37 @@ services:
       timeout: 5s
       retries: 5
 
+  # Zookeeper for Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: petcare-zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - petcare-network
+
+  # Kafka Message Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: petcare-kafka
+    restart: always
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    networks:
+      - petcare-network
+
   # Backend Service
   backend:
     build:
@@ -67,6 +98,7 @@ services:
       - SERVER_PORT=8080
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - CLOUDINARY_CLOUD_NAME=dptcumyqm
       - CLOUDINARY_API_KEY=689576972883836
       - CLOUDINARY_API_SECRET=QtcsaagCOhJ5-55uWmgixZcgTLw
@@ -75,6 +107,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      kafka:
+        condition: service_started
     networks:
       - petcare-network
     volumes:

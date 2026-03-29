@@ -139,7 +139,7 @@ const VetDashboard = () => {
                 customerMap.set(customerId, {
                     id: customerId,
                     email: customerEmail,
-                    name: appointment.customerName || appointment.userName || appointment.name || customerEmail?.split('@')[0] || 'N/A',
+                    name: appointment.customerName || appointment.userName || customerEmail?.split('@')[0] || 'N/A',
                     phone: appointment.customerPhone || 'N/A',
                     appointments: [],
                     pets: new Set(),
@@ -385,9 +385,8 @@ const VetDashboard = () => {
                         <Table responsive hover className="mb-0">
                             <thead className="table-dark">
                                 <tr>
-                                    <th style={{ width: '250px' }}>Khách hàng</th>
-                                    <th style={{ width: '200px' }}>Liên hệ</th>
-                                    <th style={{ width: '300px' }}>Thú cưng</th>
+                                    <th style={{ width: '250px' }}>Tên khách hàng</th>
+                                    <th style={{ width: '200px' }}>Email</th>
                                     <th style={{ width: '120px' }}>Số lần khám</th>
                                     <th style={{ width: '150px' }}>Tổng chi phí</th>
                                     <th style={{ width: '150px' }}>Lần khám cuối</th>
@@ -413,22 +412,7 @@ const VetDashboard = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div>
-                                                {customer.pets.length > 0 ? (
-                                                    customer.pets.slice(0, 2).map((pet, petIndex) => (
-                                                        <div key={petIndex} className="mb-1">
-                                                            <span className="fw-bold">{pet.name}</span>
-                                                        </div>
-                                                    ))
-                                                ) : (
-                                                    <span className="text-muted">Không có thông tin</span>
-                                                )}
-                                                {customer.pets.length > 2 && (
-                                                    <small className="text-muted">+{customer.pets.length - 2} thú cưng khác</small>
-                                                )}
-                                            </div>
-                                        </td>
+
                                         <td>
                                             <div className="text-center">
                                                 <Badge bg="info" className="fs-6">
@@ -487,162 +471,231 @@ const VetDashboard = () => {
             />
 
             {/* Customer Detail Modal */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>Chi tiết khách hàng</Modal.Title>
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="xl" centered>
+                <Modal.Header closeButton style={{
+                    background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '20px 28px'
+                }}>
+                    <Modal.Title className="d-flex align-items-center gap-2" style={{ fontSize: '1.2rem', fontWeight: 700 }}>
+                        <FaUser />
+                        Chi tiết khách hàng
+                        {selectedCustomer && (
+                            <Badge bg="light" text="dark" className="ms-2" style={{ fontSize: '0.8rem' }}>
+                                #{selectedCustomer.id}
+                            </Badge>
+                        )}
+                    </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={{ padding: '24px', backgroundColor: '#f8f9fa' }}>
                     {selectedCustomer && (
-                        <Row>
-                            <Col md={6}>
-                                <Card className="h-100">
-                                    <Card.Header>
-                                        <h6 className="mb-0">
-                                            <FaUser className="me-2" />
-                                            Thông tin khách hàng
-                                        </h6>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <p><strong>Tên:</strong> {selectedCustomer.name}</p>
-                                        <p><strong>Email:</strong> {selectedCustomer.email}</p>
-                                        <p><strong>Điện thoại:</strong> {selectedCustomer.phone}</p>
-                                        <p><strong>ID:</strong> {selectedCustomer.id}</p>
-                                        <p><strong>Số lần khám:</strong> <Badge bg="info">{selectedCustomer.appointmentCount}</Badge></p>
-                                        <p><strong>Tổng chi phí:</strong> <span className="fw-bold text-success">{selectedCustomer.totalSpent.toLocaleString()} VNĐ</span></p>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className="h-100">
-                                    <Card.Header>
-                                        <h6 className="mb-0">
-                                            <FaPaw className="me-2" />
-                                            Thú cưng
-                                        </h6>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        {selectedCustomer.pets.length > 0 ? (
-                                            selectedCustomer.pets.map((pet, index) => (
-                                                <div key={index} className="border rounded p-3 mb-3 bg-light">
-                                                    <div className="d-flex align-items-start">
-                                                        <div className="pet-avatar-container me-3">
-                                                            {pet.image ? (
-                                                                <img
-                                                                    src={pet.image}
-                                                                    alt={pet.name}
-                                                                    className="rounded-circle"
-                                                                    style={{ width: '60px', height: '60px', objectFit: 'cover', border: '2px solid #007bff' }}
-                                                                />
-                                                            ) : (
-                                                                <div
-                                                                    className="rounded-circle d-flex align-items-center justify-content-center"
-                                                                    style={{
-                                                                        width: '60px',
-                                                                        height: '60px',
-                                                                        backgroundColor: '#e3f2fd',
-                                                                        border: '2px solid #007bff'
-                                                                    }}
-                                                                >
-                                                                    <FaPaw className="text-primary" style={{ fontSize: '24px' }} />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex-grow-1">
-                                                            <div className="d-flex align-items-center mb-2">
-                                                                <FaPaw className="me-2 text-primary" />
-                                                                <h6 className="mb-0 fw-bold">{pet.name}</h6>
-                                                            </div>
-                                                            <div className="row">
-                                                                <div className="col-md-6">
-                                                                    <small className="text-muted d-block">
-                                                                        <strong>Loài:</strong> {pet.type}
-                                                                    </small>
-                                                                    <small className="text-muted d-block">
-                                                                        <strong>Giống:</strong> {pet.breed}
-                                                                    </small>
-                                                                    {pet.age !== 'N/A' && (
-                                                                        <small className="text-muted d-block">
-                                                                            <strong>Tuổi:</strong> {pet.age}
-                                                                        </small>
-                                                                    )}
-                                                                </div>
-                                                                <div className="col-md-6">
-                                                                    {pet.weight !== 'N/A' && (
-                                                                        <small className="text-muted d-block">
-                                                                            <strong>Cân nặng:</strong> {pet.weight} kg
-                                                                        </small>
-                                                                    )}
-                                                                    {pet.gender !== 'N/A' && (
-                                                                        <small className="text-muted d-block">
-                                                                            <strong>Giới tính:</strong> {pet.gender}
-                                                                        </small>
-                                                                    )}
-                                                                    {pet.id && (
-                                                                        <small className="text-muted d-block">
-                                                                            <strong>ID:</strong> #{pet.id}
-                                                                        </small>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                        <>
+                            {/* Top: Customer info + Pets */}
+                            <Row className="g-3 mb-3">
+                                {/* Customer Info */}
+                                <Col md={5}>
+                                    <Card className="h-100 shadow-sm border-0">
+                                        <Card.Header className="d-flex align-items-center gap-2 border-0"
+                                            style={{ background: '#fff', padding: '16px 20px', borderBottom: '2px solid #f0f0f0' }}>
+                                            <div style={{
+                                                width: 32, height: 32, borderRadius: '50%',
+                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                            }}>
+                                                <FaUser style={{ color: '#fff', fontSize: 14 }} />
+                                            </div>
+                                            <span className="fw-bold" style={{ fontSize: '0.95rem' }}>Thông tin khách hàng</span>
+                                        </Card.Header>
+                                        <Card.Body style={{ padding: '20px' }}>
+                                            {/* Avatar + Name */}
+                                            <div className="d-flex align-items-center gap-3 mb-4">
+                                                <div style={{
+                                                    width: 56, height: 56, borderRadius: '50%',
+                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    color: '#fff', fontWeight: 700, fontSize: '1.3rem', flexShrink: 0
+                                                }}>
+                                                    {selectedCustomer.name?.charAt(0)?.toUpperCase() || 'K'}
                                                 </div>
-                                            ))
-                                        ) : (
-                                            <p className="text-muted">Không có thông tin thú cưng</p>
-                                        )}
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                            <Col md={12} className="mt-3">
-                                <Card>
-                                    <Card.Header>
-                                        <h6 className="mb-0">
-                                            <FaHistory className="me-2" />
-                                            Lịch sử khám ({selectedCustomer.appointmentCount} lần)
-                                        </h6>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                            {selectedCustomer.appointments.map((appointment, index) => (
-                                                <div key={index} className="border rounded p-2 mb-2 bg-light">
-                                                    <div className="d-flex justify-content-between align-items-start">
-                                                        <div>
-                                                            <div className="fw-bold">{appointment.name}</div>
-                                                            <small className="text-muted">
-                                                                {formatDate(appointment.date || appointment.appointmentDate)}
-                                                            </small>
-                                                            {appointment.services && (
-                                                                <div className="mt-1">
-                                                                    {appointment.services.map((service, sIndex) => (
-                                                                        <Badge key={sIndex} bg="secondary" className="me-1">
-                                                                            {service.name}
-                                                                        </Badge>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="text-end">
-                                                            {appointment.services && (
-                                                                <div className="fw-bold text-success">
-                                                                    {appointment.services
-                                                                        .reduce((total, service) => total + (service.price || 0), 0)
-                                                                        .toLocaleString()} VNĐ
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
+                                                <div>
+                                                    <div className="fw-bold" style={{ fontSize: '1rem' }}>{selectedCustomer.name}</div>
+                                                    <small className="text-muted">{selectedCustomer.email}</small>
+                                                </div>
+                                            </div>
+                                            {/* Info rows */}
+                                            {[
+                                                { label: 'Email', value: selectedCustomer.email },
+                                                { label: 'Số lần khám', value: <Badge bg="primary" pill>{selectedCustomer.appointmentCount} lần</Badge> },
+                                                { label: 'Tổng chi phí', value: <span className="fw-bold text-success">{selectedCustomer.totalSpent.toLocaleString()} VNĐ</span> },
+                                                { label: 'Lần khám gần nhất', value: selectedCustomer.lastVisit ? formatDate(selectedCustomer.lastVisit) : 'N/A' },
+                                            ].map((row, i) => (
+                                                <div key={i} className="d-flex justify-content-between align-items-center py-2"
+                                                    style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                                    <span className="text-muted" style={{ fontSize: '0.85rem' }}>{row.label}</span>
+                                                    <span style={{ fontSize: '0.9rem' }}>{row.value}</span>
                                                 </div>
                                             ))}
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+
+                                {/* Pets */}
+                                <Col md={7}>
+                                    <Card className="h-100 shadow-sm border-0">
+                                        <Card.Header className="d-flex align-items-center gap-2 border-0"
+                                            style={{ background: '#fff', padding: '16px 20px', borderBottom: '2px solid #f0f0f0' }}>
+                                            <div style={{
+                                                width: 32, height: 32, borderRadius: '50%',
+                                                background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                            }}>
+                                                <FaPaw style={{ color: '#fff', fontSize: 14 }} />
+                                            </div>
+                                            <span className="fw-bold" style={{ fontSize: '0.95rem' }}>
+                                                Thú cưng
+                                                <Badge bg="info" pill className="ms-2" style={{ fontSize: '0.75rem' }}>
+                                                    {selectedCustomer.pets.length}
+                                                </Badge>
+                                            </span>
+                                        </Card.Header>
+                                        <Card.Body style={{ padding: '16px 20px', maxHeight: '260px', overflowY: 'auto' }}>
+                                            {selectedCustomer.pets.length > 0 ? (
+                                                <Row className="g-2">
+                                                    {selectedCustomer.pets.map((pet, index) => (
+                                                        <Col md={6} key={index}>
+                                                            <div style={{
+                                                                border: '1px solid #e2e8f0', borderRadius: 12,
+                                                                padding: '12px 14px', background: '#fafbff'
+                                                            }}>
+                                                                <div className="d-flex align-items-center gap-2 mb-2">
+                                                                    {pet.image ? (
+                                                                        <img src={pet.image} alt={pet.name} className="rounded-circle"
+                                                                            style={{ width: 44, height: 44, objectFit: 'cover', border: '2px solid #6366f1' }} />
+                                                                    ) : (
+                                                                        <div style={{
+                                                                            width: 44, height: 44, borderRadius: '50%',
+                                                                            background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
+                                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                                            border: '2px solid #6366f1', flexShrink: 0
+                                                                        }}>
+                                                                            <FaPaw style={{ color: '#6366f1', fontSize: 18 }} />
+                                                                        </div>
+                                                                    )}
+                                                                    <div>
+                                                                        <div className="fw-bold" style={{ fontSize: '0.9rem' }}>{pet.name}</div>
+                                                                        <small className="text-muted">{pet.type} · {pet.breed}</small>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="d-flex flex-wrap gap-1">
+                                                                    {pet.age !== 'N/A' && pet.age && (
+                                                                        <Badge bg="light" text="dark" style={{ fontSize: '0.75rem', border: '1px solid #e2e8f0' }}>
+                                                                            🎂 {pet.age} tuổi
+                                                                        </Badge>
+                                                                    )}
+                                                                    {pet.weight !== 'N/A' && pet.weight && (
+                                                                        <Badge bg="light" text="dark" style={{ fontSize: '0.75rem', border: '1px solid #e2e8f0' }}>
+                                                                            ⚖️ {pet.weight} kg
+                                                                        </Badge>
+                                                                    )}
+                                                                    {pet.gender !== 'N/A' && pet.gender && (
+                                                                        <Badge bg="light" text="dark" style={{ fontSize: '0.75rem', border: '1px solid #e2e8f0' }}>
+                                                                            {pet.gender === 'Đực' || pet.gender === 'Male' ? '♂' : '♀'} {pet.gender}
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </Col>
+                                                    ))}
+                                                </Row>
+                                            ) : (
+                                                <div className="text-center py-4 text-muted">
+                                                    <FaPaw style={{ fontSize: 32, opacity: 0.3 }} />
+                                                    <div className="mt-2">Không có thông tin thú cưng</div>
+                                                </div>
+                                            )}
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            </Row>
+
+                            {/* Appointment History */}
+                            <Card className="shadow-sm border-0">
+                                <Card.Header className="d-flex align-items-center justify-content-between border-0"
+                                    style={{ background: '#fff', padding: '16px 20px', borderBottom: '2px solid #f0f0f0' }}>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <div style={{
+                                            width: 32, height: 32, borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                        }}>
+                                            <FaHistory style={{ color: '#fff', fontSize: 14 }} />
                                         </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        </Row>
+                                        <span className="fw-bold" style={{ fontSize: '0.95rem' }}>Lịch sử khám</span>
+                                        <Badge bg="warning" text="dark" pill style={{ fontSize: '0.75rem' }}>
+                                            {selectedCustomer.appointmentCount} lần
+                                        </Badge>
+                                    </div>
+                                </Card.Header>
+                                <Card.Body style={{ padding: '12px 20px' }}>
+                                    <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                                        {selectedCustomer.appointments.map((appointment, index) => {
+                                            const total = appointment.services
+                                                ? appointment.services.reduce((s, sv) => s + (sv.price || 0), 0)
+                                                : 0;
+                                            return (
+                                                <div key={index} style={{
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                                    border: '1px solid #e2e8f0', borderRadius: 10,
+                                                    padding: '12px 16px', background: '#fffbf0',
+                                                    marginBottom: 8, gap: 12
+                                                }}>
+                                                    {/* Left: ID + badge màu */}
+                                                    <div style={{
+                                                        width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                                                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        color: '#fff', fontWeight: 700, fontSize: '0.8rem'
+                                                    }}>
+                                                        #{appointment.id}
+                                                    </div>
+                                                    {/* Middle: name + date - fixed width */}
+                                                    <div style={{ width: 220, flexShrink: 0 }}>
+                                                        <div className="fw-bold text-truncate" style={{ fontSize: '0.9rem' }}>
+                                                            {appointment.name}
+                                                        </div>
+                                                        <small className="text-muted">
+                                                            📅 {formatDate(appointment.date || appointment.appointmentDate)}
+                                                        </small>
+                                                    </div>
+                                                    {/* Services badges - fixed width, always aligned */}
+                                                    <div style={{ width: 160, flexShrink: 0, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                                                        {appointment.services && appointment.services.length > 0
+                                                            ? appointment.services.map((service, sIndex) => (
+                                                                <Badge key={sIndex} bg="secondary" style={{ fontSize: '0.75rem' }}>
+                                                                    {service.name}
+                                                                </Badge>
+                                                            ))
+                                                            : null
+                                                        }
+                                                    </div>
+                                                    {/* Right: price */}
+                                                    {total > 0 && (
+                                                        <div className="fw-bold text-success" style={{ fontSize: '0.9rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                                            {total.toLocaleString()} VNĐ
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </Card.Body>
+                            </Card>
+                        </>
                     )}
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
+                <Modal.Footer style={{ background: '#fff', borderTop: '1px solid #f0f0f0', padding: '12px 24px' }}>
+                    <Button variant="secondary" onClick={() => setShowModal(false)} style={{ minWidth: 90 }}>
                         Đóng
                     </Button>
                 </Modal.Footer>

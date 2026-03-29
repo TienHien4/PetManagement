@@ -1,0 +1,73 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pet-management-ingress
+  namespace: pet-management
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    # Uncomment for HTTPS with cert-manager
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  # Uncomment for HTTPS
+  # tls:
+  # - hosts:
+  #   - petmanagement.yourdomain.com
+  #   secretName: petmanagement-tls
+  rules:
+  - host: petmanagement.local  # Change to your domain
+    http:
+      paths:
+      # Backend API routes
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8080
+      # WebSocket routes
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8080
+      # OAuth2 routes
+      - path: /oauth2
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8080
+      - path: /login
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8080
+      # Uploads (static files)
+      - path: /uploads
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8080
+      # Frontend routes (catch-all)
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80

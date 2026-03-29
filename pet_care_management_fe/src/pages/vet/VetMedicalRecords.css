@@ -1,0 +1,323 @@
+.vet-medical-records {
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 100%);
+    min-height: 100vh;
+}
+
+.page-title {
+    color: #1e293b;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.custom-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+    padding-bottom: 5px;
+    background: white;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 10px 5px 10px;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.tab-button:hover {
+    color: #6366f1;
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+.tab-button.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8b5cf6;
+}
+
+.search-box .form-control {
+    padding-left: 45px;
+    border-radius: 12px;
+    border: 2px solid #e0e7ff;
+    transition: all 0.3s ease;
+}
+
+.search-box .form-control:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.pet-card {
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #fefce8 100%);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.pet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.pet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(139, 92, 246, 0.1);
+}
+
+.pet-name {
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.pet-species {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+    font-weight: 500;
+}
+
+.pet-info {
+    margin-bottom: 15px;
+}
+
+.info-item {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #475569;
+}
+
+.info-item strong {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.pet-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pet-actions .btn {
+    flex: 1;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.pet-actions .btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+}
+
+.pet-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.pet-actions .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+}
+
+.pet-actions .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.pet-actions .btn-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    border: none;
+}
+
+.pet-actions .btn-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+    border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+}
+
+.card-header h5 {
+    margin: 0;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.card {
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(139, 92, 246, 0.08);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+    color: #1e293b;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+}
+
+.table tbody tr {
+    transition: all 0.2s;
+}
+
+.table tbody tr:hover {
+    background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+    transform: translateX(2px);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+    color: white;
+    font-weight: 700;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-content {
+    border-radius: 12px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+}
+
+.btn-outline-secondary {
+    border: 2px solid #64748b;
+    color: #64748b;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: #64748b;
+    color: white;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .pet-actions {
+        flex-direction: column;
+    }
+
+    .pet-actions .btn {
+        width: 100%;
+    }
+
+    .custom-tabs {
+        overflow-x: auto;
+    }
+
+    .tab-button {
+        white-space: nowrap;
+    }
+}

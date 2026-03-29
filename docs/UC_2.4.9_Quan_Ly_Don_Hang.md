@@ -44,6 +44,21 @@
 
 **Hậu điều kiện**: Đơn hàng được lưu trữ và theo dõi qua các trạng thái cho đến khi hoàn thành
 
+## 3.2.2.9. Kiểm thử chức năng quản lý đơn hàng
+
+### Bảng 3.9 Danh sách test case chức năng quản lý đơn hàng
+
+| Tên test case | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Trạng thái |
+|---------------|-------------------|------------------|-----------------|------------|
+| Tạo đơn hàng thành công | Thêm sản phẩm vào giỏ → truy cập /shopping-cart → click "Đặt hàng & Thanh toán" | Đơn hàng được tạo với trạng thái "PENDING", tạo OrderItem và chuyển sang VNPay | Đơn hàng được tạo với trạng thái "PENDING", tạo OrderItem và chuyển sang VNPay | PASS |
+| Đặt hàng với giỏ hàng trống | Truy cập /shopping-cart (giỏ trống) → click "Đặt hàng & Thanh toán" | Hiển thị "Giỏ hàng trống" và không cho phép đặt hàng | Hiển thị "Giỏ hàng trống" và không cho phép đặt hàng | PASS |
+| Đặt hàng với sản phẩm hết hàng | Thêm sản phẩm vào giỏ → sản phẩm hết hàng → click "Đặt hàng" | Hiển thị "Sản phẩm đã hết hàng" và loại khỏi giỏ | Hiển thị "Sản phẩm đã hết hàng" và loại khỏi giỏ | PASS |
+| Xem lịch sử đơn hàng (User) | User đăng nhập → truy cập /user/orders | Hiển thị danh sách đơn hàng với trạng thái: PENDING, PAID, PROCESSING, COMPLETED, CANCELLED | Hiển thị danh sách đơn hàng với trạng thái: PENDING, PAID, PROCESSING, COMPLETED, CANCELLED | PASS |
+| Xem chi tiết đơn hàng | User click vào đơn hàng trong danh sách | Hiển thị chi tiết: Danh sách sản phẩm, số lượng, giá, tổng cộng, ngày đặt | Hiển thị chi tiết: Danh sách sản phẩm, số lượng, giá, tổng cộng, ngày đặt | PASS |
+| Admin xem tất cả đơn hàng | Admin truy cập /admin/orders | Hiển thị danh sách đơn hàng của tất cả khách hàng: Mã đơn, Khách hàng, Ngày đặt, Tổng tiền, Trạng thái | Hiển thị danh sách đơn hàng của tất cả khách hàng: Mã đơn, Khách hàng, Ngày đặt, Tổng tiền, Trạng thái | PASS |
+| Admin xem chi tiết đơn hàng | Admin click vào đơn hàng | Hiển thị chi tiết đơn hàng: Danh sách sản phẩm, thông tin khách hàng, trạng thái thanh toán VNPay | Hiển thị chi tiết đơn hàng: Danh sách sản phẩm, thông tin khách hàng, trạng thái thanh toán VNPay | PASS |
+| Thanh toán lại đơn hàng PENDING | User chọn đơn hàng trạng thái "PENDING" → click "Thanh toán lại" | Chuyển đến trang thanh toán VNPay với thông tin đơn hàng | Chuyển đến trang thanh toán VNPay với thông tin đơn hàng | PASS |
+
 ## Biểu đồ Sequence - Luồng đặt hàng và thanh toán
 
 ```mermaid

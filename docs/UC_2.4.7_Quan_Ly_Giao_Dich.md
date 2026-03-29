@@ -43,3 +43,18 @@
 | 5c | Hệ thống | Nếu timeout từ VNPay thì hiển thị "Giao dịch hết hạn, vui lòng thử lại" |
 
 **Hậu điều kiện**: Giao dịch được ghi nhận và trạng thái đơn hàng được cập nhật
+
+## 3.2.2.7. Kiểm thử chức năng quản lý giao dịch
+
+### Bảng 3.7 Danh sách test case chức năng quản lý giao dịch
+
+| Tên test case | Các bước thực hiện | Kết quả mong đợi | Kết quả thực tế | Trạng thái |
+|---------------|-------------------|------------------|-----------------|------------|
+| Thanh toán VNPay thành công | Thêm sản phẩm vào giỏ → click "Đặt hàng & Thanh toán" → chọn phương thức VNPay → xác nhận | Trạng thái đơn hàng chuyển thành "PAID", hiển thị mã giao dịch VNPay | Trạng thái đơn hàng chuyển thành "PAID", hiển thị mã giao dịch VNPay | PASS |
+| Thanh toán thất bại | Đặt hàng → chọn VNPay → nhập thông tin thẻ sai → xác nhận | Đơn hàng giữ trạng thái "PENDING", hiển thị "Thanh toán thất bại" | Đơn hàng giữ trạng thái "PENDING", hiển thị "Thanh toán thất bại" | PASS |
+| Hủy giao dịch VNPay | Đặt hàng → chuyển sang VNPay → click "Hủy giao dịch" | Hiển thị "Bạn đã hủy thanh toán" và quay về giỏ hàng | Hiển thị "Bạn đã hủy thanh toán" và quay về giỏ hàng | PASS |
+| Timeout giao dịch VNPay | Đặt hàng → chuyển sang VNPay → để quá thời gian cho phép | Hiển thị "Giao dịch hết hạn, vui lòng thử lại" | Hiển thị "Giao dịch hết hạn, vui lòng thử lại" | PASS |
+| Xem lịch sử giao dịch (User) | User đăng nhập → truy cập /user/orders | Hiển thị danh sách đơn hàng với trạng thái thanh toán | Hiển thị danh sách đơn hàng với trạng thái thanh toán | PASS |
+| Xem chi tiết giao dịch | User click vào đơn hàng trong lịch sử | Hiển thị chi tiết: mã giao dịch VNPay, số tiền, thời gian, sản phẩm | Hiển thị chi tiết: mã giao dịch VNPay, số tiền, thời gian, sản phẩm | PASS |
+| Admin xem tất cả giao dịch | Admin truy cập /admin/orders | Hiển thị danh sách đơn hàng của tất cả khách hàng với trạng thái thanh toán | Hiển thị danh sách đơn hàng của tất cả khách hàng với trạng thái thanh toán | PASS |
+| Admin xem chi tiết giao dịch VNPay | Admin click vào đơn hàng | Hiển thị mã giao dịch VNPay (vnp_TxnRef), số tiền, thời gian, trạng thái | Hiển thị mã giao dịch VNPay (vnp_TxnRef), số tiền, thời gian, trạng thái | PASS |

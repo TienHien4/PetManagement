@@ -505,6 +505,17 @@ const Schedule = () => {
           border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
+        .card-header-inner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .card-header-text {
+          flex: 1;
+        }
+
         .schedule-title {
           font-size: 2rem;
           font-weight: 700;
@@ -768,6 +779,17 @@ const Schedule = () => {
             padding: 24px;
           }
 
+          .card-header-inner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+          }
+
+          .card-header-inner .add-schedule-btn {
+            width: 100%;
+            justify-content: center;
+          }
+
           .appointments-grid {
             grid-template-columns: 1fr;
             gap: 16px;
@@ -879,8 +901,8 @@ const Schedule = () => {
             {/* Card Header */}
 
             <div className="card-header">
-              <div className="d-flex justify-content-between align-items-center">
-                <div className="card-header">
+              <div className="card-header-inner">
+                <div className="card-header-text">
                   <h2 className="schedule-title">📅 Lịch khám thú cưng</h2>
                   <p className="schedule-subtitle">Quản lý và theo dõi lịch khám cho các thú cưng của bạn</p>
                 </div>

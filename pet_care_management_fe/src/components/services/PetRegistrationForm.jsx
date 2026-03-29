@@ -10,7 +10,6 @@ const PetRegistrationForm = () => {
   const userID = localStorage.getItem("userId")
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     petId: "", // Changed from petSpecies to petId
     petSpecies: "",
     services: [],
@@ -53,14 +52,11 @@ const PetRegistrationForm = () => {
       console.log("User pets:", res.data)
       setUserPets(res.data)
 
-      // If no pets found, redirect to create new pet
-      if (!res.data || res.data.length === 0) {
-        navigate('/pet/add')
-      }
+      // Không redirect nữa - cho phép user vào trang services dù chưa có pet
     } catch (error) {
       console.error("Error fetching user pets:", error)
-      // If no pets found, redirect to create new pet
-      navigate('/pet/add')
+      // Không redirect - cho phép user vào trang services
+      setUserPets([])
     }
   }
 
@@ -123,12 +119,6 @@ const PetRegistrationForm = () => {
 
     if (!formData.name.trim()) {
       newErrors.name = "Vui lòng nhập họ và tên"
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Vui lòng nhập email"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email không hợp lệ"
     }
 
     // Validate pet selection based on mode
@@ -251,7 +241,6 @@ const PetRegistrationForm = () => {
       setTimeout(() => {
         setFormData({
           name: "",
-          email: "",
           petId: "",
           petSpecies: "",
           services: [],
@@ -675,50 +664,24 @@ const PetRegistrationForm = () => {
               )}
 
               <form onSubmit={handleSubmit}>
-                <div className="row">
-                  <div className="col-md-6">
-                    <div className="form-group">
-                      <label className="form-label">
-                        <i className="bi bi-person-fill me-2"></i>
-                        Họ và tên *
-                      </label>
-                      <input
-                        type="text"
-                        className={`form-input ${errors.name ? "error" : ""}`}
-                        value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        placeholder="Nhập họ và tên của bạn"
-                      />
-                      {errors.name && (
-                        <div className="error-message">
-                          <i className="bi bi-exclamation-circle"></i>
-                          {errors.name}
-                        </div>
-                      )}
+                <div className="form-group">
+                  <label className="form-label">
+                    <i className="bi bi-person-fill me-2"></i>
+                    Họ và tên *
+                  </label>
+                  <input
+                    type="text"
+                    className={`form-input ${errors.name ? "error" : ""}`}
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    placeholder="Nhập họ và tên của bạn"
+                  />
+                  {errors.name && (
+                    <div className="error-message">
+                      <i className="bi bi-exclamation-circle"></i>
+                      {errors.name}
                     </div>
-                  </div>
-
-                  <div className="col-md-6">
-                    <div className="form-group">
-                      <label className="form-label">
-                        <i className="bi bi-envelope-fill me-2"></i>
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        className={`form-input ${errors.email ? "error" : ""}`}
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        placeholder="Nhập địa chỉ email"
-                      />
-                      {errors.email && (
-                        <div className="error-message">
-                          <i className="bi bi-exclamation-circle"></i>
-                          {errors.email}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Pet Selection Section */}
@@ -749,6 +712,21 @@ const PetRegistrationForm = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Thông báo khi chưa có thú cưng */}
+                  {userPets.length === 0 && (
+                    <div className="alert alert-info">
+                      <i className="bi bi-info-circle me-2"></i>
+                      <strong>Bạn chưa có thú cưng nào.</strong> Vui lòng điền thông tin thú cưng bên dưới hoặc{' '}
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 align-baseline"
+                        onClick={handleCreateNewPet}
+                      >
+                        tạo mới tại đây
+                      </button>.
+                    </div>
+                  )}
 
                   {!showCreatePetForm && userPets.length > 0 ? (
                     <div>
