@@ -128,7 +128,7 @@ public class EmailServiceIplm implements EmailService {
 
             helper.setText(emailContent, true);
 
-//            mailSender.send(message);
+            mailSender.send(message);
             logger.info("Appointment confirmation email sent successfully via SMTP");
 
         } catch (MessagingException | IOException e) {
