@@ -511,8 +511,8 @@ function DashboardPage() {
                 className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
                 onClick={() => handleNavigation("/admin/petmanagement")}
               >
-                <span className="menu-icon">ðŸ¾</span>
-                <span className="menu-text">ThÃº cÆ°ng</span>
+                <span className="menu-icon">🐾</span>
+                <span className="menu-text">Thú cưng</span>
               </button>
             </li>
             <li>
@@ -521,7 +521,7 @@ function DashboardPage() {
                 onClick={() => handleNavigation("/admin/productmanagement")}
               >
                 <i className="bi bi-box-seam menu-icon"></i>
-                <span className="menu-text">Sáº£n pháº©m</span>
+                <span className="menu-text">Sản phẩm</span>
               </button>
             </li>
             <li>
@@ -530,7 +530,7 @@ function DashboardPage() {
                 onClick={() => handleNavigation("/admin/usermanagement")}
               >
                 <i className="bi bi-person menu-icon"></i>
-                <span className="menu-text">TÃ i khoáº£n</span>
+                <span className="menu-text">Tài khoản</span>
               </button>
             </li>
             <li>
@@ -539,7 +539,7 @@ function DashboardPage() {
                 onClick={() => handleNavigation("/admin/orders")}
               >
                 <i className="bi bi-bag menu-icon"></i>
-                <span className="menu-text">ÄÆ¡n hÃ ng</span>
+                <span className="menu-text">Đơn hàng</span>
               </button>
             </li>
           </ul>
@@ -574,8 +574,8 @@ function DashboardPage() {
 
           {/* Dashboard Header */}
           <div className="dashboard-header">
-            <h1 className="dashboard-title">ðŸ“Š Dashboard Analytics</h1>
-            <p className="dashboard-subtitle">Theo dÃµi hiá»‡u suáº¥t vÃ  thá»‘ng kÃª kinh doanh cá»§a báº¡n</p>
+            <h1 className="dashboard-title">📊 Dashboard Analytics</h1>
+            <p className="dashboard-subtitle">Theo dõi hiệu suất và thống kê kinh doanh của bạn</p>
           </div>
 
           {/* Content */}

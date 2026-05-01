@@ -18,18 +18,18 @@ const ContactPage = () => {
   const [errors, setErrors] = useState({})
 
   const services = [
-    { value: "general", label: "KhÃ¡m bá»‡nh tá»•ng quÃ¡t" },
-    { value: "vaccine", label: "TiÃªm phÃ²ng vaccine" },
-    { value: "surgery", label: "Pháº«u thuáº­t" },
+    { value: "general", label: "Khám bệnh tổng quát" },
+    { value: "vaccine", label: "Tiêm phòng vaccine" },
+    { value: "surgery", label: "Phẫu thuật" },
     { value: "grooming", label: "Spa & Grooming" },
-    { value: "emergency", label: "Cáº¥p cá»©u" },
-    { value: "consultation", label: "TÆ° váº¥n" },
+    { value: "emergency", label: "Cấp cứu" },
+    { value: "consultation", label: "Tư vấn" },
   ]
 
   const contactInfo = [
     {
       icon: "bi-telephone",
-      title: "Äiá»‡n thoáº¡i",
+      title: "Điện thoại",
       content: "0382562504",
       link: "tel:0382562504",
       color: "#e74c3c",
@@ -43,15 +43,15 @@ const ContactPage = () => {
     },
     {
       icon: "bi-geo-alt",
-      title: "Äá»‹a chá»‰",
-      content: "Thuáº­n ThÃ nh - Báº¯c Ninh",
+      title: "Địa chỉ",
+      content: "Thuận Thành - Bắc Ninh",
       link: "#",
       color: "#2ecc71",
     },
     {
       icon: "bi-clock",
-      title: "Giá» lÃ m viá»‡c",
-      content: "8:00 - 17:00 (Thá»© 2 - Thá»© 7)",
+      title: "Giờ làm việc",
+      content: "8:00 - 17:00 (Thứ 2 - Thứ 7)",
       link: "#",
       color: "#f39c12",
     },
@@ -76,27 +76,27 @@ const ContactPage = () => {
     const newErrors = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = "Vui lÃ²ng nháº­p há» tÃªn"
+      newErrors.name = "Vui lòng nhập họ tên"
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Vui lÃ²ng nháº­p email"
+      newErrors.email = "Vui lòng nhập email"
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email khÃ´ng há»£p lá»‡"
+      newErrors.email = "Email không hợp lệ"
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = "Vui lÃ²ng nháº­p sá»‘ Ä‘iá»‡n thoáº¡i"
+      newErrors.phone = "Vui lòng nhập số điện thoại"
     } else if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\s/g, ""))) {
-      newErrors.phone = "Sá»‘ Ä‘iá»‡n thoáº¡i khÃ´ng há»£p lá»‡"
+      newErrors.phone = "Số điện thoại không hợp lệ"
     }
 
     if (!formData.subject.trim()) {
-      newErrors.subject = "Vui lÃ²ng nháº­p tiÃªu Ä‘á»"
+      newErrors.subject = "Vui lòng nhập tiêu đề"
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = "Vui lÃ²ng nháº­p ná»™i dung tin nháº¯n"
+      newErrors.message = "Vui lòng nhập nội dung tin nhắn"
     }
 
     setErrors(newErrors)
@@ -114,7 +114,7 @@ const ContactPage = () => {
 
     // Simulate API call
     setTimeout(() => {
-      alert("Cáº£m Æ¡n báº¡n Ä‘Ã£ liÃªn há»‡! ChÃºng tÃ´i sáº½ pháº£n há»“i trong thá»i gian sá»›m nháº¥t.")
+      alert("Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.")
       setFormData({
         name: "",
         email: "",
@@ -564,9 +564,9 @@ const ContactPage = () => {
           <div className="container">
             {/* Hero Section */}
             <div className="hero-section">
-              <h1 className="hero-title">LiÃªn Há»‡ Vá»›i ChÃºng TÃ´i</h1>
+              <h1 className="hero-title">Liên Hệ Với Chúng Tôi</h1>
               <p className="hero-subtitle">
-                ChÃºng tÃ´i luÃ´n sáºµn sÃ ng há»— trá»£ vÃ  tÆ° váº¥n cho báº¡n vá» má»i váº¥n Ä‘á» liÃªn quan Ä‘áº¿n thÃº cÆ°ng
+                Chúng tôi luôn sẵn sàng hỗ trợ và tư vấn cho bạn về mọi vấn đề liên quan đến thú cưng
               </p>
             </div>
 
@@ -574,19 +574,19 @@ const ContactPage = () => {
             <div className="contact-content">
               {/* Contact Form */}
               <div className="contact-form-section">
-                <h2 className="form-title">Gá»­i Tin Nháº¯n</h2>
+                <h2 className="form-title">Gửi Tin Nhắn</h2>
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-md-6">
                       <div className="form-group">
                         <label className="form-label">
-                          <i className="bi bi-person"></i> Há» vÃ  tÃªn *
+                          <i className="bi bi-person"></i> Họ và tên *
                         </label>
                         <input
                           type="text"
                           name="name"
                           className={`form-control ${errors.name ? "error" : ""}`}
-                          placeholder="Nháº­p há» vÃ  tÃªn cá»§a báº¡n"
+                          placeholder="Nhập họ và tên của bạn"
                           value={formData.name}
                           onChange={handleInputChange}
                         />
@@ -607,7 +607,7 @@ const ContactPage = () => {
                           type="email"
                           name="email"
                           className={`form-control ${errors.email ? "error" : ""}`}
-                          placeholder="Nháº­p Ä‘á»‹a chá»‰ email"
+                          placeholder="Nhập địa chỉ email"
                           value={formData.email}
                           onChange={handleInputChange}
                         />
@@ -625,13 +625,13 @@ const ContactPage = () => {
                     <div className="col-md-6">
                       <div className="form-group">
                         <label className="form-label">
-                          <i className="bi bi-telephone"></i> Sá»‘ Ä‘iá»‡n thoáº¡i *
+                          <i className="bi bi-telephone"></i> Số điện thoại *
                         </label>
                         <input
                           type="tel"
                           name="phone"
                           className={`form-control ${errors.phone ? "error" : ""}`}
-                          placeholder="Nháº­p sá»‘ Ä‘iá»‡n thoáº¡i"
+                          placeholder="Nhập số điện thoại"
                           value={formData.phone}
                           onChange={handleInputChange}
                         />
@@ -646,7 +646,7 @@ const ContactPage = () => {
                     <div className="col-md-6">
                       <div className="form-group">
                         <label className="form-label">
-                          <i className="bi bi-heart-pulse"></i> Dá»‹ch vá»¥ quan tÃ¢m
+                          <i className="bi bi-heart-pulse"></i> Dịch vụ quan tâm
                         </label>
                         <select
                           name="service"
@@ -654,7 +654,7 @@ const ContactPage = () => {
                           value={formData.service}
                           onChange={handleInputChange}
                         >
-                          <option value="">Chá»n dá»‹ch vá»¥</option>
+                          <option value="">Chọn dịch vụ</option>
                           {services.map((service) => (
                             <option key={service.value} value={service.value}>
                               {service.label}
@@ -667,13 +667,13 @@ const ContactPage = () => {
 
                   <div className="form-group">
                     <label className="form-label">
-                      <i className="bi bi-chat-text"></i> TiÃªu Ä‘á» *
+                      <i className="bi bi-chat-text"></i> Tiêu đề *
                     </label>
                     <input
                       type="text"
                       name="subject"
                       className={`form-control ${errors.subject ? "error" : ""}`}
-                      placeholder="Nháº­p tiÃªu Ä‘á» tin nháº¯n"
+                      placeholder="Nhập tiêu đề tin nhắn"
                       value={formData.subject}
                       onChange={handleInputChange}
                     />
@@ -687,12 +687,12 @@ const ContactPage = () => {
 
                   <div className="form-group">
                     <label className="form-label">
-                      <i className="bi bi-chat-dots"></i> Ná»™i dung tin nháº¯n *
+                      <i className="bi bi-chat-dots"></i> Nội dung tin nhắn *
                     </label>
                     <textarea
                       name="message"
                       className={`form-control form-textarea ${errors.message ? "error" : ""}`}
-                      placeholder="Nháº­p ná»™i dung tin nháº¯n cá»§a báº¡n..."
+                      placeholder="Nhập nội dung tin nhắn của bạn..."
                       value={formData.message}
                       onChange={handleInputChange}
                     ></textarea>
@@ -708,12 +708,12 @@ const ContactPage = () => {
                     {isSubmitting ? (
                       <>
                         <div className="loading-spinner"></div>
-                        Äang gá»­i...
+                        Đang gửi...
                       </>
                     ) : (
                       <>
                         <i className="bi bi-send"></i>
-                        Gá»­i tin nháº¯n
+                        Gửi tin nhắn
                       </>
                     )}
                   </button>
@@ -722,7 +722,7 @@ const ContactPage = () => {
 
               {/* Contact Info */}
               <div className="contact-info-section">
-                <h2 className="info-title">ThÃ´ng Tin LiÃªn Há»‡</h2>
+                <h2 className="info-title">Thông Tin Liên Hệ</h2>
                 <div className="contact-info-grid">
                   {contactInfo.map((info, index) => (
                     <div key={index} className="contact-info-card">
@@ -746,8 +746,8 @@ const ContactPage = () => {
                   <div className="contact-icon" style={{ backgroundColor: "#9b59b6" }}>
                     <i className="bi bi-chat-heart"></i>
                   </div>
-                  <h3 className="contact-info-title">LiÃªn há»‡ nhanh</h3>
-                  <p className="contact-info-content">Gá»i ngay hotline Ä‘á»ƒ Ä‘Æ°á»£c tÆ° váº¥n miá»…n phÃ­ vÃ  Ä‘áº·t lá»‹ch háº¹n</p>
+                  <h3 className="contact-info-title">Liên hệ nhanh</h3>
+                  <p className="contact-info-content">Gọi ngay hotline để được tư vấn miễn phí và đặt lịch hẹn</p>
                   <div style={{ marginTop: "15px" }}>
                     <a
                       href="tel:0382562504"
@@ -760,7 +760,7 @@ const ContactPage = () => {
                       }}
                     >
                       <i className="bi bi-telephone"></i>
-                      Gá»i ngay
+                      Gọi ngay
                     </a>
                   </div>
                 </div>
@@ -769,14 +769,14 @@ const ContactPage = () => {
 
             {/* Map Section */}
             <div className="map-section">
-              <h2 className="map-title">Vá»‹ TrÃ­ Cá»§a ChÃºng TÃ´i</h2>
+              <h2 className="map-title">Vị Trí Của Chúng Tôi</h2>
               <div className="map-placeholder">
                 <div style={{ textAlign: "center" }}>
                   <i className="bi bi-geo-alt" style={{ fontSize: "48px", marginBottom: "15px" }}></i>
                   <br />
-                  <strong>Thuáº­n ThÃ nh - Báº¯c Ninh</strong>
+                  <strong>Thuận Thành - Bắc Ninh</strong>
                   <br />
-                  <span style={{ opacity: 0.8 }}>Báº£n Ä‘á»“ sáº½ Ä‘Æ°á»£c tÃ­ch há»£p táº¡i Ä‘Ã¢y</span>
+                  <span style={{ opacity: 0.8 }}>Bản đồ sẽ được tích hợp tại đây</span>
                 </div>
               </div>
             </div>

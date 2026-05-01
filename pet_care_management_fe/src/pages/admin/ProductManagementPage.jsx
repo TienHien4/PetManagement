@@ -509,7 +509,7 @@ const ProductManagementPage = () => {
                 onClick={() => handleNavigation("/admin")}
               >
                 <i className="bi bi-bar-chart menu-icon"></i>
-                <span className="menu-text">Thá»‘ng kÃª</span>
+                <span className="menu-text">Thống kê</span>
               </button>
             </li>
             <li>
@@ -517,14 +517,14 @@ const ProductManagementPage = () => {
                 className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
                 onClick={() => handleNavigation("/admin/petmanagement")}
               >
-                <span className="menu-icon">ðŸ¾</span>
-                <span className="menu-text">ThÃº cÆ°ng</span>
+                <span className="menu-icon">🐾</span>
+                <span className="menu-text">Thú cưng</span>
               </button>
             </li>
             <li>
               <button className="menu-item active">
                 <i className="bi bi-box-seam menu-icon"></i>
-                <span className="menu-text">Sáº£n pháº©m</span>
+                <span className="menu-text">Sản phẩm</span>
               </button>
             </li>
             <li>
@@ -533,7 +533,7 @@ const ProductManagementPage = () => {
                 onClick={() => handleNavigation("/admin/usermanagement")}
               >
                 <i className="bi bi-person menu-icon"></i>
-                <span className="menu-text">TÃ i khoáº£n</span>
+                <span className="menu-text">Tài khoản</span>
               </button>
             </li>
             <li>
@@ -542,7 +542,7 @@ const ProductManagementPage = () => {
                 onClick={() => handleNavigation("/admin/orders")}
               >
                 <i className="bi bi-bag menu-icon"></i>
-                <span className="menu-text">ÄÆ¡n hÃ ng</span>
+                <span className="menu-text">Đơn hàng</span>
               </button>
             </li>
           </ul>
@@ -578,10 +578,10 @@ const ProductManagementPage = () => {
           {/* Page Header */}
           <div className="page-header">
             <h1 className="page-title">
-              <span>ðŸ“¦</span>
-              <span>Quáº£n lÃ½ sáº£n pháº©m</span>
+              <span>📦</span>
+              <span>Quản lý sản phẩm</span>
             </h1>
-            <p className="page-subtitle">Quáº£n lÃ½ thÃ´ng tin vÃ  kho sáº£n pháº©m trong há»‡ thá»‘ng</p>
+            <p className="page-subtitle">Quản lý thông tin và kho sản phẩm trong hệ thống</p>
           </div>
 
           {/* Content */}

@@ -905,7 +905,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin")}
               >
                 <i className="bi bi-bar-chart menu-icon"></i>
-                <span className="menu-text">Thá»‘ng kÃª</span>
+                <span className="menu-text">Thống kê</span>
               </button>
             </li>
             <li>
@@ -913,8 +913,8 @@ const OrderManagement = () => {
                 className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
                 onClick={() => handleNavigation("/admin/petmanagement")}
               >
-                <span className="menu-icon">ðŸ¾</span>
-                <span className="menu-text">ThÃº cÆ°ng</span>
+                <span className="menu-icon">🐾</span>
+                <span className="menu-text">Thú cưng</span>
               </button>
             </li>
             <li>
@@ -923,7 +923,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin/productmanagement")}
               >
                 <i className="bi bi-box-seam menu-icon"></i>
-                <span className="menu-text">Sáº£n pháº©m</span>
+                <span className="menu-text">Sản phẩm</span>
               </button>
             </li>
             <li>
@@ -932,7 +932,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin/usermanagement")}
               >
                 <i className="bi bi-person menu-icon"></i>
-                <span className="menu-text">TÃ i khoáº£n</span>
+                <span className="menu-text">Tài khoản</span>
               </button>
             </li>
             <li>
@@ -941,7 +941,7 @@ const OrderManagement = () => {
                 onClick={() => handleNavigation("/admin/orders")}
               >
                 <i className="bi bi-bag menu-icon"></i>
-                <span className="menu-text">ÄÆ¡n hÃ ng</span>
+                <span className="menu-text">Đơn hàng</span>
               </button>
             </li>
           </ul>
@@ -975,9 +975,9 @@ const OrderManagement = () => {
               <div className="page-header">
                 <h1 className="page-title">
                   <i className="bi bi-box-seam"></i>
-                  Quáº£n lÃ½ Ä‘Æ¡n hÃ ng
+                  Quản lý đơn hàng
                 </h1>
-                <p className="page-subtitle">Quáº£n lÃ½ thÃ´ng tin vÃ  kho sáº£n pháº©m trong há»‡ thá»‘ng</p>
+                <p className="page-subtitle">Quản lý thông tin và trạng thái đơn hàng trong hệ thống</p>
               </div>
 
 
@@ -987,7 +987,7 @@ const OrderManagement = () => {
                 <div className="d-flex search-controls" style={{ gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
                   <input
                     type="text"
-                    placeholder="TÃ¬m kiáº¿m theo mÃ£ Ä‘Æ¡n hÃ ng hoáº·c ID khÃ¡ch hÃ ng..."
+                    placeholder="Tìm kiếm theo mã đơn hàng hoặc ID khách hàng..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="search-input"
@@ -995,7 +995,7 @@ const OrderManagement = () => {
                   />
                   <button className="btn-search" onClick={handleSearch} disabled={loading}>
                     <i className="bi bi-search me-2"></i>
-                    TÃ¬m kiáº¿m
+                    Tìm kiếm
                   </button>
                 </div>
               </div>
@@ -1010,12 +1010,12 @@ const OrderManagement = () => {
                   <table className="table orders-table">
                     <thead>
                       <tr>
-                        <th style={{ width: "15%" }}>MÃ£ Ä‘Æ¡n hÃ ng</th>
-                        <th style={{ width: "15%" }}>KhÃ¡ch hÃ ng</th>
-                        <th style={{ width: "15%" }}>NgÃ y Ä‘áº·t</th>
-                        <th style={{ width: "20%" }}>Tá»•ng tiá»n</th>
-                        <th style={{ width: "15%" }}>Tráº¡ng thÃ¡i</th>
-                        <th style={{ width: "20%" }}>HÃ nh Ä‘á»™ng</th>
+                        <th style={{ width: "15%" }}>Mã đơn hàng</th>
+                        <th style={{ width: "15%" }}>Khách hàng</th>
+                        <th style={{ width: "15%" }}>Ngày đặt</th>
+                        <th style={{ width: "20%" }}>Tổng tiền</th>
+                        <th style={{ width: "15%" }}>Trạng thái</th>
+                        <th style={{ width: "20%" }}>Hành động</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1032,7 +1032,7 @@ const OrderManagement = () => {
                           </td>
                           <td>
                             <strong className="text-success">
-                              {order.totalPrice?.toLocaleString("vi-VN")} â‚«
+                              {order.totalPrice?.toLocaleString("vi-VN")} ₫
                             </strong>
                           </td>
                           <td>{getStatusBadge(order.status)}</td>
@@ -1040,21 +1040,21 @@ const OrderManagement = () => {
                             <button
                               className="action-btn btn-view"
                               onClick={() => openDetailModal(order)}
-                              title="Xem chi tiáº¿t"
+                              title="Xem chi tiết"
                             >
                               <Eye size={16} />
                             </button>
                             <button
                               className="action-btn btn-edit"
                               onClick={() => openEditModal(order)}
-                              title="Chá»‰nh sá»­a"
+                              title="Chỉnh sửa"
                             >
                               <Edit size={16} />
                             </button>
                             <button
                               className="action-btn btn-delete"
                               onClick={() => handleDeleteOrder(order.orderId)}
-                              title="XÃ³a"
+                              title="Xóa"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -1065,9 +1065,9 @@ const OrderManagement = () => {
                   </table>
                 ) : (
                   <div className="empty-state">
-                    <div className="empty-icon">ðŸ“¦</div>
-                    <h5>KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n hÃ ng nÃ o</h5>
-                    <p>HÃ£y thá»­ tÃ¬m kiáº¿m vá»›i tá»« khÃ³a khÃ¡c hoáº·c thay Ä‘á»•i bá»™ lá»c</p>
+                    <div className="empty-icon">📦</div>
+                    <h5>Không tìm thấy đơn hàng nào</h5>
+                    <p>Hãy thử tìm kiếm với từ khóa khác hoặc thay đổi bộ lọc</p>
                   </div>
                 )}
               </div>
@@ -1084,7 +1084,7 @@ const OrderManagement = () => {
                 }}>
                   <div className="modal-content-custom">
                     <div className="modal-header-custom">
-                      <h3 className="modal-title">Chi tiáº¿t Ä‘Æ¡n hÃ ng #{selectedOrder.orderId}</h3>
+                      <h3 className="modal-title">Chi tiết đơn hàng #{selectedOrder.orderId}</h3>
                       <button className="btn-close-custom" onClick={closeDetailModal}>
                         <X size={24} />
                       </button>
@@ -1094,20 +1094,20 @@ const OrderManagement = () => {
                     <div className="order-detail-section">
                       <div className="section-title">
                         <i className="bi bi-person-circle"></i>
-                        ThÃ´ng tin khÃ¡ch hÃ ng
+                        Thông tin khách hàng
                       </div>
                       <div className="detail-card">
                         <p className="mb-2">
-                          <strong>ID khÃ¡ch hÃ ng:</strong> {selectedOrder.userId || "N/A"}
+                          <strong>ID khách hàng:</strong> {selectedOrder.userId || "N/A"}
                         </p>
                         <p className="mb-2">
-                          <strong>NgÃ y Ä‘áº·t:</strong>{" "}
+                          <strong>Ngày đặt:</strong>{" "}
                           {selectedOrder.orderDate
                             ? new Date(selectedOrder.orderDate).toLocaleString("vi-VN")
                             : "N/A"}
                         </p>
                         <p className="mb-0">
-                          <strong>Tráº¡ng thÃ¡i:</strong> {getStatusBadge(selectedOrder.status)}
+                          <strong>Trạng thái:</strong> {getStatusBadge(selectedOrder.status)}
                         </p>
                       </div>
                     </div>
@@ -1116,7 +1116,7 @@ const OrderManagement = () => {
                     <div className="order-detail-section">
                       <div className="section-title">
                         <i className="bi bi-cart3"></i>
-                        Sáº£n pháº©m Ä‘Ã£ Ä‘áº·t
+                        Sản phẩm đã đặt
                       </div>
                       {selectedOrder.orderItems && selectedOrder.orderItems.length > 0 ? (
                         selectedOrder.orderItems.map((item) => (
@@ -1126,27 +1126,27 @@ const OrderManagement = () => {
                                 <p className="fw-medium text-dark mb-1">
                                   {item.product?.name || "N/A"}
                                 </p>
-                                <small className="text-muted">Sá»‘ lÆ°á»£ng: {item.quantity}</small>
+                                <small className="text-muted">Số lượng: {item.quantity}</small>
                               </div>
                               <div className="text-end">
                                 <p className="text-success fw-bold mb-0">
-                                  {item.price?.toLocaleString("vi-VN")} â‚«
+                                  {item.price?.toLocaleString("vi-VN")} ₫
                                 </p>
                               </div>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <p className="text-muted">KhÃ´ng cÃ³ sáº£n pháº©m</p>
+                        <p className="text-muted">Không có sản phẩm</p>
                       )}
                     </div>
 
                     {/* Total */}
                     <div className="detail-card">
                       <div className="d-flex justify-content-between align-items-center">
-                        <span className="fs-5 fw-semibold">Tá»•ng cá»™ng:</span>
+                        <span className="fs-5 fw-semibold">Tổng cộng:</span>
                         <span className="fs-4 fw-bold text-success">
-                          {selectedOrder.totalPrice?.toLocaleString("vi-VN")} â‚«
+                          {selectedOrder.totalPrice?.toLocaleString("vi-VN")} ₫
                         </span>
                       </div>
                     </div>

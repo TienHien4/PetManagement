@@ -504,7 +504,7 @@ const UserManagementPage = () => {
                 onClick={() => handleNavigation("/admin")}
               >
                 <i className="bi bi-bar-chart menu-icon"></i>
-                <span className="menu-text">Thá»‘ng kÃª</span>
+                <span className="menu-text">Thống kê</span>
               </button>
             </li>
             <li>
@@ -512,8 +512,8 @@ const UserManagementPage = () => {
                 className={`menu-item ${window.location.pathname === "/admin/petmanagement" ? "active" : ""}`}
                 onClick={() => handleNavigation("/admin/petmanagement")}
               >
-                <span className="menu-icon">ðŸ¾</span>
-                <span className="menu-text">ThÃº cÆ°ng</span>
+                <span className="menu-icon">🐾</span>
+                <span className="menu-text">Thú cưng</span>
               </button>
             </li>
             <li>
@@ -522,13 +522,13 @@ const UserManagementPage = () => {
                 onClick={() => handleNavigation("/admin/productmanagement")}
               >
                 <i className="bi bi-box-seam menu-icon"></i>
-                <span className="menu-text">Sáº£n pháº©m</span>
+                <span className="menu-text">Sản phẩm</span>
               </button>
             </li>
             <li>
               <button className="menu-item active">
                 <i className="bi bi-person menu-icon"></i>
-                <span className="menu-text">TÃ i khoáº£n</span>
+                <span className="menu-text">Tài khoản</span>
               </button>
             </li>
             <li>
@@ -537,7 +537,7 @@ const UserManagementPage = () => {
                 onClick={() => handleNavigation("/admin/orders")}
               >
                 <i className="bi bi-bag menu-icon"></i>
-                <span className="menu-text">ÄÆ¡n hÃ ng</span>
+                <span className="menu-text">Đơn hàng</span>
               </button>
             </li>
           </ul>
@@ -572,8 +572,8 @@ const UserManagementPage = () => {
 
           {/* Page Header */}
           <div className="page-header">
-            <h1 className="page-title">Quáº£n lÃ½ tÃ i khoáº£n</h1>
-            <p className="page-subtitle">Quáº£n lÃ½ thÃ´ng tin ngÆ°á»i dÃ¹ng vÃ  phÃ¢n quyá»n trong há»‡ thá»‘ng</p>
+            <h1 className="page-title">Quản lý tài khoản</h1>
+            <p className="page-subtitle">Quản lý thông tin người dùng và phân quyền trong hệ thống</p>
           </div>
 
           {/* Content */}
