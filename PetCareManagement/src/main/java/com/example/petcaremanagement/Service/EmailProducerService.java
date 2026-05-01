@@ -80,13 +80,27 @@ public class EmailProducerService {
                 "Xác nhận đặt lịch khám - Pet Care Management",
                 EmailEventType.APPOINTMENT_CONFIRMATION.getTemplatePath());
 
+        // Định dạng ngày giờ
+        java.text.SimpleDateFormat dateFormatter = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        java.text.SimpleDateFormat timeFormatter = new java.text.SimpleDateFormat("HH:mm");
+        String formattedDate = dateFormatter.format(appointment.getDate());
+        String formattedTime = timeFormatter.format(appointment.getDate());
+
+        // Lấy danh sách dịch vụ (lý do khám)
+        String reason = "Khám tổng quát";
+        if (appointment.getServices() != null && !appointment.getServices().isEmpty()) {
+            reason = appointment.getServices().stream()
+                    .map(com.example.petcaremanagement.Entity.ServicesType::getName)
+                    .collect(java.util.stream.Collectors.joining(", "));
+        }
+
         // Thêm dữ liệu động cho template
         event.addTemplateData("petName", pet.getName())
                 .addTemplateData("petSpecies", pet.getSpecies())
                 .addTemplateData("petBreed", pet.getBreed() != null ? pet.getBreed() : "Không rõ")
-                .addTemplateData("appointmentDate", appointment.getDate().toString())
-                .addTemplateData("services", appointment.getServices())
-                .addTemplateData("reason", appointment.getServices())
+                .addTemplateData("appointmentDate", formattedDate)
+                .addTemplateData("appointmentTime", formattedTime)
+                .addTemplateData("reason", reason)
                 .addTemplateData("status", getStatusText(appointment.getStatus()))
                 .addTemplateData("statusColor", getStatusColor(appointment.getStatus()))
                 .addTemplateData("appointmentId", appointment.getId());
@@ -96,6 +110,36 @@ public class EmailProducerService {
 
         logger.info("Appointment confirmation email event queued for user: {} ({})",
                 user.getUserName(), user.getEmail());
+
+        // Gửi email thông báo cho bác sĩ thú y
+        if (appointment.getVet() != null && appointment.getVet().getUser() != null) {
+            User vetUser = appointment.getVet().getUser();
+            if (vetUser.getEmail() != null && !vetUser.getEmail().isEmpty()) {
+                EmailEvent vetEvent = new EmailEvent(
+                        EmailEventType.VET_APPOINTMENT_NOTIFICATION.getEventName(),
+                        vetUser.getId(),
+                        vetUser.getEmail(),
+                        vetUser.getUserName(),
+                        "Thông báo lịch khám mới - Pet Care Management",
+                        EmailEventType.VET_APPOINTMENT_NOTIFICATION.getTemplatePath());
+
+                vetEvent.addTemplateData("vetName", vetUser.getUserName())
+                        .addTemplateData("customerName", user.getUserName())
+                        .addTemplateData("customerEmail", user.getEmail() != null ? user.getEmail() : "Không có")
+                        .addTemplateData("petName", pet.getName())
+                        .addTemplateData("petSpecies", pet.getSpecies())
+                        .addTemplateData("appointmentDate", formattedDate)
+                        .addTemplateData("appointmentTime", formattedTime)
+                        .addTemplateData("reason", reason)
+                        .addTemplateData("appointmentId", appointment.getId());
+
+                sendEmailEvent(vetEvent);
+                logger.info("Vet appointment notification email event queued for vet: {} ({})",
+                        vetUser.getUserName(), vetUser.getEmail());
+            } else {
+                logger.warn("Vet user {} has no email. Skipping vet notification.", vetUser.getUserName());
+            }
+        }
     }
 
     /**
@@ -118,8 +162,24 @@ public class EmailProducerService {
                 "Cập nhật trạng thái lịch khám - Pet Care Management",
                 EmailEventType.APPOINTMENT_STATUS_UPDATE.getTemplatePath());
 
+        // Định dạng ngày giờ
+        java.text.SimpleDateFormat dateFormatter = new java.text.SimpleDateFormat("dd/MM/yyyy");
+        java.text.SimpleDateFormat timeFormatter = new java.text.SimpleDateFormat("HH:mm");
+        String formattedDate = dateFormatter.format(appointment.getDate());
+        String formattedTime = timeFormatter.format(appointment.getDate());
+
+        // Lấy danh sách dịch vụ (lý do khám)
+        String reason = "Khám tổng quát";
+        if (appointment.getServices() != null && !appointment.getServices().isEmpty()) {
+            reason = appointment.getServices().stream()
+                    .map(com.example.petcaremanagement.Entity.ServicesType::getName)
+                    .collect(java.util.stream.Collectors.joining(", "));
+        }
+
         event.addTemplateData("petName", pet.getName())
-                .addTemplateData("appointmentDate", appointment.getDate().toString())
+                .addTemplateData("appointmentDate", formattedDate)
+                .addTemplateData("appointmentTime", formattedTime)
+                .addTemplateData("reason", reason)
                 .addTemplateData("oldStatus", getStatusText(oldStatus))
                 .addTemplateData("newStatus", getStatusText(newStatus))
                 .addTemplateData("oldStatusColor", getStatusColor(oldStatus))
@@ -198,7 +258,8 @@ public class EmailProducerService {
      */
     private String getTopicByEventType(String eventType) {
         return switch (eventType) {
-            case "appointment-confirmation", "appointment-status-update", "appointment-reminder" ->
+            case "appointment-confirmation", "vet-appointment-notification", "appointment-status-update",
+                    "appointment-reminder" ->
                 "appointment-email-events";
             case "promotion", "new-year-promotion", "year-end-sale" -> "promotion-email-events";
             case "system-upgrade", "password-reset", "welcome" -> "system-email-events";
@@ -278,6 +339,20 @@ public class EmailProducerService {
                     return false;
                 }
 
+                // Định dạng ngày giờ
+                java.text.SimpleDateFormat dateFormatter = new java.text.SimpleDateFormat("dd/MM/yyyy");
+                java.text.SimpleDateFormat timeFormatter = new java.text.SimpleDateFormat("HH:mm");
+                String formattedDate = dateFormatter.format(appointment.getDate());
+                String formattedTime = timeFormatter.format(appointment.getDate());
+
+                // Lấy danh sách dịch vụ (lý do khám)
+                String reason = "Khám tổng quát";
+                if (appointment.getServices() != null && !appointment.getServices().isEmpty()) {
+                    reason = appointment.getServices().stream()
+                            .map(com.example.petcaremanagement.Entity.ServicesType::getName)
+                            .collect(java.util.stream.Collectors.joining(", "));
+                }
+
                 // Tạo context cho template Thymeleaf
                 Context context = new Context();
                 context.setVariable("userName", user.getUserName());
@@ -285,9 +360,9 @@ public class EmailProducerService {
                 context.setVariable("petName", pet.getName());
                 context.setVariable("petSpecies", pet.getSpecies());
                 context.setVariable("petBreed", pet.getBreed() != null ? pet.getBreed() : "Không rõ");
-                context.setVariable("appointmentDate", appointment.getDate().toString());
-                context.setVariable("services", appointment.getServices());
-                context.setVariable("reason", appointment.getServices());
+                context.setVariable("appointmentDate", formattedDate);
+                context.setVariable("appointmentTime", formattedTime);
+                context.setVariable("reason", reason);
                 context.setVariable("status", getStatusText(appointment.getStatus()));
                 context.setVariable("statusColor", getStatusColor(appointment.getStatus()));
                 context.setVariable("appointmentId", appointment.getId());

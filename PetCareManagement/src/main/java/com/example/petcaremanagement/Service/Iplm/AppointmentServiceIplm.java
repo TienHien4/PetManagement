@@ -33,7 +33,6 @@ public class AppointmentServiceIplm implements AppointmentService {
     private final EmailService emailService;
     private final EmailProducerService emailProducerService;
 
-
     public AppointmentServiceIplm(
             AppointmentRepository appointmentRepository,
             AppointmentMapper appointmentMapper,
@@ -95,7 +94,7 @@ public class AppointmentServiceIplm implements AppointmentService {
             appointment = appointmentRepository.save(appointment);
 
             // Send notification
-            emailService.sendAppointmentConfirmationDirect(appointment, user, pet);
+            emailProducerService.sendAppointmentConfirmationEmail(user, pet, appointment);
 
             // Create response
             AppointmentResponse response = appointmentMapper.toAppointmentResponse(appointment);
@@ -234,15 +233,13 @@ public class AppointmentServiceIplm implements AppointmentService {
                     appointment.getUser(),
                     pet,
                     oldStatus,
-                    status
-            );
+                    status);
         } catch (Exception e) {
             System.err.println("Failed to send status update email: " + e.getMessage());
         }
 
         return convertToResponse(updatedAppointment);
     }
-
 
     @Override
     public AppointmentResponse updateAppointmentStatusByVetUserId(Long appointmentId, String status, Long userId) {

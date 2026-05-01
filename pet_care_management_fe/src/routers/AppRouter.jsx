@@ -10,6 +10,7 @@ import CreatePetForm from '../pages/Profile/CreatePetForm';
 import EditPetForm from '../pages/Profile/EditPetForm';
 import Dashboard from '../pages/admin/DashboardPage';
 import UserManagementPage from '../pages/admin/UserManagementPage';
+import EditUser from '../pages/admin/EditUser';
 import ServicesPage from '../pages/ServicesPage';
 import LoginPage from '../pages/login/LoginPage';
 import PetList from '../pages/Profile/PetList';
@@ -64,6 +65,11 @@ const AppRouter = () => {
                 <Route path="/admin/usermanagement" element={
                     <ProtectedRoute allowedRoles={['ADMIN']}>
                         <UserManagementPage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/editUser/:userId" element={
+                    <ProtectedRoute allowedRoles={['ADMIN']}>
+                        <EditUser />
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/petmanagement" element={

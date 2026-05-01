@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Báo Lịch Khám Mới</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7fa;
+            padding: 20px;
+        }
+
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #17a2b8 0%, #0c5460 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.95;
+            margin: 5px 0;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .greeting {
+            font-size: 20px;
+            color: #17a2b8;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .message {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            border-left: 5px solid #17a2b8;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .info-card h3 {
+            color: #17a2b8;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(23, 162, 184, 0.1);
+            align-items: flex-start;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #17a2b8;
+            min-width: 160px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 15px;
+            flex: 1;
+        }
+
+        .note-box {
+            background: #e2e3e5;
+            border: 1px solid #d6d8db;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+
+        .note-box strong {
+            color: #383d41;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .note-box ul {
+            margin: 10px 0 0 20px;
+            color: #383d41;
+        }
+
+        .note-box li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: #17a2b8;
+            margin-bottom: 15px;
+        }
+
+        .footer-contact {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-contact span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer-disclaimer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #17a2b8, transparent);
+            margin: 25px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-wrapper">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">🩺</div>
+            <h1>Thông Báo Lịch Khám Mới</h1>
+            <p>Pet Care Management System</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="greeting">Xin chào Bác sĩ <strong th:text="${vetName}">Vet</strong>! 👋</p>
+
+            <p class="message">
+                Có một khách hàng vừa mới đặt lịch khám thú cưng và chọn bạn là người phụ trách. Vui lòng kiểm tra thông
+                tin chi tiết bên dưới.
+            </p>
+
+            <!-- Appointment Info Card -->
+            <div class="info-card">
+                <h3>📋 Thông Tin Lịch Khám</h3>
+
+                <div class="info-row">
+                    <span class="info-label">🆔 Mã lịch khám:</span>
+                    <span class="info-value"><strong th:text="${appointmentId}">APT001</strong></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">👤 Khách hàng:</span>
+                    <span class="info-value" th:text="${customerName}">Nguyễn Văn A</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">✉️ Email liên hệ:</span>
+                    <span class="info-value" th:text="${customerEmail}">example@gmail.com</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">🐕 Tên thú cưng:</span>
+                    <span class="info-value" th:text="${petName}">Max</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">🏷️ Loại:</span>
+                    <span class="info-value" th:text="${petSpecies}">Chó</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">📅 Ngày khám:</span>
+                    <span class="info-value" th:text="${appointmentDate}">15/10/2025</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">⏰ Giờ khám:</span>
+                    <span class="info-value" th:text="${appointmentTime}">10:00 AM</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">📝 Lý do khám:</span>
+                    <span class="info-value" th:text="${reason}">Khám sức khỏe định kỳ</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Important Notes -->
+            <div class="note-box">
+                <strong>💡 Lưu ý dành cho Bác sĩ:</strong>
+                <ul>
+                    <li>Vui lòng đăng nhập vào hệ thống để xác nhận hoặc cập nhật trạng thái lịch khám này.</li>
+                    <li>Sắp xếp công việc để có mặt đúng thời gian khám.</li>
+                    <li>Hệ thống sẽ tự động thông báo kết quả xác nhận của bạn đến khách hàng.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">Pet Care Clinic</div>
+            <div class="footer-contact">
+                <span>📍 123 Đường Thú Cưng, Quận 1, TP.HCM</span>
+                <span>📞 Hotline: 1900 1234</span>
+                <span>📧 support@petcare.com</span>
+            </div>
+            <div class="footer-disclaimer">
+                Đây là email tự động từ hệ thống Pet Care Management. Vui lòng không trả lời email này.
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

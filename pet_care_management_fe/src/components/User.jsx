@@ -58,7 +58,7 @@ const User = () => {
             alert("Xóa người dùng thành công!")
         } catch (error) {
             console.error("Error deleting user:", error)
-            alert("Có lỗi xảy ra khi xóa người dùng!")
+            alert(`Có lỗi xảy ra khi xóa người dùng! Chi tiết: ${error.response?.data?.message || error.message}`)
         }
     }
 

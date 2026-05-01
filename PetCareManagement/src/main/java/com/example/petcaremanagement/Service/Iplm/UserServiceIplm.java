@@ -72,17 +72,34 @@ public class UserServiceIplm implements UserService {
     @Override
     public UserResponse UpdateUser(long id, UserRequest request) {
         User user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("Not found user by id: " + id));
+        String oldPassword = user.getPassword();
+        Set<Role> oldRoles = user.getRoles();
+
         userMapper.updateUser(user, request);
-        var response = userMapper.toUserResponse(user);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Set<Role> roles = new HashSet<>();
-        var r = roleRepo.findById("USER")
-                .orElseThrow(() -> new RuntimeException("Not found!"));
-        roles.add(r);
-        response.setRoles(roles);
-        user.setRoles(roles);
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()
+                && !request.getPassword().equals(oldPassword)) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        } else {
+            user.setPassword(oldPassword);
+        }
+
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+            Set<Role> newRoles = new HashSet<>();
+            for (String roleName : request.getRoles()) {
+                var r = roleRepo.findById(roleName)
+                        .orElseThrow(() -> new RuntimeException("Not found role: " + roleName));
+                newRoles.add(r);
+            }
+            user.setRoles(newRoles);
+        } else {
+            user.setRoles(oldRoles);
+        }
+
         userRepo.save(user);
+        var response = userMapper.toUserResponse(user);
+        response.setRoles(user.getRoles());
         return response;
     }
 

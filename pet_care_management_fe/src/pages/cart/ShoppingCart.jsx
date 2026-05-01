@@ -10,7 +10,7 @@ const ShoppingCart = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [total, setTotal] = useState(0)
-    const [shipping, setShipping] = useState(5)
+    const [shipping, setShipping] = useState(0) // Phí vận chuyển mặc định là 0đ thay vì 5đ
     const [cartImageErrors, setCartImageErrors] = useState(new Map())
     const navigate = useNavigate()
 

@@ -2,6 +2,7 @@ package com.example.petcaremanagement.Enum;
 
 public enum EmailEventType {
     APPOINTMENT_CONFIRMATION("appointment-confirmation", "email/appointment-confirmation"),
+    VET_APPOINTMENT_NOTIFICATION("vet-appointment-notification", "email/vet-appointment-notification"),
     APPOINTMENT_STATUS_UPDATE("appointment-status-update", "email/appointment-status-update"),
     APPOINTMENT_REMINDER("appointment-reminder", "email/appointment-reminder"),
     PROMOTION("promotion", "email/promotion"),

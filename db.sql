@@ -3,6 +3,8 @@
 -- Bao gồm: Tạo database, tạo bảng, thêm dữ liệu test
 -- =====================================================
 
+SET NAMES utf8mb4;
+
 -- ===== PHẦN 1: TẠO DATABASE =====
 DROP DATABASE IF EXISTS petcaremanagement;
 CREATE DATABASE petcaremanagement CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -264,9 +266,9 @@ INSERT INTO user (id, user_name, email, password, dob, provider, gender) VALUES
 (3, 'tranthiha', 'tranthiha@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1995-08-20', 'local', 'Nữ'),
 (4, 'phamtuan', 'phamtuan@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1988-11-10', 'local', 'Nam'),
 (5, 'levananh', 'levananh@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1993-03-25', 'local', 'Nữ'),
-(6, 'drthanh', 'drthanh@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1985-07-12', 'local', 'Nam'),
-(7, 'drlinh', 'drlinh@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1987-09-05', 'local', 'Nữ'),
-(8, 'staffminh', 'minh@petcare.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1998-12-18', 'local', 'Nam');
+(6, 'drthanh', 'nguyentienhien040304@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1985-07-12', 'local', 'Nam'),
+(7, 'drlinh', 'kurumilop8@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1987-09-05', 'local', 'Nữ'),
+(8, 'hien', 'nguyentienhien432004@gmail.com', '$2a$10$9DHEYDfPyd/2RDI2DM6Cx.rO/4k.gUEwKjSST6/tyB8pviV2Ywfzy', '1998-12-18', 'local', 'Nam');
 
 -- 5. Thêm User Roles
 INSERT INTO user_roles (user_id, roles_name) VALUES
