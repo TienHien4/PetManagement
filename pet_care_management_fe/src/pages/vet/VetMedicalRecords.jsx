@@ -128,6 +128,7 @@ const VetMedicalRecords = () => {
             // Clean up data before sending
             const cleanedData = {
                 ...recordForm,
+                recordDate: recordForm.visitDate, // Map visitDate to backend's expected recordDate
                 diagnosis: recordForm.diagnosis.trim(),
                 treatment: recordForm.treatment ? recordForm.treatment.trim() : '',
                 symptoms: recordForm.symptoms ? recordForm.symptoms.trim() : '',
@@ -413,7 +414,9 @@ const VetMedicalRecords = () => {
                                     <tbody>
                                         {medicalRecords.map((record, i) => (
                                             <tr key={record.id} style={{ borderBottom: '1px solid #f0f0f0', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                                                <td style={{ padding: '12px 16px', textAlign: 'left', color: '#6c757d' }}>{record.visitDate ? new Date(record.visitDate).toLocaleDateString('vi-VN') : 'N/A'}</td>
+                                                <td style={{ padding: '12px 16px', textAlign: 'left', color: '#6c757d' }}>
+                                                    {(record.visitDate || record.recordDate) ? new Date(record.visitDate || record.recordDate).toLocaleDateString('vi-VN') : 'N/A'}
+                                                </td>
                                                 <td style={{ padding: '12px 16px', textAlign: 'left' }}>{record.diagnosis}</td>
                                                 <td style={{ padding: '12px 16px', textAlign: 'left' }}>{record.treatment}</td>
                                                 <td style={{ padding: '12px 16px', textAlign: 'left', color: '#6c757d' }}>{record.notes}</td>

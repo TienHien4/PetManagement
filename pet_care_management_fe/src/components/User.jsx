@@ -428,10 +428,7 @@ const User = () => {
                             <i className="bi bi-search me-2"></i>
                             Tìm kiếm
                         </button>
-                        <button className="btn-add" onClick={() => (window.location.href = "/admin/addUser")}>
-                            <i className="bi bi-person-plus me-2"></i>
-                            Thêm người dùng
-                        </button>
+
                     </div>
                 </div>
 

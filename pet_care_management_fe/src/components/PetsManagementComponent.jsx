@@ -611,13 +611,13 @@ const PetsManagement = () => {
               disabled={loading}
             >
               <option value="">Tất cả loài</option>
-              <option value="Dog">🐕 Chó</option>
-              <option value="Cat">🐱 Mèo</option>
+              <option value="Chó">🐕 Chó</option>
+              <option value="Mèo">🐱 Mèo</option>
             </select>
-            <button 
-              className="btn-search" 
+            <button
+              className="btn-search"
               onClick={handleAddPet}
-              style={{ 
+              style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 minWidth: "160px"
               }}

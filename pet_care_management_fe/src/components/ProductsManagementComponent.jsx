@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { Edit, Trash2, Plus, X } from "lucide-react"
 import {
     getAllProducts,
@@ -126,7 +127,7 @@ const ProductsManagement = () => {
         document.body.style.overflow = 'hidden'
     }
 
-    const openEditModal = async (product) => {
+    const openEditModal = (product) => {
         setModalMode("edit")
         setSelectedProduct(product)
         setFormData({
@@ -137,27 +138,27 @@ const ProductsManagement = () => {
             description: product.description || "",
         })
 
-        // Convert existing image URL to File object
+        setFormErrors({})
+        setShowModal(true)
+        document.body.style.overflow = 'hidden'
+
+        // Convert existing image URL to File object non-blocking
         if (product.image) {
-            try {
-                const response = await fetch(product.image)
-                const blob = await response.blob()
-                const file = new File([blob], "product-image.jpg", { type: blob.type })
-                setImageFile(file)
-                setImagePreview(product.image)
-            } catch (error) {
-                console.error("Error loading image:", error)
-                setImageFile(null)
-                setImagePreview(product.image)
-            }
+            setImagePreview(product.image)
+            fetch(product.image)
+                .then(response => response.blob())
+                .then(blob => {
+                    const file = new File([blob], "product-image.jpg", { type: blob.type })
+                    setImageFile(file)
+                })
+                .catch(error => {
+                    console.error("Error loading image:", error)
+                    setImageFile(null)
+                })
         } else {
             setImageFile(null)
             setImagePreview(null)
         }
-
-        setFormErrors({})
-        setShowModal(true)
-        document.body.style.overflow = 'hidden'
     }
 
     const closeModal = () => {
@@ -240,7 +241,7 @@ const ProductsManagement = () => {
             errors.quantity = "Số lượng không được âm"
         }
 
-        if (!imageFile) {
+        if (!imageFile && !imagePreview) {
             errors.image = "Vui lòng chọn ảnh sản phẩm"
         }
 
@@ -882,139 +883,146 @@ const ProductsManagement = () => {
                     )}
 
                 {/* Modal for Create/Edit */}
-                {showModal && (
-                    <div className="modal-overlay" style={{ height: 600 }} onClick={(e) => {
+                {showModal && typeof document !== 'undefined' && createPortal(
+                    <div className="modal show d-block" tabIndex="-1" onClick={(e) => {
                         if (e.target === e.currentTarget) closeModal()
-                    }}>
-                        <div className="modal-content-custom">
-                            <div className="modal-header-custom">
-                                <h3 className="modal-title">{modalMode === "create" ? "Thêm Sản Phẩm Mới" : "Chỉnh Sửa Sản Phẩm"}</h3>
-                                <button className="btn-close-custom" onClick={closeModal}>
-                                    <X size={24} />
-                                </button>
-                            </div>
-
-                            <form onSubmit={handleSubmit}>
-                                {/* Product Name */}
-                                <div className="form-group">
-                                    <label className="form-label">Tên Sản Phẩm *</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        className={`form-control-custom ${formErrors.name ? "is-invalid" : ""}`}
-                                        placeholder="Nhập tên sản phẩm"
-                                    />
-                                    {formErrors.name && <div className="invalid-feedback">{formErrors.name}</div>}
+                    }} style={{ backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1050, overflowY: 'auto', padding: '20px 0' }}>
+                        <div className="modal-dialog modal-lg" style={{ margin: '0 auto', maxWidth: '800px' }}>
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
+                                        <i className={`bi ${modalMode === "create" ? "bi-plus-circle" : "bi-pencil-square"} me-2`}></i>
+                                        {modalMode === "create" ? "Thêm Sản Phẩm Mới" : "Chỉnh Sửa Sản Phẩm"}
+                                    </h5>
+                                    <button type="button" className="btn-close" onClick={closeModal}></button>
                                 </div>
 
-                                {/* Category */}
-                                <div className="form-group">
-                                    <label className="form-label">Danh Mục *</label>
-                                    <select
-                                        name="type"
-                                        value={formData.type}
-                                        onChange={handleInputChange}
-                                        className={`form-control-custom ${formErrors.type ? "is-invalid" : ""}`}
-                                    >
-                                        <option value="">Chọn danh mục</option>
-                                        <option value="Thức Ăn">Thức Ăn</option>
-                                        <option value="Đồ Chơi">Đồ Chơi</option>
-                                        <option value="Phụ Kiện">Phụ Kiện</option>
-                                        <option value="Thuốc & Vitamin">Thuốc & Vitamin</option>
-                                        <option value="Vệ Sinh">Vệ Sinh</option>
-                                        <option value="Khác">Khác</option>
-                                    </select>
-                                    {formErrors.type && <div className="invalid-feedback">{formErrors.type}</div>}
-                                </div>
-
-                                {/* Price and Stock Row */}
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">Giá (₫) *</label>
+                                <div className="modal-body p-4">
+                                    <form onSubmit={handleSubmit}>
+                                        {/* Product Name */}
+                                        <div className="form-group mb-3">
+                                            <label className="form-label fw-bold">Tên Sản Phẩm *</label>
                                             <input
-                                                type="number"
-                                                name="price"
-                                                value={formData.price}
+                                                type="text"
+                                                name="name"
+                                                value={formData.name}
                                                 onChange={handleInputChange}
-                                                className={`form-control-custom ${formErrors.price ? "is-invalid" : ""}`}
-                                                placeholder="0"
-                                                min="0"
-                                                step="1000"
+                                                className={`form-control ${formErrors.name ? "is-invalid" : ""}`}
+                                                placeholder="Nhập tên sản phẩm"
                                             />
-                                            {formErrors.price && <div className="invalid-feedback">{formErrors.price}</div>}
+                                            {formErrors.name && <div className="invalid-feedback">{formErrors.name}</div>}
                                         </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label className="form-label">Tồn Kho *</label>
-                                            <input
-                                                type="number"
-                                                name="quantity"
-                                                value={formData.quantity}
+
+                                        {/* Category */}
+                                        <div className="form-group mb-3">
+                                            <label className="form-label fw-bold">Danh Mục *</label>
+                                            <select
+                                                name="type"
+                                                value={formData.type}
                                                 onChange={handleInputChange}
-                                                className={`form-control-custom ${formErrors.quantity ? "is-invalid" : ""}`}
-                                                placeholder="0"
-                                                min="0"
-                                            />
-                                            {formErrors.quantity && <div className="invalid-feedback">{formErrors.quantity}</div>}
+                                                className={`form-select ${formErrors.type ? "is-invalid" : ""}`}
+                                            >
+                                                <option value="">Chọn danh mục</option>
+                                                <option value="Thức Ăn">Thức Ăn</option>
+                                                <option value="Đồ Chơi">Đồ Chơi</option>
+                                                <option value="Phụ Kiện">Phụ Kiện</option>
+                                                <option value="Thuốc & Vitamin">Thuốc & Vitamin</option>
+                                                <option value="Vệ Sinh">Vệ Sinh</option>
+                                                <option value="Khác">Khác</option>
+                                            </select>
+                                            {formErrors.type && <div className="invalid-feedback d-block">{formErrors.type}</div>}
                                         </div>
-                                    </div>
-                                </div>
 
-                                {/* Description */}
-                                <div className="form-group">
-                                    <label className="form-label">Mô Tả</label>
-                                    <textarea
-                                        name="description"
-                                        value={formData.description}
-                                        onChange={handleInputChange}
-                                        className="form-control-custom"
-                                        placeholder="Nhập mô tả sản phẩm"
-                                        rows="3"
-                                    />
-                                </div>
-
-                                {/* Image Upload */}
-                                <div className="form-group">
-                                    <label className="form-label">
-                                        Ảnh Sản Phẩm {modalMode === "create" ? "*" : "(Tùy chọn)"}
-                                    </label>
-                                    <div className="image-upload-container" onClick={() => document.getElementById("imageInput").click()}>
-                                        <input
-                                            id="imageInput"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            style={{ display: "none" }}
-                                        />
-                                        {imagePreview ? (
-                                            <img src={imagePreview} alt="Preview" className="image-preview" />
-                                        ) : (
-                                            <div>
-                                                <i className="bi bi-cloud-upload" style={{ fontSize: "3rem", color: "#6c757d" }}></i>
-                                                <p className="mt-2">Click để chọn ảnh</p>
-                                                <small className="text-muted">Kích thước tối đa: 5MB</small>
+                                        {/* Price and Stock Row */}
+                                        <div className="row mb-3">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label fw-bold">Giá (₫) *</label>
+                                                    <input
+                                                        type="number"
+                                                        name="price"
+                                                        value={formData.price}
+                                                        onChange={handleInputChange}
+                                                        className={`form-control ${formErrors.price ? "is-invalid" : ""}`}
+                                                        placeholder="0"
+                                                        min="0"
+                                                        step="1000"
+                                                    />
+                                                    {formErrors.price && <div className="invalid-feedback d-block">{formErrors.price}</div>}
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                    {formErrors.image && <div className="invalid-feedback">{formErrors.image}</div>}
-                                </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label className="form-label fw-bold">Tồn Kho *</label>
+                                                    <input
+                                                        type="number"
+                                                        name="quantity"
+                                                        value={formData.quantity}
+                                                        onChange={handleInputChange}
+                                                        className={`form-control ${formErrors.quantity ? "is-invalid" : ""}`}
+                                                        placeholder="0"
+                                                        min="0"
+                                                    />
+                                                    {formErrors.quantity && <div className="invalid-feedback d-block">{formErrors.quantity}</div>}
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                {/* Footer Buttons */}
-                                <div className="modal-footer-custom">
-                                    <button type="button" className="btn-cancel" onClick={closeModal}>
-                                        Hủy
-                                    </button>
-                                    <button type="submit" className="btn-submit" disabled={loading}>
-                                        {loading ? "Đang xử lý..." : modalMode === "create" ? "Tạo Sản Phẩm" : "Cập Nhật"}
-                                    </button>
+                                        {/* Description */}
+                                        <div className="form-group mb-3">
+                                            <label className="form-label fw-bold">Mô Tả</label>
+                                            <textarea
+                                                name="description"
+                                                value={formData.description}
+                                                onChange={handleInputChange}
+                                                className="form-control"
+                                                placeholder="Nhập mô tả sản phẩm"
+                                                rows="3"
+                                            />
+                                        </div>
+
+                                        {/* Image Upload */}
+                                        <div className="form-group mb-3">
+                                            <label className="form-label fw-bold">
+                                                Ảnh Sản Phẩm {modalMode === "create" ? "*" : "(Tùy chọn)"}
+                                            </label>
+                                            <div className="border border-2 border-dashed rounded p-3 text-center" style={{ cursor: "pointer", borderColor: '#dee2e6', borderStyle: 'dashed' }} onClick={() => document.getElementById("imageInput").click()}>
+                                                <input
+                                                    id="imageInput"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageChange}
+                                                    className="d-none"
+                                                />
+                                                {imagePreview ? (
+                                                    <img src={imagePreview} alt="Preview" className="img-thumbnail" style={{ maxHeight: "200px" }} />
+                                                ) : (
+                                                    <div>
+                                                        <i className="bi bi-cloud-upload" style={{ fontSize: "3rem", color: "#6c757d" }}></i>
+                                                        <p className="mt-2 text-muted">Click để chọn ảnh</p>
+                                                        <small className="text-muted">Kích thước tối đa: 5MB</small>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {formErrors.image && <div className="invalid-feedback d-block">{formErrors.image}</div>}
+                                        </div>
+
+                                        {/* Footer Buttons */}
+                                        <div className="modal-footer border-0 px-0 pb-0">
+                                            <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                                                <i className="bi bi-x-circle me-2"></i>Hủy
+                                            </button>
+                                            <button type="submit" className="btn btn-primary" disabled={loading}>
+                                                <i className={`bi ${modalMode === "create" ? "bi-check-circle" : "bi-pencil"} me-2`}></i>
+                                                {loading ? "Đang xử lý..." : modalMode === "create" ? "Tạo Sản Phẩm" : "Cập Nhật"}
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </div>
         </>
