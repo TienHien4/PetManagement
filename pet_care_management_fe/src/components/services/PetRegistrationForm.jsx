@@ -89,30 +89,20 @@ const PetRegistrationForm = () => {
 
   const fixMojibake = (text) => {
     if (typeof text !== "string") return ""
-    const looksBroken = /[ÃÂÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßáºá»â€]/.test(text)
-    if (!looksBroken) return text
 
-    const decodeUtf8FromLatin1 = (value) => {
-      try {
-        const bytes = Uint8Array.from([...value].map((ch) => ch.charCodeAt(0) & 0xff))
-        return new TextDecoder("utf-8", { fatal: false }).decode(bytes)
-      } catch {
-        return value
-      }
-    }
-
-    let fixed = text
-    for (let i = 0; i < 2; i++) {
-      const next = decodeUtf8FromLatin1(fixed)
-      if (!next || next === fixed) break
-      fixed = next
-      if (!/[ÃÂÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßáºá»â€]/.test(fixed)) break
-    }
+    // Only attempt to decode if it REALLY looks like Mojibake (e.g., contains 'Ã' or 'áº'/'á»' sequences)
+    // Avoid matching valid Vietnamese characters like 'á' which was causing the text to be corrupted
+    const isMojibake = /(Ã[¡-ÿ])|(áº[¡-¿])|(á»[\x80-\xBF])|(Ä‘)/.test(text)
+    if (!isMojibake) return text
 
     try {
-      return decodeURIComponent(escape(fixed))
+      const bytes = new Uint8Array(text.length)
+      for (let i = 0; i < text.length; i++) {
+        bytes[i] = text.charCodeAt(i) & 0xff
+      }
+      return new TextDecoder("utf-8", { fatal: true }).decode(bytes)
     } catch {
-      return fixed
+      return text
     }
   }
 
@@ -179,7 +169,7 @@ const PetRegistrationForm = () => {
   const getServiceDisplayName = (serviceName) => {
     const type = detectServiceType(serviceName)
     const displayNameMap = {
-      general: "Khám tổng quát",
+      // general: "Khám tổng quát",
       vaccine: "Tiêm phòng",
       surgery: "Phẫu thuật",
       dental: "Nha khoa",
