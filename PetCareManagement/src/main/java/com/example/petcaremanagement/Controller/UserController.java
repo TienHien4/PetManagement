@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +25,30 @@ public class UserController {
     public ResponseEntity<?> CreateUser(@RequestBody UserRequest request) {
         try {
             return ResponseEntity.ok().body(userService.CreateUser(request));
+        } catch (DataIntegrityViolationException e) {
+            // 1. Most specific exception first
+            String root = e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage();
+            String lower = root == null ? "" : root.toLowerCase();
+
+            if (lower.contains("user.email") || lower.contains("duplicate")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorResponse("Email đã được sử dụng, vui lòng dùng email khác"));
+            } else if (lower.contains("username") || lower.contains("user_name") || lower.contains("user.userName")
+                    || lower.contains("tên")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorResponse("Tên tài khoản đã tồn tại, vui lòng chọn tên khác"));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorResponse("Đăng ký thất bại. Vui lòng thử lại!"));
+            }
+        } catch (RuntimeException e) {
+            // 2. More general runtime exception next
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
         } catch (Exception e) {
+            // 3. Most general exception last
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("You need to enter complete information"));
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Đăng ký thất bại. Vui lòng thử lại!"));
         }
     }
 

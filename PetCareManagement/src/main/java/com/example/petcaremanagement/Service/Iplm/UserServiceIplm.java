@@ -33,6 +33,24 @@ public class UserServiceIplm implements UserService {
 
     @Override
     public UserResponse CreateUser(UserRequest request) throws Exception {
+        if (request == null || isNullOrEmpty(request.getUserName()) || isNullOrEmpty(request.getPassword())
+                || isNullOrEmpty(request.getEmail())) {
+            throw new RuntimeException("Vui lòng nhập đầy đủ thông tin");
+        }
+
+        // Check duplicate email
+        if (userRepo.existsUsersByEmail(request.getEmail())) {
+            throw new RuntimeException("Email đã được sử dụng, vui lòng dùng email khác");
+        }
+
+        // Validate email format
+        if (!isValidEmail(request.getEmail())) {
+            throw new RuntimeException("Vui lòng nhập email đúng định dạng");
+        }
+        // Check duplicate username
+        if (userRepo.findUserByUserName(request.getUserName()) != null) {
+            throw new RuntimeException("Tên tài khoản đã tồn tại, vui lòng chọn tên khác");
+        }
 
         User user = userMapper.toUser(request);
         var response = userMapper.toUserResponse(user);
@@ -44,12 +62,22 @@ public class UserServiceIplm implements UserService {
         roles.add(r);
         response.setRoles(roles);
         user.setRoles(roles);
-        if (user.getUserName().isEmpty() || user.getPassword().isEmpty() || user.getEmail().isEmpty()) {
-            throw new Exception("You need to enter complete information");
-        }
+
         userRepo.save(user);
         return response;
     }
+
+    private boolean isNullOrEmpty(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+    private boolean isValidEmail(String email) {
+        if (email == null) return false;
+        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email.matches(regex);
+    }
+
+
 
     @Override
     public List<UserResponse> GetAllUser() {
