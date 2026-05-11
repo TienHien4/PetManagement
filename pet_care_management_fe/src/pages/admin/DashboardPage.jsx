@@ -492,7 +492,7 @@ function DashboardPage() {
         <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
             <div className="logo">
-              <span className="logo-icon">ðŸ¾</span>
+
               {!collapsed && <span>Dashboard</span>}
             </div>
           </div>
@@ -503,7 +503,7 @@ function DashboardPage() {
                 onClick={() => handleNavigation("/admin")}
               >
                 <i className="bi bi-bar-chart menu-icon"></i>
-                <span className="menu-text">Thá»‘ng kÃª</span>
+                <span className="menu-text">Thống kê</span>
               </button>
             </li>
             <li>

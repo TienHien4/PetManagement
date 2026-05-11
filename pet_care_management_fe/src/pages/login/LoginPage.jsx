@@ -13,7 +13,7 @@ const LoginPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!userName || !password) {
-            setErrorMessage("Username and password are required!");
+            setErrorMessage("Vui lòng nhập đầy đủ thông tin");
             return;
         }
 
@@ -24,7 +24,13 @@ const LoginPage = () => {
             });
 
             if (response.data.message !== "Login success!") {
-                setErrorMessage(response.data.message || "Login failed!");
+                const msg = response.data.message || "";
+                const lower = String(msg).toLowerCase();
+                if (response.status === 401 || lower.includes("invalid") || lower.includes("not found") || lower.includes("wrong") || lower.includes("incorrect") || lower.includes("không")) {
+                    setErrorMessage("Tên đăng nhập hoặc mật khẩu không đúng");
+                } else {
+                    setErrorMessage("Đăng nhập thất bại. Vui lòng thử lại!");
+                }
                 return;
             }
 
@@ -70,9 +76,14 @@ const LoginPage = () => {
             }
         } catch (error) {
             console.error("Login error:", error);
-            const errorMessage =
-                error.response?.data?.message || "An error occurred during login.";
-            setErrorMessage(errorMessage);
+            const resp = error.response?.data;
+            const respMsg = resp?.message || (typeof resp === "string" ? resp : "") || error.message || "";
+            const lower = String(respMsg).toLowerCase();
+            if (error.response?.status === 401 || lower.includes("invalid") || lower.includes("not found") || lower.includes("wrong") || lower.includes("incorrect") || lower.includes("không")) {
+                setErrorMessage("Email hoặc mật khẩu không đúng");
+            } else {
+                setErrorMessage("Đăng nhập thất bại. Vui lòng thử lại!");
+            }
         }
     };
 
@@ -125,7 +136,7 @@ const LoginPage = () => {
 
                                                 <div data-mdb-input-init className="form-outline mb-4">
                                                     <label className="form-label" htmlFor="form2Example17">
-                                                        Tên đăng nhập
+
                                                     </label>
                                                     <input
                                                         type="text"
@@ -140,7 +151,7 @@ const LoginPage = () => {
 
                                                 <div data-mdb-input-init className="form-outline mb-4">
                                                     <label className="form-label" htmlFor="form2Example27">
-                                                        Mật khẩu
+
                                                     </label>
                                                     <input
                                                         type="password"
@@ -152,6 +163,8 @@ const LoginPage = () => {
                                                     />
 
                                                 </div>
+
+                                                {errorMessage && <p style={{ color: "red", textAlign: "center" }}>{errorMessage}</p>}
 
                                                 <div className="pt-1 mb-4">
                                                     <button

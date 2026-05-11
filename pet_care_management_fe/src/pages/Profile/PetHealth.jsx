@@ -58,14 +58,14 @@ const PetHealth = () => {
 
         } catch (error) {
             console.error("Error fetching pet health data:", error)
-            alert("KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u sá»©c khá»e thÃº cÆ°ng!")
+            alert("Không thể tải dữ liệu sức khỏe thú cưng!")
         } finally {
             setLoading(false)
         }
     }
 
     const handleDeleteRecord = async (recordId) => {
-        if (!window.confirm('Äá»“ng Ã½ xÃ³a há»“ sÆ¡ bá»‡nh Ã¡n nÃ y?')) {
+        if (!window.confirm('Đồng ý xóa hồ sơ bệnh án này?')) {
             return
         }
 
@@ -74,12 +74,12 @@ const PetHealth = () => {
             await axios.delete(`http://localhost:8080/api/medical-records/${recordId}`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             })
-            alert('XÃ³a há»“ sÆ¡ bá»‡nh Ã¡n thÃ nh cÃ´ng!')
+            alert('Xóa hồ sơ bệnh án thành công!')
             // Refresh data
             fetchPetHealthData(accessToken)
         } catch (error) {
             console.error("Error deleting record:", error)
-            alert('KhÃ´ng thá»ƒ xÃ³a há»“ sÆ¡ bá»‡nh Ã¡n!')
+            alert('Không thể xóa hồ sơ bệnh án!')
         }
     }
 
@@ -622,8 +622,8 @@ const PetHealth = () => {
                                     <div className="pet-details">
                                         <h3>{pet.name}</h3>
                                         <p className="text-muted mb-2">
-                                            {pet.species === "Dog" ? "ðŸ• ChÃ³" : pet.species === "Cat" ? "ðŸ± MÃ¨o" : pet.species} â€¢
-                                            {pet.breed} â€¢ {pet.age} tuá»•i
+                                            {pet.species === "Dog" ? "🐶 Chó" : pet.species === "Cat" ? "🐱 Mèo" : pet.species} •
+                                            {pet.breed} • {pet.age} tuổi
                                         </p>
                                     </div>
                                     <div

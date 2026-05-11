@@ -13,18 +13,24 @@ const RegisterPage = () => {
     const navigate = useNavigate();
 
     const handleRegister = async () => {
+        // Required fields: tên, email, mật khẩu
+        if (!userName || !email || !password || !repeatPassword) {
+            setError("Vui lòng nhập đầy đủ thông tin");
+            return;
+        }
+        // Invalid information (e.g., password mismatch)
         if (password !== repeatPassword) {
-            setError("Mật khẩu không khớp!");
+            setError("Vui lòng nhập đầy đủ thông tin");
             return;
         }
-        if (!gender) {
-            setError("Vui lòng chọn giới tính!");
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email.trim())) {
+            setError("Vui lòng nhập email đúng định dạng");
             return;
         }
-        if (!dob) {
-            setError("Vui lòng chọn ngày sinh!");
-            return;
-        }  
+
         setError("");
 
         try {
@@ -37,9 +43,18 @@ const RegisterPage = () => {
             });
             console.log("User registered:", res.data);
             navigate("/login");
-        } catch (error) {
-            console.error("Registration failed:", error);
-            setError("Đăng ký thất bại. Vui lòng thử lại!");
+        } catch (err) {
+            console.error("Registration failed:", err);
+            const serverMsg = err?.response?.data?.message
+                || (typeof err?.response?.data === "string" ? err.response.data : "")
+                || err?.message
+                || JSON.stringify(err?.response?.data || err) || "";
+
+            if (serverMsg) {
+                setError(serverMsg);
+            } else {
+                setError("Đăng ký thất bại. Vui lòng thử lại!");
+            }
         }
     };
 

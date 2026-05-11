@@ -498,7 +498,7 @@ const ProductManagementPage = () => {
         <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
             <div className="logo">
-              <span className="logo-icon">ðŸ“¦</span>
+
               {!collapsed && <span>Product Management</span>}
             </div>
           </div>

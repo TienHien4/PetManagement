@@ -139,13 +139,13 @@ const PetRegistrationForm = () => {
 
     if (
       (repaired.includes("kham") && repaired.includes("tong")) ||
-      raw.includes("khÃ¡m") ||
-      raw.includes("tá»•ng")
+      raw.includes("khám") ||
+      raw.includes("tổng")
     ) return "general"
 
-    if (repaired.includes("tiem") || repaired.includes("vaccine") || raw.includes("tiÃªm")) return "vaccine"
+    if (repaired.includes("tiem") || repaired.includes("vaccine") || raw.includes("tiêm")) return "vaccine"
 
-    if (repaired.includes("phau") || repaired.includes("surgery") || raw.includes("pháº«u")) return "surgery"
+    if (repaired.includes("phau") || repaired.includes("surgery") || raw.includes("phẫu")) return "surgery"
 
     if (repaired.includes("nha khoa") || repaired.includes("rang") || repaired.includes("dental")) return "dental"
 
@@ -153,15 +153,15 @@ const PetRegistrationForm = () => {
       repaired.includes("tam") ||
       repaired.includes("tia long") ||
       repaired.includes("groom") ||
-      raw.includes("táº¯m") ||
-      raw.includes("lá»")
+      raw.includes("tắm") ||
+      raw.includes("lông")
     ) return "grooming"
 
-    if (repaired.includes("sieu am") || repaired.includes("ultra") || raw.includes("siÃªu") || maybeUltrasound) return "ultrasound"
+    if (repaired.includes("sieu am") || repaired.includes("ultra") || raw.includes("siêu") || maybeUltrasound) return "ultrasound"
 
     if (repaired.includes("x quang") || repaired.includes("x-quang") || repaired.includes("xray") || raw.includes("x-quang")) return "xray"
 
-    if (repaired.includes("xet nghiem") || repaired.includes("mau") || repaired.includes("blood") || raw.includes("xÃ©t") || maybeBloodTest) return "blood"
+    if (repaired.includes("xet nghiem") || repaired.includes("mau") || repaired.includes("blood") || raw.includes("xét") || maybeBloodTest) return "blood"
 
     return "other"
   }

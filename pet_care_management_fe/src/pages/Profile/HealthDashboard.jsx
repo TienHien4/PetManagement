@@ -30,7 +30,7 @@ const HealthDashboard = () => {
       setPets(petsRes.data)
     } catch (error) {
       console.error("Error fetching pets:", error)
-      alert("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch thÃº cÆ°ng!")
+      alert("Không thể tải danh sách thú cưng!")
     } finally {
       setLoading(false)
     }
@@ -462,17 +462,17 @@ const HealthDashboard = () => {
             >
               <i className="bi bi-x-circle stat-icon text-danger"></i>
               <div className="stat-number">{filterCounts.critical}</div>
-              <p className="stat-label">Cáº§n khÃ¡m ngay</p>
+              <p className="stat-label">Cần khám ngay</p>
             </div>
           </div>
 
           <div className="pets-section">
             <div className="section-header">
               <h2 className="section-title">
-                {selectedFilter === 'all' ? 'Táº¥t cáº£ thÃº cÆ°ng' :
-                  selectedFilter === 'good' ? 'ThÃº cÆ°ng cÃ³ sá»©c khá»e tá»‘t' :
-                    selectedFilter === 'warning' ? 'ThÃº cÆ°ng cáº§n chÃº Ã½' :
-                      'ThÃº cÆ°ng cáº§n khÃ¡m ngay'} ({filteredPets.length})
+                {selectedFilter === 'all' ? 'Tất cả thú cưng' :
+                  selectedFilter === 'good' ? 'Thú cưng có sức khỏe tốt' :
+                    selectedFilter === 'warning' ? 'Thú cưng cần chú ý' :
+                      'Thú cưng cần khám ngay'} ({filteredPets.length})
               </h2>
             </div>
 
@@ -493,35 +493,35 @@ const HealthDashboard = () => {
                         <div className="pet-info">
                           <h5>{pet.name}</h5>
                           <p className="pet-details">
-                            {pet.species === "Dog" ? "ðŸ• ChÃ³" : pet.species === "Cat" ? "ðŸ± MÃ¨o" : pet.species} â€¢
-                            {pet.breed} â€¢ {pet.age} tuá»•i
+                            {pet.species === "Dog" ? "🐶 Chó" : pet.species === "Cat" ? "🐱 Mèo" : pet.species} •
+                            {pet.breed} • {pet.age} tuổi
                           </p>
                         </div>
                       </div>
 
                       <div className="health-indicators">
                         <div className="health-indicator">
-                          <div className="indicator-label">TÃ¬nh tráº¡ng sá»©c khá»e</div>
+                          <div className="indicator-label">Tình trạng sức khỏe</div>
                           <div className={`indicator-value text-${healthStatus.color}`}>
                             {healthStatus.text}
                           </div>
                         </div>
                         <div className="health-indicator">
-                          <div className="indicator-label">TiÃªm chá»§ng</div>
+                          <div className="indicator-label">Tiêm chủng</div>
                           <div className={`indicator-value text-${vaccinationStatus.color}`}>
                             {vaccinationStatus.text}
                           </div>
                         </div>
                         <div className="health-indicator">
-                          <div className="indicator-label">KhÃ¡m láº§n cuá»‘i</div>
+                          <div className="indicator-label">Khám lần cuối</div>
                           <div className="indicator-value">
-                            {healthStatus.days} ngÃ y trÆ°á»›c
+                            {healthStatus.days} ngày trước
                           </div>
                         </div>
                         <div className="health-indicator">
-                          <div className="indicator-label">CÃ¢n náº·ng</div>
+                          <div className="indicator-label">Cân nặng</div>
                           <div className="indicator-value">
-                            {pet.weight || 'ChÆ°a cáº­p nháº­t'} kg
+                            {pet.weight || 'Chưa cập nhật'} kg
                           </div>
                         </div>
                       </div>

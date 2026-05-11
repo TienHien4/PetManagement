@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useState } from "react"
 import axios from "axios"
@@ -72,7 +72,7 @@ const OrderManagement = () => {
       setFilteredOrders(response.data)
     } catch (err) {
       console.error("Error fetching orders:", err)
-      alert("KhÃ´ng thá»ƒ táº£i danh sÃ¡ch Ä‘Æ¡n hÃ ng!")
+      alert("Không thể tải danh sách đơn hàng!")
     } finally {
       setLoading(false)
     }
@@ -215,17 +215,17 @@ const OrderManagement = () => {
         }
       )
 
-      alert("Cáº­p nháº­t tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng!")
+      alert("Cập nhật trạng thái đơn hàng thành công!")
       closeEditModal()
       getOrders()
     } catch (error) {
       console.error("Error updating order:", error)
-      alert("KhÃ´ng thá»ƒ cáº­p nháº­t Ä‘Æ¡n hÃ ng. Vui lÃ²ng thá»­ láº¡i!")
+      alert("Không thể cập nhật đơn hàng. Vui lòng thử lại!")
     }
   }
 
   const handleDeleteOrder = async (orderId) => {
-    if (!window.confirm("Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a Ä‘Æ¡n hÃ ng nÃ y?")) {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) {
       return
     }
 
@@ -237,21 +237,21 @@ const OrderManagement = () => {
         },
       })
 
-      alert("XÃ³a Ä‘Æ¡n hÃ ng thÃ nh cÃ´ng!")
+      alert("Xóa đơn hàng thành công!")
       getOrders()
     } catch (error) {
       console.error("Error deleting order:", error)
-      alert("KhÃ´ng thá»ƒ xÃ³a Ä‘Æ¡n hÃ ng. Vui lÃ²ng thá»­ láº¡i!")
+      alert("Không thể xóa đơn hàng. Vui lòng thử lại!")
     }
   }
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      COMPLETED: { label: "HoÃ n thÃ nh", className: "bg-success" },
-      PENDING: { label: "Chá» xá»­ lÃ½", className: "bg-warning text-dark" },
-      PROCESSING: { label: "Äang xá»­ lÃ½", className: "bg-info" },
-      PAID: { label: "ÄÃ£ thanh toÃ¡n", className: "bg-primary" },
-      CANCELLED: { label: "ÄÃ£ há»§y", className: "bg-danger" },
+      COMPLETED: { label: "Hoàn thành", className: "bg-success" },
+      PENDING: { label: "Chờ xử lý", className: "bg-warning text-dark" },
+      PROCESSING: { label: "Đang xử lý", className: "bg-info" },
+      PAID: { label: "Đã thanh toán", className: "bg-primary" },
+      CANCELLED: { label: "Đã hủy", className: "bg-danger" },
     }
     const config = statusConfig[status] || statusConfig.PENDING
     return <span className={`badge ${config.className}`}>{config.label}</span>
@@ -894,7 +894,7 @@ const OrderManagement = () => {
         <div className={`sidebar ${collapsed ? "collapsed" : "expanded"}`}>
           <div className="sidebar-header">
             <div className="logo">
-              <span className="logo-icon">ðŸ¾</span>
+              <span className="logo-icon">🐾</span>
               {!collapsed && <span>Order Management</span>}
             </div>
           </div>
@@ -1161,7 +1161,7 @@ const OrderManagement = () => {
                 }}>
                   <div className="modal-content-custom">
                     <div className="modal-header-custom">
-                      <h3 className="modal-title">Chá»‰nh sá»­a Ä‘Æ¡n hÃ ng #{selectedOrder.orderId}</h3>
+                      <h3 className="modal-title">Chỉnh sửa đơn hàng #{selectedOrder.orderId}</h3>
                       <button className="btn-close-custom" onClick={closeEditModal}>
                         <X size={24} />
                       </button>
@@ -1169,27 +1169,27 @@ const OrderManagement = () => {
 
                     <form onSubmit={handleUpdateStatus}>
                       <div className="form-group">
-                        <label className="form-label">Tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng</label>
+                        <label className="form-label">Trạng thái đơn hàng</label>
                         <select
                           value={editStatus}
                           onChange={(e) => setEditStatus(e.target.value)}
                           className="form-control-custom"
                           required
                         >
-                          <option value="PENDING">Chá» xá»­ lÃ½</option>
-                          <option value="PAID">ÄÃ£ thanh toÃ¡n</option>
-                          <option value="PROCESSING">Äang xá»­ lÃ½</option>
-                          <option value="COMPLETED">HoÃ n thÃ nh</option>
-                          <option value="CANCELLED">ÄÃ£ há»§y</option>
+                          <option value="PENDING">Chờ xử lý</option>
+                          <option value="PAID">Đã thanh toán</option>
+                          <option value="PROCESSING">Đang xử lý</option>
+                          <option value="COMPLETED">Hoàn thành</option>
+                          <option value="CANCELLED">Đã hủy</option>
                         </select>
                       </div>
 
                       <div className="modal-footer-custom">
                         <button type="button" className="btn-cancel" onClick={closeEditModal}>
-                          Há»§y
+                          Hủy
                         </button>
                         <button type="submit" className="btn-submit">
-                          Cáº­p nháº­t
+                          Cập nhật
                         </button>
                       </div>
                     </form>
