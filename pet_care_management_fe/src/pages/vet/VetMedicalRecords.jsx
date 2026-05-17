@@ -16,6 +16,7 @@ const VetMedicalRecords = () => {
     const [showRecordModal, setShowRecordModal] = useState(false);
     const [showVaccinationModal, setShowVaccinationModal] = useState(false);
     const [activeTab, setActiveTab] = useState('pets');
+    const [currentVet, setCurrentVet] = useState(null);
 
     // Form states
     const [recordForm, setRecordForm] = useState({
@@ -42,11 +43,27 @@ const VetMedicalRecords = () => {
 
     useEffect(() => {
         fetchAllPets();
+        fetchCurrentVet();
     }, []);
 
-    const fetchAllPets = async () => {
-        setLoading(true);
+    const fetchCurrentVet = async () => {
         const token = localStorage.getItem('accessToken');
+        const userId = localStorage.getItem('userId');
+        if (!userId) return;
+
+        try {
+            const response = await axios.get(`http://localhost:8080/api/vet/getByUserId/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCurrentVet(response.data);
+        } catch (error) {
+            console.error('Error fetching current vet profile:', error);
+        }
+    };
+
+    const fetchAllPets = async () => {
+        const token = localStorage.getItem('accessToken');
+        setLoading(true);
 
         try {
             const response = await axios.get('http://localhost:8080/api/pet/getAllPet', {
@@ -92,8 +109,9 @@ const VetMedicalRecords = () => {
         setRecordForm({
             ...recordForm,
             petId: pet.id,
-            veterinarian: localStorage.getItem('userName') || '',
-            clinic: 'Veterinary Clinic'
+            veterinarian: currentVet ? currentVet.name : (localStorage.getItem('UserName') || ''),
+            clinic: currentVet ? currentVet.clinicAddress : 'Veterinary Clinic',
+            visitDate: new Date().toISOString().split('T')[0]
         });
         setShowRecordModal(true);
     };
@@ -103,8 +121,13 @@ const VetMedicalRecords = () => {
         setVaccinationForm({
             ...vaccinationForm,
             petId: pet.id,
-            veterinarian: localStorage.getItem('userName') || '',
-            clinic: 'Veterinary Clinic'
+            vaccineName: '',
+            vaccinationDate: new Date().toISOString().split('T')[0],
+            nextDueDate: '',
+            veterinarian: currentVet ? currentVet.name : (localStorage.getItem('UserName') || ''),
+            clinic: currentVet ? currentVet.clinicAddress : 'Veterinary Clinic',
+            batchNumber: '',
+            notes: ''
         });
         setShowVaccinationModal(true);
     };

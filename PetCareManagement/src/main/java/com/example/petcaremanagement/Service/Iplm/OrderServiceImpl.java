@@ -29,6 +29,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private ShoppingCartRepository shoppingCartRepository;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Transactional
     public OrderResponse placeOrder(OrderRequest request) {
@@ -105,22 +107,67 @@ public class OrderServiceImpl implements OrderService {
         for (Order order : orders) {
             OrderResponse orderResponse = new OrderResponse();
             orderResponse.setOrderId(order.getOrderId());
-            orderResponse.setUserId(order.getUser().getId());
+            if (order.getUser() != null) {
+                orderResponse.setUserId(order.getUser().getId());
+            }
             orderResponse.setOrderDate(order.getOrderDate());
             orderResponse.setTotalQuantity(order.getTotalQuantity());
             orderResponse.setTotalPrice(order.getTotalPrice());
             List<OrderItemResponse> itemResponses = new ArrayList<>();
-            for (OrderItem item : order.getOrderItems()) {
-                OrderItemResponse itemResponse = new OrderItemResponse();
-                itemResponse.setProductId(item.getProduct().getId());
-                itemResponse.setProductName(item.getProduct().getName());
-                itemResponse.setQuantity(item.getQuantity());
-                itemResponse.setPrice(item.getPrice());
-                itemResponses.add(itemResponse);
+            if (order.getOrderItems() != null) {
+                for (OrderItem item : order.getOrderItems()) {
+                    OrderItemResponse itemResponse = new OrderItemResponse();
+                    itemResponse.setProductId(item.getProduct().getId());
+                    itemResponse.setProductName(item.getProduct().getName());
+                    itemResponse.setQuantity(item.getQuantity());
+                    itemResponse.setPrice(item.getPrice());
+                    itemResponses.add(itemResponse);
+                }
             }
             orderResponse.setItems(itemResponses);
             result.add(orderResponse);
         }
+
+        // Add completed appointment revenues as virtual orders
+        try {
+            List<Appointment> appointments = appointmentRepository.findAll();
+            for (Appointment appt : appointments) {
+                if ("COMPLETED".equalsIgnoreCase(appt.getStatus())) {
+                    OrderResponse apptOrder = new OrderResponse();
+                    apptOrder.setOrderId(-appt.getId()); // Use negative ID to distinguish virtual orders
+                    if (appt.getUser() != null) {
+                        apptOrder.setUserId(appt.getUser().getId());
+                    }
+                    
+                    // Convert java.util.Date to LocalDateTime
+                    if (appt.getDate() != null) {
+                        java.time.Instant instant = appt.getDate().toInstant();
+                        java.time.ZoneId zone = java.time.ZoneId.systemDefault();
+                        apptOrder.setOrderDate(java.time.LocalDateTime.ofInstant(instant, zone));
+                    }
+                    
+                    // Calculate total price of all services in this completed appointment
+                    double apptTotalPrice = 0.0;
+                    int apptTotalQuantity = 0;
+                    if (appt.getServices() != null) {
+                        apptTotalQuantity = appt.getServices().size();
+                        for (ServicesType svc : appt.getServices()) {
+                            apptTotalPrice += svc.getPrice();
+                        }
+                    }
+                    
+                    apptOrder.setTotalQuantity(apptTotalQuantity);
+                    apptOrder.setTotalPrice(apptTotalPrice);
+                    apptOrder.setStatus("COMPLETED");
+                    apptOrder.setItems(new ArrayList<>()); // Empty list of items for virtual orders
+                    
+                    result.add(apptOrder);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error adding appointment revenue: " + e.getMessage());
+        }
+
         return result;
     }
 

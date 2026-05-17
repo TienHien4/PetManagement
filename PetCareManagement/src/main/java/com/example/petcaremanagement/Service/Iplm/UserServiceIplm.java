@@ -72,12 +72,11 @@ public class UserServiceIplm implements UserService {
     }
 
     private boolean isValidEmail(String email) {
-        if (email == null) return false;
+        if (email == null)
+            return false;
         String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
         return email.matches(regex);
     }
-
-
 
     @Override
     public List<UserResponse> GetAllUser() {
@@ -188,8 +187,14 @@ public class UserServiceIplm implements UserService {
     }
 
     @Override
-    public List<User> getAllVets() {
-        return userRepo.findDistinctByRoles_Name("VET");
+    public List<UserResponse> getAllVets() {
+        return userRepo.findUsersByRoleName("VET").stream()
+                .map(user -> {
+                    UserResponse resp = userMapper.toUserResponse(user);
+                    resp.setRoles(user.getRoles());
+                    return resp;
+                })
+                .collect(Collectors.toList());
     }
 
 }

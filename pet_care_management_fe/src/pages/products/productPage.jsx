@@ -8,7 +8,6 @@ import Footer from '../../components/home/Footer';
 const ProductPage = () => {
     const navigate = useNavigate();
 
-
     const [activeTab, setActiveTab] = useState('tab-1');
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -17,6 +16,10 @@ const ProductPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [modalImageError, setModalImageError] = useState(false);
     const [productImageErrors, setProductImageErrors] = useState(new Map());
+
+    // Phân trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 8; // 8 sản phẩm mỗi trang (2 hàng x 4 cột)
 
     useEffect(() => {
         // Thử lấy từ cả hai cách lưu token  
@@ -32,14 +35,10 @@ const ProductPage = () => {
             const res = await axios.get('/api/product/getAllProduct', {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
-            // Backend đã trả về field 'image' trực tiếp, không cần chuyển đổi
             console.log('=== ALL PRODUCTS FROM API ===');
             console.log('Total products:', res.data.length);
-            console.log('Products:', res.data);
-            console.log('Product types:', res.data.map(p => ({ id: p.id, name: p.name, type: p.type })));
             setProducts(res.data);
             setLoading(false);
-            // Reset product image errors when products change
             setProductImageErrors(new Map());
         } catch (err) {
             console.error('Error loading products:', err);
@@ -48,8 +47,10 @@ const ProductPage = () => {
         }
     };
 
-
-    const handleTabChange = (tab) => setActiveTab(tab);
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        setCurrentPage(1); // Reset về trang 1 khi đổi danh mục
+    };
 
     // Hiển thị modal chi tiết sản phẩm
     const handleViewDetail = (product) => {
@@ -84,13 +85,11 @@ const ProductPage = () => {
         });
     }, []);
 
-    // Thêm sản phẩm vào giỏ hàng (theo chuẩn BE mới: trả về CartItemResponse, xử lý lỗi rõ ràng)
+    // Thêm sản phẩm vào giỏ hàng
     const handleAddToCart = async (product) => {
-        // Thử lấy từ cả hai cách lưu token
         let accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token')
         let userId = localStorage.getItem('userId')
 
-        // Nếu không có userId, thử lấy từ user object
         if (!userId) {
             const user = localStorage.getItem('user')
             if (user) {
@@ -102,10 +101,6 @@ const ProductPage = () => {
                 }
             }
         }
-
-        console.log("AddToCart - Token:", accessToken ? "Available" : "Missing")
-        console.log("AddToCart - UserId:", userId ? userId : "Missing")
-        console.log("AddToCart - Product:", product)
 
         if (!userId) {
             alert('Bạn cần đăng nhập để thêm vào giỏ hàng!');
@@ -120,8 +115,7 @@ const ProductPage = () => {
         }
 
         try {
-            // BE mới: trả về CartItemResponse, không cần check lại dữ liệu trả về ở đây
-            const response = await axios.post(
+            await axios.post(
                 '/api/shopping-cart/add',
                 { quantity: 1 },
                 {
@@ -129,17 +123,8 @@ const ProductPage = () => {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 }
             );
-            console.log("Add to cart response:", response.data)
-
-            // Trigger cart count update
             window.dispatchEvent(new CustomEvent('cartUpdated'));
-
-            // Hiển thị thông báo chi tiết và hướng dẫn
-            const confirmCheckout = window.confirm(
-                `Đã thêm "${product.name}" vào giỏ hàng!\n\n`
-            )
-
-
+            window.confirm(`Đã thêm "${product.name}" vào giỏ hàng!`);
         } catch (err) {
             if (err.response && err.response.status === 401) {
                 alert('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!');
@@ -151,6 +136,25 @@ const ProductPage = () => {
             }
         }
     };
+
+    // --- Xử lý lọc danh mục & phân trang ---
+    const filteredProducts = products.filter(product => {
+        if (!product.type) return activeTab === 'tab-1';
+        const normalizedType = product.type.trim().toLowerCase();
+        if (activeTab === 'tab-2') return normalizedType === 'thức ăn';
+        // Hỗ trợ cả phụ kiện và vật dụng ở tab Phụ kiện
+        if (activeTab === 'tab-3') return normalizedType === 'phụ kiện' || normalizedType === 'vật dụng';
+        return true;
+    });
+
+    const totalPages = Math.ceil(filteredProducts.length / pageSize);
+    const safeCurrentPage = Math.min(currentPage, Math.max(totalPages, 1));
+
+    // Cắt danh sách sản phẩm hiển thị riêng trang hiện tại
+    const paginatedProducts = filteredProducts.slice(
+        (safeCurrentPage - 1) * pageSize,
+        safeCurrentPage * pageSize
+    );
 
     return (
         <div>
@@ -165,7 +169,6 @@ const ProductPage = () => {
                     </div>
                 </div>
                 <div className="container">
-                    {/* Tabs and product list always rendered, filter in .map */}
                     <div className="tab-content" style={{ minHeight: 600 }}>
                         <div className="tab-pane fade show active" style={{ minHeight: 600 }}>
                             {loading ? (
@@ -180,40 +183,25 @@ const ProductPage = () => {
                                 <>
                                     <div className="row g-4 justify-content-center align-items-stretch" style={{ minHeight: 500 }}>
                                         {(() => {
-                                            const filtered = products.filter(product => {
-                                                if (!product.type) return activeTab === 'tab-1';
-                                                const normalizedType = product.type.trim().toLowerCase();
-                                                if (activeTab === 'tab-2') return normalizedType === 'thức ăn';
-                                                if (activeTab === 'tab-3') return normalizedType === 'phụ kiện';
-                                                return true;
-                                            });
-
-                                            console.log('=== FILTER RESULT ===');
-                                            console.log('Active Tab:', activeTab);
-                                            console.log('Total products:', products.length);
-                                            console.log('Filtered products:', filtered.length);
-                                            console.log('Filtered items:', filtered.map(p => ({ id: p.id, name: p.name, type: p.type })));
-                                            // Đảm bảo luôn render đủ 4 cột (dù thiếu sản phẩm)
                                             const colCount = 4;
                                             const rows = [];
-                                            // Đảm bảo luôn có ít nhất 2 hàng (8 slot) để layout không bị co lại khi ít sản phẩm
                                             const minRows = 2;
-                                            const totalSlots = Math.max(filtered.length, colCount * minRows);
+                                            const totalSlots = Math.max(paginatedProducts.length, colCount * minRows);
                                             for (let i = 0; i < totalSlots; i += colCount) {
-                                                const rowItems = filtered.slice(i, i + colCount);
+                                                const rowItems = paginatedProducts.slice(i, i + colCount);
                                                 while (rowItems.length < colCount) {
                                                     rowItems.push(null);
                                                 }
                                                 rows.push(rowItems);
                                             }
-                                            if (filtered.length === 0) {
+                                            if (filteredProducts.length === 0) {
                                                 return <div className="col-12 text-center">Không có sản phẩm nào.</div>;
                                             }
                                             return rows.map((row, rowIdx) => (
                                                 <React.Fragment key={rowIdx}>
                                                     {row.map((product, idx) => product ? (
                                                         <div key={product.id} className="col-xl-3 col-lg-4 col-md-6 d-flex align-items-stretch">
-                                                            <div className="card shadow-sm h-100 w-100 product-card border-0 d-flex flex-column" style={{ minHeight: 390, maxHeight: 390, height: 390 }}>
+                                                            <div className="card shadow-sm h-100 w-100 product-card border-0 d-flex flex-column" style={{ minHeight: 390, maxHeight: 390, height: 390, overflow: 'hidden' }}>
                                                                 <div className="position-relative bg-light overflow-hidden" style={{ height: 180, minHeight: 180, maxHeight: 180 }}>
                                                                     <img
                                                                         className="img-fluid w-100 h-100 object-fit-cover product-img"
@@ -226,14 +214,29 @@ const ProductPage = () => {
                                                                         <span className="badge bg-danger position-absolute top-0 end-0 m-2">-{product.salePercent}%</span>
                                                                     )}
                                                                 </div>
-                                                                <div className="card-body text-center flex-grow-1 d-flex flex-column justify-content-between p-2" style={{ minHeight: 120, maxHeight: 120, height: 120 }}>
-                                                                    <div className="d-block h5 mb-2 text-dark text-decoration-none text-truncate" style={{ minHeight: 32, maxHeight: 32, overflow: 'hidden' }}>
+                                                                <div className="card-body text-center flex-grow-1 d-flex flex-column justify-content-between p-2" style={{ minHeight: 120, maxHeight: 120, height: 120, overflow: 'hidden' }}>
+                                                                    <div
+                                                                        className="h6 mb-2 text-dark text-decoration-none fw-semibold"
+                                                                        title={product.name}
+                                                                        style={{
+                                                                            display: '-webkit-box',
+                                                                            WebkitLineClamp: 2,
+                                                                            WebkitBoxOrient: 'vertical',
+                                                                            overflow: 'hidden',
+                                                                            textOverflow: 'ellipsis',
+                                                                            height: '40px',
+                                                                            minHeight: '40px',
+                                                                            maxHeight: '40px',
+                                                                            lineHeight: '20px',
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                    >
                                                                         {product.name}
                                                                     </div>
                                                                     <div>
                                                                         <span className="text-success fw-bold me-1">{product.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                                                                         {product.salePercent > 0 && (
-                                                                            <span className="text-muted text-decoration-line-through ms-2">{(product.price / (1 - product.salePercent / 100)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                                            <span className="text-muted text-decoration-line-through ms-2" style={{ fontSize: '0.85rem' }}>{(product.price / (1 - product.salePercent / 100)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
                                                                         )}
                                                                     </div>
                                                                 </div>
@@ -258,6 +261,46 @@ const ProductPage = () => {
                                             ));
                                         })()}
                                     </div>
+
+                                    {/* Hộp phân trang (Pagination) */}
+                                    {totalPages > 1 && (
+                                        <div className="d-flex justify-content-center align-items-center mt-5 mb-3 gap-2">
+                                            <button
+                                                className="btn btn-outline-success d-flex align-items-center justify-content-center"
+                                                style={{ width: '40px', height: '40px', borderRadius: '50%', fontWeight: '600' }}
+                                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                                disabled={safeCurrentPage === 1}
+                                                title="Trang trước"
+                                            >
+                                                <i className="fa fa-chevron-left" style={{ fontSize: '12px' }}></i>
+                                            </button>
+
+                                            {Array.from({ length: totalPages }, (_, index) => {
+                                                const pageNum = index + 1;
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        className={`btn d-flex align-items-center justify-content-center ${safeCurrentPage === pageNum ? 'btn-success text-white' : 'btn-outline-success'}`}
+                                                        style={{ width: '40px', height: '40px', borderRadius: '50%', fontWeight: '600', transition: 'all 0.2s' }}
+                                                        onClick={() => setCurrentPage(pageNum)}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            })}
+
+                                            <button
+                                                className="btn btn-outline-success d-flex align-items-center justify-content-center"
+                                                style={{ width: '40px', height: '40px', borderRadius: '50%', fontWeight: '600' }}
+                                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                                disabled={safeCurrentPage === totalPages}
+                                                title="Trang sau"
+                                            >
+                                                <i className="fa fa-chevron-right" style={{ fontSize: '12px' }}></i>
+                                            </button>
+                                        </div>
+                                    )}
+
                                     <div className="d-flex justify-content-center mt-4">
                                         <ul className="nav nav-pills">
                                             <li className="nav-item">

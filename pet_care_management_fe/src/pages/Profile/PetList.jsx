@@ -13,7 +13,7 @@ const PetList = () => {
   const [deleting, setDeleting] = useState(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [petsPerPage] = useState(6)
+  const [petsPerPage] = useState(8)
 
   useEffect(() => {
     const userId = localStorage.getItem("userId")

@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class ChatRequest {
     private String message;
     private String conversationId; // Optional: để track conversation
+    private Long userId; // Để chatbot có thể truy vấn dữ liệu cá nhân
 }

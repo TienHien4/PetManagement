@@ -11,4 +11,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             " OR p.description LIKE CONCAT('%', ?1, '%')" +
             " OR p.type LIKE CONCAT('%', ?1, '%')")
     List<Product> searchSP(String keyword);
+
+    List<Product> findByType(String type);
 }

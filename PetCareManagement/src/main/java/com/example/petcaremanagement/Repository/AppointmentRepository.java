@@ -40,4 +40,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT a FROM Appointment a WHERE a.vet.user.email = :email AND DATE(a.date) = :date")
     List<Appointment> findByVetEmailAndDate(@Param("email") String email, @Param("date") Date date);
+
+    List<Appointment> findByUserId(Long userId);
 }

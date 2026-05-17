@@ -4,6 +4,7 @@ import com.example.petcaremanagement.Entity.Pet;
 import com.example.petcaremanagement.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,7 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT user FROM User user WHERE user.userName LIKE CONCAT('%', ?1, '%')" +
             " OR user.email LIKE CONCAT('%', ?1, '%')")
     List<User> searchUser(String keyword);
-    List<User> findDistinctByRoles_Name(String roleName);
+    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.name = :roleName")
+    List<User> findUsersByRoleName(@Param("roleName") String roleName);
 
     @Query("SELECT u FROM User u WHERE u.vet IS NOT NULL")
     List<User> findAllUsersWithVetProfile();

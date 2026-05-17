@@ -14,4 +14,7 @@ public interface VetRepository extends JpaRepository<Vet, Long> {
 
     @Query("SELECT v FROM Vet v WHERE v.user.email = :email")
     Optional<Vet> findByUserEmail(@Param("email") String email);
+
+    @Query("SELECT v FROM Vet v WHERE v.user.id = :userId")
+    Optional<Vet> findByUserId(@Param("userId") long userId);
 }

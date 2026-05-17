@@ -20,4 +20,6 @@ public interface VetService {
     Page<VetResponse> Pagination(int pageNo, int pageSize);
 
     VetResponse getVetByEmail(String email);
+
+    VetResponse getVetByUserId(long userId);
 }

@@ -43,6 +43,7 @@ import VNPayReturn from '../pages/Payment/VNPayReturn';
 // Route Components
 import ProtectedRoute from '../components/ProtectedRoute';
 import RoleBasedRedirect from '../components/RoleBasedRedirect';
+import FloatingChatButton from '../components/FloatingChatButton';
 
 
 const AppRouter = () => {
@@ -184,6 +185,7 @@ const AppRouter = () => {
                     </div>
                 } />
             </Routes>
+            <FloatingChatButton />
         </Router>
     );
 };

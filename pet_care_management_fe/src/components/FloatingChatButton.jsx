@@ -85,8 +85,23 @@ const FloatingChatButton = () => {
         }
     };
 
-    // Ẩn nút chat nếu chưa đăng nhập hoặc đang ở trang login/register
-    if (!isLoggedIn || location.pathname === '/login' || location.pathname === '/register') {
+    // Ẩn nút chat nếu chưa đăng nhập, đang ở trang login/register, hoặc là ADMIN
+    const getUserRoles = () => {
+        const userData = localStorage.getItem('user');
+        if (userData && userData !== 'null') {
+            try {
+                const user = JSON.parse(userData);
+                return user.roles || [];
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        return [];
+    };
+
+    const roles = getUserRoles();
+
+    if (!isLoggedIn || location.pathname === '/login' || location.pathname === '/register' || roles.includes('ADMIN')) {
         return null;
     }
 

@@ -1,4 +1,4 @@
-﻿/* Chatbot Toggle Button */
+/* Chatbot Toggle Button */
 .chatbot-toggle {
     position: fixed;
     bottom: 30px;
@@ -31,10 +31,11 @@
 /* Chatbot Window */
 .chatbot-window {
     position: fixed;
-    bottom: 100px;
+    bottom: 80px;
     right: 30px;
-    width: 380px;
-    height: 600px;
+    width: 720px;
+    height: 800px;
+    max-height: calc(100vh - 120px);
     background: white;
     border-radius: 20px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
@@ -195,7 +196,7 @@
 }
 
 .message-content {
-    max-width: 70%;
+    max-width: 85%;
 }
 
 .message.user .message-content {
@@ -210,6 +211,7 @@
     line-height: 1.5;
     white-space: pre-wrap;
     word-wrap: break-word;
+    text-align: left;
 }
 
 .message.assistant .message-bubble {
@@ -282,7 +284,7 @@
 
 .quick-questions-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 8px;
 }
 

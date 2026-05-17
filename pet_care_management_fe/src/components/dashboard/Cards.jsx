@@ -4,7 +4,6 @@ import "../../assets/css/Cards.css";
 import axios from '../../services/customizeAxios'
 
 function Cards() {
-  const [userActive, setUserActive] = useState(0)
   const [petAmount, setPetAmount] = useState(0)
   const [vetAmount, setVetAmount] = useState(0)
   const accessToken = localStorage.getItem("accessToken")
@@ -16,10 +15,6 @@ function Cards() {
       })
       setPetAmount(res1.data.length)
 
-      // const res2 = await axios.get("/api/user/getAll", {
-      //   headers: {Authorization: `Bearer ${accessToken}`}
-      // })
-      // setPetAmount(res1.data.length)
       const res3 = await axios.get("/api/vet/getAllVet", {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
@@ -36,13 +31,6 @@ function Cards() {
         <div className="text">
           <span className="value">{petAmount}</span>
           <span className="label">Thú cưng đã đăng ký</span>
-        </div>
-      </div>
-      <div className="card">
-        <i className="fas fa-user icon white"></i>
-        <div className="text">
-          <span className="value">-</span>
-          <span className="label">Khách hàng đang hoạt động</span>
         </div>
       </div>
       <div className="card">

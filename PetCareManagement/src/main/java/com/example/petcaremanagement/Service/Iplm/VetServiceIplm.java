@@ -75,4 +75,11 @@ public class VetServiceIplm implements VetService {
                 .orElseThrow(() -> new RuntimeException("Vet not found with user email: " + email));
         return vetMapper.toVetResponse(vet);
     }
+
+    @Override
+    public VetResponse getVetByUserId(long userId) {
+        Vet vet = vetRepo.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Vet not found with user ID: " + userId));
+        return vetMapper.toVetResponse(vet);
+    }
 }

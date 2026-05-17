@@ -4,8 +4,11 @@ import com.example.petcaremanagement.Dto.Request.MedicalRecordRequest;
 import com.example.petcaremanagement.Dto.Response.MedicalRecordResponse;
 import com.example.petcaremanagement.Entity.MedicalRecord;
 import com.example.petcaremanagement.Entity.Pet;
+import com.example.petcaremanagement.Entity.User;
+import com.example.petcaremanagement.Entity.Vet;
 import com.example.petcaremanagement.Repository.MedicalRecordRepository;
 import com.example.petcaremanagement.Repository.PetRepository;
+import com.example.petcaremanagement.Repository.UserRepository;
 import com.example.petcaremanagement.Service.MedicalRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     private final MedicalRecordRepository medicalRecordRepository;
     private final PetRepository petRepository;
+    private final UserRepository userRepository;
 
     @Override
     public MedicalRecordResponse createMedicalRecord(MedicalRecordRequest request) {
@@ -37,13 +41,35 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet not found with ID: " + request.getPetId()));
 
+        String veterinarian = request.getVeterinarian();
+        String clinic = request.getClinic();
+
+        try {
+            var authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                String username = authentication.getName();
+                User user = userRepository.findUserByUserName(username);
+                if (user != null && user.getVet() != null) {
+                    Vet vet = user.getVet();
+                    if (veterinarian == null || veterinarian.trim().isEmpty() || veterinarian.equals("Veterinary Clinic") || veterinarian.equalsIgnoreCase(user.getUserName())) {
+                        veterinarian = vet.getName();
+                    }
+                    if (clinic == null || clinic.trim().isEmpty() || clinic.equals("Veterinary Clinic")) {
+                        clinic = vet.getClinicAddress();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+
         MedicalRecord medicalRecord = MedicalRecord.builder()
                 .pet(pet)
                 .visitDate(request.getRecordDate())
                 .diagnosis(request.getDiagnosis().trim())
                 .treatment(request.getTreatment() != null ? request.getTreatment().trim() : null)
-                .veterinarian(request.getVeterinarian() != null ? request.getVeterinarian().trim() : null)
-                .clinic(request.getClinic() != null ? request.getClinic().trim() : null)
+                .veterinarian(veterinarian != null ? veterinarian.trim() : null)
+                .clinic(clinic != null ? clinic.trim() : null)
                 .symptoms(request.getSymptoms() != null ? request.getSymptoms().trim() : null)
                 .notes(request.getNotes() != null ? request.getNotes().trim() : null)
                 .createdAt(new Date())
@@ -66,11 +92,33 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         MedicalRecord medicalRecord = medicalRecordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Medical record not found with ID: " + id));
 
+        String veterinarian = request.getVeterinarian();
+        String clinic = request.getClinic();
+
+        try {
+            var authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                String username = authentication.getName();
+                User user = userRepository.findUserByUserName(username);
+                if (user != null && user.getVet() != null) {
+                    Vet vet = user.getVet();
+                    if (veterinarian == null || veterinarian.trim().isEmpty() || veterinarian.equals("Veterinary Clinic") || veterinarian.equalsIgnoreCase(user.getUserName())) {
+                        veterinarian = vet.getName();
+                    }
+                    if (clinic == null || clinic.trim().isEmpty() || clinic.equals("Veterinary Clinic")) {
+                        clinic = vet.getClinicAddress();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+
         medicalRecord.setVisitDate(request.getRecordDate());
         medicalRecord.setDiagnosis(request.getDiagnosis().trim());
         medicalRecord.setTreatment(request.getTreatment() != null ? request.getTreatment().trim() : null);
-        medicalRecord.setVeterinarian(request.getVeterinarian() != null ? request.getVeterinarian().trim() : null);
-        medicalRecord.setClinic(request.getClinic() != null ? request.getClinic().trim() : null);
+        medicalRecord.setVeterinarian(veterinarian != null ? veterinarian.trim() : null);
+        medicalRecord.setClinic(clinic != null ? clinic.trim() : null);
         medicalRecord.setSymptoms(request.getSymptoms() != null ? request.getSymptoms().trim() : null);
         medicalRecord.setNotes(request.getNotes() != null ? request.getNotes().trim() : null);
 

@@ -3,8 +3,11 @@ package com.example.petcaremanagement.Service.Iplm;
 import com.example.petcaremanagement.Dto.Request.VaccinationRequest;
 import com.example.petcaremanagement.Dto.Response.VaccinationResponse;
 import com.example.petcaremanagement.Entity.Pet;
+import com.example.petcaremanagement.Entity.User;
 import com.example.petcaremanagement.Entity.Vaccination;
+import com.example.petcaremanagement.Entity.Vet;
 import com.example.petcaremanagement.Repository.PetRepository;
+import com.example.petcaremanagement.Repository.UserRepository;
 import com.example.petcaremanagement.Repository.VaccinationRepository;
 import com.example.petcaremanagement.Service.VaccinationService;
 import lombok.RequiredArgsConstructor;
@@ -20,19 +23,42 @@ public class VaccinationServiceImpl implements VaccinationService {
 
     private final VaccinationRepository vaccinationRepository;
     private final PetRepository petRepository;
+    private final UserRepository userRepository;
 
     @Override
     public VaccinationResponse createVaccination(VaccinationRequest request) {
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new RuntimeException("Pet not found"));
 
+        String veterinarian = request.getVeterinarian();
+        String clinic = request.getClinic();
+
+        try {
+            var authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                String username = authentication.getName();
+                User user = userRepository.findUserByUserName(username);
+                if (user != null && user.getVet() != null) {
+                    Vet vet = user.getVet();
+                    if (veterinarian == null || veterinarian.trim().isEmpty() || veterinarian.equals("Veterinary Clinic") || veterinarian.equalsIgnoreCase(user.getUserName())) {
+                        veterinarian = vet.getName();
+                    }
+                    if (clinic == null || clinic.trim().isEmpty() || clinic.equals("Veterinary Clinic")) {
+                        clinic = vet.getClinicAddress();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+
         Vaccination vaccination = Vaccination.builder()
                 .pet(pet)
                 .vaccineName(request.getVaccineName())
                 .vaccinationDate(request.getVaccinationDate())
                 .nextDueDate(request.getNextDueDate())
-                .veterinarian(request.getVeterinarian())
-                .clinic(request.getClinic())
+                .veterinarian(veterinarian)
+                .clinic(clinic)
                 .batchNumber(request.getBatchNumber())
                 .notes(request.getNotes())
                 .createdAt(new Date())
@@ -47,11 +73,33 @@ public class VaccinationServiceImpl implements VaccinationService {
         Vaccination vaccination = vaccinationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vaccination not found"));
 
+        String veterinarian = request.getVeterinarian();
+        String clinic = request.getClinic();
+
+        try {
+            var authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                String username = authentication.getName();
+                User user = userRepository.findUserByUserName(username);
+                if (user != null && user.getVet() != null) {
+                    Vet vet = user.getVet();
+                    if (veterinarian == null || veterinarian.trim().isEmpty() || veterinarian.equals("Veterinary Clinic") || veterinarian.equalsIgnoreCase(user.getUserName())) {
+                        veterinarian = vet.getName();
+                    }
+                    if (clinic == null || clinic.trim().isEmpty() || clinic.equals("Veterinary Clinic")) {
+                        clinic = vet.getClinicAddress();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+
         vaccination.setVaccineName(request.getVaccineName());
         vaccination.setVaccinationDate(request.getVaccinationDate());
         vaccination.setNextDueDate(request.getNextDueDate());
-        vaccination.setVeterinarian(request.getVeterinarian());
-        vaccination.setClinic(request.getClinic());
+        vaccination.setVeterinarian(veterinarian);
+        vaccination.setClinic(clinic);
         vaccination.setBatchNumber(request.getBatchNumber());
         vaccination.setNotes(request.getNotes());
 

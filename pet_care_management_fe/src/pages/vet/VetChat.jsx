@@ -154,7 +154,13 @@ const VetChat = () => {
             {/* Back button */}
             <button
                 className="chat-back-button"
-                onClick={() => navigate(-1)}
+                onClick={() => {
+                    if (window.history.state && window.history.state.idx > 0) {
+                        navigate(-1);
+                    } else {
+                        navigate('/vet/dashboard');
+                    }
+                }}
                 title="Quay lại"
             >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

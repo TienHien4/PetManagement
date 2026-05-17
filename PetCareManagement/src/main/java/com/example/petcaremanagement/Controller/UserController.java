@@ -94,8 +94,8 @@ public class UserController {
     }
 
     @GetMapping("/vets")
-    public ResponseEntity<List<User>> getAllVets() {
-        List<User> vets = userService.getAllVets();
+    public ResponseEntity<List<UserResponse>> getAllVets() {
+        List<UserResponse> vets = userService.getAllVets();
         return ResponseEntity.ok(vets);
     }
 
